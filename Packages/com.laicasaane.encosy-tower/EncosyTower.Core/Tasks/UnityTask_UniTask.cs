@@ -1,0 +1,448 @@
+#if UNITASK && !ENCOSY_UNITYTASK_AWAITABLE
+
+using System;
+using System.Runtime.CompilerServices;
+using Cysharp.Threading.Tasks;
+
+namespace EncosyTower.Tasks
+{
+    public readonly partial struct UnityTask
+    {
+        private readonly UniTask _task;
+
+        /// <summary>
+        /// Wraps <paramref name="task"/> without further processing.
+        /// </summary>
+        /// <param name="task">The native task to wrap.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal UnityTask(UniTask task)
+            => _task = task;
+
+        /// <summary>
+        /// Gets a value that indicates whether the task has completed and can be awaited on the current thread without
+        /// suspending.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <b>Thread:</b> returns <c>false</c> when the task is done but the current thread kind (main or thread pool)
+        /// differs from the kind of thread that created it; awaiting it then resumes on the creator's thread kind.
+        /// </para>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Status</c> (through its awaiter); Unity:
+        /// <see cref="UnityEngine.Awaitable.IsCompleted"/>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this reads <c>UniTask.Awaiter.IsCompleted</c>; on the
+        /// <c>Awaitable</c> backend it reads the EncosyTower task source, never <c>Awaitable.IsCompleted</c>.
+        /// </para>
+        /// </remarks>
+        public bool IsCompleted
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _task.GetAwaiter().IsCompleted;
+        }
+
+        /// <summary>
+        /// Gets the current state of the task.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <b>Thread:</b> returns <see cref="UnityTaskStatus.Pending"/> when the task is done but the current thread
+        /// kind (main or thread pool) differs from the kind of thread that created it, as <see cref="IsCompleted"/>
+        /// does.
+        /// </para>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Status</c>; Unity: none, because
+        /// <see cref="UnityEngine.Awaitable"/> exposes only <c>IsCompleted</c>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this maps <c>UniTask.Status</c> (same values); on the
+        /// <c>Awaitable</c> backend it reads the EncosyTower task source.
+        /// </para>
+        /// </remarks>
+        public UnityTaskStatus Status
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => (UnityTaskStatus)_task.Status;
+        }
+
+        /// <summary>
+        /// Converts a native <see cref="UniTask"/> to a <see cref="UnityTask"/>.
+        /// </summary>
+        /// <param name="task">The native task to wrap.</param>
+        /// <remarks>
+        /// <para>
+        /// <b>Interop:</b> a task converted from <see cref="UniTask"/> follows native UniTask behaviour; the
+        /// <see cref="UnityTask"/> behaviour contract does not apply to it.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> only the selected backend's conversion exists: from <c>UniTask</c> on the UniTask backend,
+        /// from <c>Awaitable</c> on the <c>Awaitable</c> backend.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator UnityTask(UniTask task)
+            => new(task);
+
+        /// <summary>
+        /// Returns a task that has already succeeded with <paramref name="value"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the result.</typeparam>
+        /// <param name="value">The result of the completed task.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static UnityTask<T> CreateFromResult<T>(T value)
+            => new(UniTask.FromResult(value));
+
+        /// <summary>
+        /// Creates a task that reads <paramref name="source"/> through <paramref name="token"/>.
+        /// </summary>
+        /// <param name="source">The source that produces the outcome.</param>
+        /// <param name="token">The version of <paramref name="source"/> that this task was created with.</param>
+        /// <remarks>
+        /// Used by the EncosyTower source classes on the UniTask backend, where each one implements
+        /// <c>IUniTaskSource</c>. The <c>UniTask</c> constructor stores the source and the token as given.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static UnityTask FromSource(IUniTaskSource source, short token)
+            => new(new UniTask(source, token));
+
+        /// <summary>
+        /// Creates a task that reads <paramref name="source"/> through <paramref name="token"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the result.</typeparam>
+        /// <param name="source">The source that produces the result.</param>
+        /// <param name="token">The version of <paramref name="source"/> that this task was created with.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static UnityTask<T> FromSource<T>(IUniTaskSource<T> source, short token)
+            => new(new UniTask<T>(source, token));
+
+        /// <summary>
+        /// Returns an awaiter for this task.
+        /// </summary>
+        /// <returns>An awaiter for this task.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.GetAwaiter</c>; Unity:
+        /// <see cref="UnityEngine.Awaitable.GetAwaiter"/>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend the awaiter wraps <c>UniTask.Awaiter</c>; on the <c>Awaitable</c>
+        /// backend it reads the EncosyTower task source directly.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Awaiter GetAwaiter()
+            => new(_task.GetAwaiter());
+
+        /// <summary>
+        /// Returns the native <see cref="UniTask"/> that backs this task.
+        /// </summary>
+        /// <returns>The backing native task.</returns>
+        /// <remarks>
+        /// <b>Interop:</b> the native task follows native UniTask behaviour; the <see cref="UnityTask"/> behaviour
+        /// contract does not apply to operations performed on it.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public UniTask AsUniTask()
+            => _task;
+
+        /// <summary>
+        /// Returns a task that can be awaited more than once and returns the same outcome each time.
+        /// </summary>
+        /// <returns>A task that stores the outcome of this task.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Behaviour:</b> the first await consumes this task; later awaits return the stored result or rethrow the
+        /// stored exception instance. Do not await this task directly after calling this method.
+        /// </para>
+        /// <para><b>Undefined behaviour:</b></para>
+        /// <list type="bullet">
+        /// <item><description>
+        /// Awaiting the returned task from two continuations before it completes: may throw
+        /// <see cref="InvalidOperationException"/>, because only one continuation can wait on the underlying task.
+        /// </description></item>
+        /// </list>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Preserve</c>; Unity: none.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this calls <c>UniTask.Preserve</c>; on the <c>Awaitable</c> backend
+        /// an EncosyTower memoizing source with the same rules wraps the task.
+        /// </para>
+        /// </remarks>
+        public UnityTask Preserve()
+            => new(_task.Preserve());
+
+        /// <summary>
+        /// Returns the state of the task in parentheses, such as <c>(Succeeded)</c>.
+        /// </summary>
+        /// <returns>The state text.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.ToString</c>; Unity: none.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this calls <c>UniTask.ToString</c>; on the <c>Awaitable</c> backend
+        /// it formats the task source status the same way.
+        /// </para>
+        /// </remarks>
+        public override string ToString()
+            => _task.ToString();
+
+        /// <summary>
+        /// Awaits a <see cref="UnityTask"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para><b>Undefined behaviour:</b></para>
+        /// <list type="bullet">
+        /// <item><description>
+        /// Calling <see cref="GetResult"/> twice, or awaiting the task or a copy more than once: may throw
+        /// <see cref="InvalidOperationException"/>, return a stale result, or observe another operation's result
+        /// because sources are pooled.
+        /// </description></item>
+        /// <item><description>
+        /// Calling <see cref="GetResult"/> before completion: may throw or block indefinitely.
+        /// </description></item>
+        /// </list>
+        /// </remarks>
+        public readonly struct Awaiter : ICriticalNotifyCompletion
+        {
+            private readonly UniTask.Awaiter _awaiter;
+
+            internal Awaiter(UniTask.Awaiter awaiter)
+                => _awaiter = awaiter;
+
+            /// <summary>
+            /// Gets a value that indicates whether the task has completed and its result can be read on the current
+            /// thread without suspending.
+            /// </summary>
+            public bool IsCompleted => _awaiter.IsCompleted;
+
+            /// <summary>
+            /// Ends the wait; throws the original exception instance when the task faulted or was cancelled.
+            /// </summary>
+            public void GetResult()
+                => _awaiter.GetResult();
+
+            /// <summary>
+            /// Schedules <paramref name="continuation"/> to run when the task completes.
+            /// </summary>
+            /// <param name="continuation">The action to run on completion.</param>
+            public void OnCompleted(Action continuation)
+                => _awaiter.OnCompleted(continuation);
+
+            /// <summary>
+            /// Schedules <paramref name="continuation"/> to run when the task completes, without flowing the execution
+            /// context.
+            /// </summary>
+            /// <param name="continuation">The action to run on completion.</param>
+            public void UnsafeOnCompleted(Action continuation)
+                => _awaiter.UnsafeOnCompleted(continuation);
+        }
+    }
+
+    public readonly partial struct UnityTask<T>
+    {
+        private readonly UniTask<T> _task;
+
+        /// <summary>
+        /// Wraps <paramref name="task"/> without further processing.
+        /// </summary>
+        /// <param name="task">The native task to wrap.</param>
+        internal UnityTask(UniTask<T> task)
+            => _task = task;
+
+        /// <summary>
+        /// Gets a value that indicates whether the task has completed and can be awaited on the current thread without
+        /// suspending.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <b>Thread:</b> returns <c>false</c> when the task is done but the current thread kind (main or thread pool)
+        /// differs from the kind of thread that created it; awaiting it then resumes on the creator's thread kind.
+        /// </para>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Status</c> (through its awaiter); Unity:
+        /// <see cref="UnityEngine.Awaitable.IsCompleted"/>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this reads <c>UniTask.Awaiter.IsCompleted</c>; on the
+        /// <c>Awaitable</c> backend it reads the EncosyTower task source, never <c>Awaitable.IsCompleted</c>.
+        /// </para>
+        /// </remarks>
+        public bool IsCompleted
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _task.GetAwaiter().IsCompleted;
+        }
+
+        /// <summary>
+        /// Gets the current state of the task.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <b>Thread:</b> returns <see cref="UnityTaskStatus.Pending"/> when the task is done but the current thread
+        /// kind (main or thread pool) differs from the kind of thread that created it, as <see cref="IsCompleted"/>
+        /// does.
+        /// </para>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Status</c>; Unity: none, because
+        /// <see cref="UnityEngine.Awaitable"/> exposes only <c>IsCompleted</c>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this maps <c>UniTask.Status</c> (same values); on the
+        /// <c>Awaitable</c> backend it reads the EncosyTower task source.
+        /// </para>
+        /// </remarks>
+        public UnityTaskStatus Status
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => (UnityTaskStatus)_task.Status;
+        }
+
+        /// <summary>
+        /// Converts a native <see cref="UniTask{T}"/> to a <see cref="UnityTask{T}"/>.
+        /// </summary>
+        /// <param name="task">The native task to wrap.</param>
+        /// <remarks>
+        /// <para>
+        /// <b>Interop:</b> a task converted from <see cref="UniTask{T}"/> follows native UniTask behaviour; the
+        /// <see cref="UnityTask{T}"/> behaviour contract does not apply to it.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> only the selected backend's conversion exists: from <c>UniTask</c> on the UniTask backend,
+        /// from <c>Awaitable</c> on the <c>Awaitable</c> backend.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator UnityTask<T>(UniTask<T> task)
+            => new(task);
+
+        /// <summary>
+        /// Returns an awaiter for this task.
+        /// </summary>
+        /// <returns>An awaiter for this task.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.GetAwaiter</c>; Unity:
+        /// <see cref="UnityEngine.Awaitable.GetAwaiter"/>.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend the awaiter wraps <c>UniTask.Awaiter</c>; on the <c>Awaitable</c>
+        /// backend it reads the EncosyTower task source directly.
+        /// </para>
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Awaiter GetAwaiter()
+            => new(_task.GetAwaiter());
+
+        /// <summary>
+        /// Returns the native <see cref="UniTask{T}"/> that backs this task.
+        /// </summary>
+        /// <returns>The backing native task.</returns>
+        /// <remarks>
+        /// <b>Interop:</b> the native task follows native UniTask behaviour; the <see cref="UnityTask{T}"/> behaviour
+        /// contract does not apply to operations performed on it.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public UniTask<T> AsUniTask()
+            => _task;
+
+        /// <summary>
+        /// Returns a task that can be awaited more than once and returns the same outcome each time.
+        /// </summary>
+        /// <returns>A task that stores the outcome of this task.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Behaviour:</b> the first await consumes this task; later awaits return the stored result or rethrow the
+        /// stored exception instance. Do not await this task directly after calling this method.
+        /// </para>
+        /// <para><b>Undefined behaviour:</b></para>
+        /// <list type="bullet">
+        /// <item><description>
+        /// Awaiting the returned task from two continuations before it completes: may throw
+        /// <see cref="InvalidOperationException"/>, because only one continuation can wait on the underlying task.
+        /// </description></item>
+        /// </list>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.Preserve</c>; Unity: none.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this calls <c>UniTask.Preserve</c>; on the <c>Awaitable</c> backend
+        /// an EncosyTower memoizing source with the same rules wraps the task.
+        /// </para>
+        /// </remarks>
+        public UnityTask<T> Preserve()
+            => new(_task.Preserve());
+
+        /// <summary>
+        /// Returns the state of the task in parentheses, such as <c>(Succeeded)</c>.
+        /// </summary>
+        /// <returns>The state text.</returns>
+        /// <remarks>
+        /// <para>
+        /// <b>Counterparts:</b> UniTask: <c>UniTask.ToString</c>; Unity: none.
+        /// </para>
+        /// <para>
+        /// <b>Backends:</b> on the UniTask backend this calls <c>UniTask.ToString</c>; on the <c>Awaitable</c> backend
+        /// it formats the task source status the same way.
+        /// </para>
+        /// </remarks>
+        public override string ToString()
+            => _task.ToString();
+
+        /// <summary>
+        /// Awaits a <see cref="UnityTask{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// <para><b>Undefined behaviour:</b></para>
+        /// <list type="bullet">
+        /// <item><description>
+        /// Calling <see cref="GetResult"/> twice, or awaiting the task or a copy more than once: may throw
+        /// <see cref="InvalidOperationException"/>, return a stale result, or observe another operation's result
+        /// because sources are pooled.
+        /// </description></item>
+        /// <item><description>
+        /// Calling <see cref="GetResult"/> before completion: may throw or block indefinitely.
+        /// </description></item>
+        /// </list>
+        /// </remarks>
+        public readonly struct Awaiter : ICriticalNotifyCompletion
+        {
+            private readonly UniTask<T>.Awaiter _awaiter;
+
+            internal Awaiter(UniTask<T>.Awaiter awaiter)
+                => _awaiter = awaiter;
+
+            /// <summary>
+            /// Gets a value that indicates whether the task has completed and its result can be read on the current
+            /// thread without suspending.
+            /// </summary>
+            public bool IsCompleted => _awaiter.IsCompleted;
+
+            /// <summary>
+            /// Returns the result; throws the original exception instance when the task faulted or was cancelled.
+            /// </summary>
+            /// <returns>The result of the task.</returns>
+            public T GetResult()
+                => _awaiter.GetResult();
+
+            /// <summary>
+            /// Schedules <paramref name="continuation"/> to run when the task completes.
+            /// </summary>
+            /// <param name="continuation">The action to run on completion.</param>
+            public void OnCompleted(Action continuation)
+                => _awaiter.OnCompleted(continuation);
+
+            /// <summary>
+            /// Schedules <paramref name="continuation"/> to run when the task completes, without flowing the execution
+            /// context.
+            /// </summary>
+            /// <param name="continuation">The action to run on completion.</param>
+            public void UnsafeOnCompleted(Action continuation)
+                => _awaiter.UnsafeOnCompleted(continuation);
+        }
+    }
+}
+
+#endif

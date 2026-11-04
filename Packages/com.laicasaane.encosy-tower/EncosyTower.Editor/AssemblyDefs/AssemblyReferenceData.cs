@@ -1,0 +1,31 @@
+#if UNITY_EDITOR
+
+using System;
+using System.Runtime.CompilerServices;
+using UnityEditorInternal;
+
+namespace EncosyTower.Editor.AssemblyDefs
+{
+#if UNITY_6000_5_OR_NEWER
+    using GUID = UnityEngine.GUID;
+#else
+    using GUID = UnityEditor.GUID;
+#endif
+
+    public class AssemblyReferenceData
+    {
+        public GUID guid;
+        public AssemblyDefinitionAsset asset;
+        public string name;
+        public string guidString;
+        public bool selected;
+
+        public string Name => asset ? asset.name : string.Empty;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CompareName(AssemblyReferenceData x, AssemblyReferenceData y)
+            => StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name);
+    }
+}
+
+#endif
