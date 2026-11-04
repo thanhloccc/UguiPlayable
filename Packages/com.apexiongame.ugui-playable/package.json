@@ -1,0 +1,24 @@
+{
+  "name": "com.apexiongame.ugui-playable",
+  "displayName": "UGUI Playable",
+  "version": "0.1.0-preview.1",
+  "unity": "6000.3",
+  "description": "Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI (RectTransform, Graphic, Image, text, CanvasGroup and more) without writing tween code.",
+  "keywords": [
+    "timeline",
+    "playable",
+    "ugui",
+    "tween",
+    "animation",
+    "ui"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "ApexionGame"
+  },
+  "dependencies": {
+    "com.unity.timeline": "1.8.13",
+    "com.unity.ugui": "2.0.0"
+  },
+  "samples": []
+}

@@ -1,0 +1,17 @@
+{
+    "name": "ApexionGame.UguiPlayable",
+    "rootNamespace": "ApexionGame.UguiPlayable",
+    "references": [
+        "Unity.Timeline",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,21 @@
+{
+    "name": "ApexionGame.UguiPlayable.Editor",
+    "rootNamespace": "ApexionGame.UguiPlayable.Editor",
+    "references": [
+        "ApexionGame.UguiPlayable",
+        "Unity.Timeline",
+        "Unity.Timeline.Editor",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
