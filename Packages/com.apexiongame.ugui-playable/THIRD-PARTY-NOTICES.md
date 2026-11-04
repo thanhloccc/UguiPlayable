@@ -8,7 +8,15 @@ keeps a `// Ported from …` header naming its source.
 - Source: https://github.com/laicasaane/EncosyTower
 - License: MIT, Copyright (c) 2026 Laicasaane
 
-Ported files: none yet.
+Ported files (paths relative to `Packages/com.laicasaane.encosy-tower/`):
+
+- `ApexionGame.UguiPlayable/Internal/ThrowHelper.cs` from `EncosyTower.Core/Debugging/ThrowHelper.cs`
+- `ApexionGame.UguiPlayable/Internal/UguiPlayableUnityObjectExtensions.cs` from
+  `EncosyTower.Core/UnityEngine.Extensions/EncosyUnityObjectExtensions.cs`
+- `ApexionGame.UguiPlayable/Internal/System.Runtime.CompilerServices/CallerArgumentExpressionAttribute.cs` from
+  `EncosyTower.Core/System.Runtime.CompilerServices/CallerArgumentExpressionAttribute.cs`
+- `ApexionGame.UguiPlayable/Internal/System.Diagnostics/StackTraceHiddenAttribute.cs` from
+  `EncosyTower.Core/System.Diagnostics/StackTraceHiddenAttribute.cs`
 
 ## TweenPlayables
 
