@@ -1,0 +1,26 @@
+{
+    "name": "ApexionGame.UguiPlayable.Samples",
+    "rootNamespace": "ApexionGame.UguiPlayable.Samples",
+    "references": [
+        "ApexionGame.UguiPlayable",
+        "Unity.Timeline",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "UGP_SAMPLE_INPUT_SYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

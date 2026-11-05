@@ -6,6 +6,8 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.0-preview.1] - 2026-11-05
+
 ### Added
 
 - Package skeleton: runtime, Editor and EditMode test assemblies.

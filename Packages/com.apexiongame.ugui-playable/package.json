@@ -20,5 +20,11 @@
     "com.unity.timeline": "1.8.13",
     "com.unity.ugui": "2.0.0"
   },
-  "samples": []
+  "samples": [
+    {
+      "displayName": "UGUI Playable Sample",
+      "description": "Screens, popups and a toast driven by Timeline: show/hide transitions, controls, toggle, shortest-path rotation, TMP per-character text and preset-built clips. Needs TMP Essential Resources.",
+      "path": "Samples~/ApexionGame.UguiPlayable.Samples"
+    }
+  ]
 }
