@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
     /// How a <see cref="RectTransformClip"/> turns from its from rotation to its to rotation.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change. Don't mix modes on one track.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value. Don't mix modes on one track.
     /// </remarks>
     public enum RotationMode
     {

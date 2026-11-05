@@ -35,12 +35,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         }
 
         /// <summary>Whether the channel animates the characters.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>The value at the start of a character's transition.</summary>
-        public T From => _from;
+        public readonly T From => _from;
 
         /// <summary>The value at the end of a character's transition, held after the clip.</summary>
-        public T To => _to;
+        public readonly T To => _to;
     }
 }

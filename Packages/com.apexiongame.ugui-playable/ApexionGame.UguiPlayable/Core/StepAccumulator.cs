@@ -15,7 +15,7 @@ namespace ApexionGame.UguiPlayable.Core
         private double _holdEnd;
 
         /// <inheritdoc cref="FloatAccumulator.HasContribution"/>
-        public bool HasContribution => _touched || _hasHold;
+        public readonly bool HasContribution => _touched || _hasHold;
 
         /// <inheritdoc cref="FloatAccumulator.Reset"/>
         public void Reset()
@@ -52,7 +52,7 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>Returns the resolved value.</summary>
-        public bool Resolve(bool baseValue)
+        public readonly bool Resolve(bool baseValue)
         {
             if (_hasValue)
             {

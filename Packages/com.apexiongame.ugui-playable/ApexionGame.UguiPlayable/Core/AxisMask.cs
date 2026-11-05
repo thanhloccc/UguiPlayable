@@ -3,10 +3,12 @@ using System;
 namespace ApexionGame.UguiPlayable.Core
 {
     /// <summary>
-    /// Selects vector axes. A <see cref="TweenChannel{T}"/> uses it to list the axes it does not animate.
+    /// Selects vector axes. Channels use it to list the axes they leave alone
+    /// (<see cref="TweenChannel{T}.IgnoredAxes"/>, <see cref="OscillationChannel.IgnoredAxes"/>).
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     [Flags]
     public enum AxisMask

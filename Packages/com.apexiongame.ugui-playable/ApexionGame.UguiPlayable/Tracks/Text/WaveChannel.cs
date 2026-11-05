@@ -54,24 +54,24 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         }
 
         /// <summary>Whether the wave adds its offset.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>
         /// What the wave moves: the position (X and Y of <see cref="Amplitude"/>, in text units), the rotation (Z, in
         /// degrees) or the scale (X and Y, added to the scale).
         /// </summary>
-        public OscillationTarget Target => _target;
+        public readonly OscillationTarget Target => _target;
 
         /// <summary>The shape of the wave.</summary>
-        public WaveShape Shape => _shape;
+        public readonly WaveShape Shape => _shape;
 
         /// <summary>The peak offset per axis.</summary>
-        public Vector3 Amplitude => _amplitude;
+        public readonly Vector3 Amplitude => _amplitude;
 
         /// <summary>The number of wave cycles over the clip.</summary>
-        public float Cycles => _cycles;
+        public readonly float Cycles => _cycles;
 
         /// <summary>The phase delay, in cycles, from one character to the next in the clip's order.</summary>
-        public float PhasePerCharacter => _phasePerCharacter;
+        public readonly float PhasePerCharacter => _phasePerCharacter;
     }
 }

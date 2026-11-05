@@ -14,7 +14,7 @@ namespace ApexionGame.UguiPlayable.Core
         private bool _hasHold;
 
         /// <inheritdoc cref="FloatAccumulator.HasContribution"/>
-        public bool HasContribution => _weight > 0f || _hasHold;
+        public readonly bool HasContribution => _weight > 0f || _hasHold;
 
         /// <inheritdoc cref="FloatAccumulator.Reset"/>
         public void Reset()
@@ -43,7 +43,7 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <inheritdoc cref="FloatAccumulator.Resolve"/>
-        public Color Resolve(Color baseValue)
+        public readonly Color Resolve(Color baseValue)
         {
             if (_weight >= 1f)
             {

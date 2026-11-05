@@ -77,33 +77,33 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>Whether the channel drives the text.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>How <see cref="From"/> is interpreted. Relative behaves like Absolute.</summary>
-        public ValueMode Mode => _mode;
+        public readonly ValueMode Mode => _mode;
 
         /// <summary>The start text. Ignored in <see cref="ValueMode.FromCurrent"/>.</summary>
-        public string From => _from;
+        public readonly string From => _from;
 
         /// <summary>The end text.</summary>
-        public string To => _to;
+        public readonly string To => _to;
 
         /// <summary>The ease applied to the clip's progress before the reveal.</summary>
-        public EaseSetting Ease => _ease;
+        public readonly EaseSetting Ease => _ease;
 
         /// <summary>The characters shown at unrevealed positions.</summary>
-        public ScrambleMode Scramble => _scramble;
+        public readonly ScrambleMode Scramble => _scramble;
 
         /// <summary>
         /// The scramble characters, used only when <see cref="Scramble"/> is <see cref="ScrambleMode.Custom"/>.
         /// </summary>
-        public string CustomScrambleChars => _customScrambleChars;
+        public readonly string CustomScrambleChars => _customScrambleChars;
 
         /// <summary>Whether <see cref="Captured"/> holds the text read when the clip became active.</summary>
-        public bool HasCaptured => _hasCaptured;
+        public readonly bool HasCaptured => _hasCaptured;
 
         /// <summary>The text read when the clip became active, used by <see cref="ValueMode.FromCurrent"/>.</summary>
-        public string Captured => _captured;
+        public readonly string Captured => _captured;
 
         /// <summary>
         /// Stores the property's current text as the start of a <see cref="ValueMode.FromCurrent"/> tween.

@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// The shape of a <see cref="WaveChannel"/>.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change; new shapes are appended.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum WaveShape
     {

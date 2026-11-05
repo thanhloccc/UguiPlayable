@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Easing
     /// The easing presets, plus <see cref="Custom"/> for a user-authored curve.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user assets. Never reorder or renumber the members.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum Ease
     {

@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// The point each character of a <see cref="TmpCharacterClip"/> rotates and scales about.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change; new pivots are appended.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum CharacterPivot
     {

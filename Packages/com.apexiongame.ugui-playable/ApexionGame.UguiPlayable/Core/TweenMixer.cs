@@ -26,7 +26,7 @@ namespace ApexionGame.UguiPlayable.Core
         private TBinding _binding;
         private bool _hasBase;
 
-        /// <summary>The component the track is bound to, or null before the first frame.</summary>
+        /// <summary>The component the track is bound to; null before the first valid frame and after the graph is destroyed.</summary>
         public TBinding Binding => _binding;
 
         /// <summary>The track's restore option.</summary>

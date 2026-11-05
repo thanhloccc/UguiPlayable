@@ -42,24 +42,27 @@ namespace ApexionGame.UguiPlayable.Easing
         /// <summary>
         /// A linear ease that carries an ease-in-out curve, ready for the user to switch to <see cref="Ease.Custom"/>.
         /// </summary>
+        /// <remarks>
+        /// Returns a new value with its own curve on each call; do not call it per frame.
+        /// </remarks>
         public static EaseSetting Default
             => new(Easing.Ease.Linear, AnimationCurve.EaseInOut(0f, 0f, 1f, 1f));
 
         /// <summary>
         /// The selected ease.
         /// </summary>
-        public Ease Ease => _ease;
+        public readonly Ease Ease => _ease;
 
         /// <summary>
         /// The custom curve, used only when <see cref="Ease"/> is <see cref="Easing.Ease.Custom"/>.
         /// </summary>
-        public AnimationCurve Curve => _curve;
+        public readonly AnimationCurve Curve => _curve;
 
         /// <summary>
         /// Maps the normalized time <paramref name="t"/> through the preset, or through the curve for
         /// <see cref="Easing.Ease.Custom"/>. A missing curve falls back to linear.
         /// </summary>
-        public float Evaluate(float t)
+        public readonly float Evaluate(float t)
         {
             if (_ease != Easing.Ease.Custom)
             {

@@ -41,35 +41,35 @@ namespace ApexionGame.UguiPlayable.Core
         private AxisMask _ignoredAxes;
 
         /// <summary>Whether the channel adds its offset.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>The property the offset is added to.</summary>
-        public OscillationTarget Target => _target;
+        public readonly OscillationTarget Target => _target;
 
         /// <summary>The peak offset per axis.</summary>
-        public Vector3 Strength => _strength;
+        public readonly Vector3 Strength => _strength;
 
         /// <summary>
         /// The oscillations over the clip: the punch's vibrato, or the number of noise samples a shake takes.
         /// </summary>
-        public float Frequency => _frequency;
+        public readonly float Frequency => _frequency;
 
         /// <summary>Punch only: from 0 (fast decay) to 1 (slow decay).</summary>
-        public float Elasticity => _elasticity;
+        public readonly float Elasticity => _elasticity;
 
         /// <summary>
         /// Shake only: 0 makes every axis follow one shared noise, 1 gives each axis its own noise.
         /// </summary>
-        public float Randomness => _randomness;
+        public readonly float Randomness => _randomness;
 
         /// <summary>Shake only: whether the shake fades to zero over the clip.</summary>
-        public bool FadeOut => _fadeOut;
+        public readonly bool FadeOut => _fadeOut;
 
         /// <summary>Shake only: the seed of the noise, so scrubbing always gives the same shake.</summary>
-        public int Seed => _seed;
+        public readonly int Seed => _seed;
 
         /// <summary>The axes that get no offset.</summary>
-        public AxisMask IgnoredAxes => _ignoredAxes;
+        public readonly AxisMask IgnoredAxes => _ignoredAxes;
 
         /// <summary>Creates a punch channel.</summary>
         public static OscillationChannel Punch(

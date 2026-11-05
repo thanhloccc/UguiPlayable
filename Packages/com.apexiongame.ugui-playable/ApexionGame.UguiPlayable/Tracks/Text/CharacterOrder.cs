@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// The order in which the characters of a <see cref="TmpCharacterClip"/> start, when the clip has a stagger.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change; new orders are appended.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum CharacterOrder
     {

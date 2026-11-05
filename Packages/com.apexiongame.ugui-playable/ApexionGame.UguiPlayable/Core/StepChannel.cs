@@ -8,7 +8,8 @@ namespace ApexionGame.UguiPlayable.Core
     /// <see cref="Threshold"/>. Step channels are not blended: the active input with the highest weight decides.
     /// </summary>
     /// <remarks>
-    /// The serialized field names are user data.
+    /// The serialized field names are user data. A default-initialised channel is disabled and has threshold 0; use
+    /// the constructor for the 0.5 default.
     /// </remarks>
     [Serializable]
     public struct StepChannel
@@ -36,18 +37,18 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>Whether the channel drives its property.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>The value written once <see cref="Threshold"/> is reached.</summary>
-        public bool Value => _value;
+        public readonly bool Value => _value;
 
         /// <summary>The normalized clip progress, from 0 to 1, at which <see cref="Value"/> applies.</summary>
-        public float Threshold => _threshold;
+        public readonly float Threshold => _threshold;
 
         /// <summary>
         /// Returns true and sets <paramref name="value"/> when <paramref name="progress"/> has reached the threshold.
         /// </summary>
-        public bool TryEvaluate(float progress, out bool value)
+        public readonly bool TryEvaluate(float progress, out bool value)
         {
             value = _value;
             return progress >= _threshold;

@@ -15,7 +15,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private ColorAccumulator _bottomRight;
 
         /// <inheritdoc cref="FloatAccumulator.HasContribution"/>
-        public bool HasContribution
+        public readonly bool HasContribution
             => _topLeft.HasContribution
                 || _topRight.HasContribution
                 || _bottomLeft.HasContribution
@@ -46,7 +46,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         }
 
         /// <inheritdoc cref="FloatAccumulator.Resolve"/>
-        public VertexGradient Resolve(in VertexGradient baseValue)
+        public readonly VertexGradient Resolve(in VertexGradient baseValue)
             => new(
                   _topLeft.Resolve(baseValue.topLeft)
                 , _topRight.Resolve(baseValue.topRight)

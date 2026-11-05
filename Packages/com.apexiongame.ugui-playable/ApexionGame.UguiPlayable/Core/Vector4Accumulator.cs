@@ -26,11 +26,11 @@ namespace ApexionGame.UguiPlayable.Core
         private bool _hasHoldW;
 
         /// <summary>Whether <see cref="Resolve"/> has anything to write this frame, on any axis.</summary>
-        public bool HasContribution
+        public readonly bool HasContribution
             => ContributedAxes != AxisMask.None;
 
         /// <summary>The axes that have weight or a hold value this frame.</summary>
-        public AxisMask ContributedAxes
+        public readonly AxisMask ContributedAxes
             => (_weight.x > 0f || _hasHoldX ? AxisMask.X : AxisMask.None)
             | (_weight.y > 0f || _hasHoldY ? AxisMask.Y : AxisMask.None)
             | (_weight.z > 0f || _hasHoldZ ? AxisMask.Z : AxisMask.None)
@@ -125,7 +125,7 @@ namespace ApexionGame.UguiPlayable.Core
         /// </summary>
         /// <param name="baseValue">The value the property had when the track bound it.</param>
         /// <param name="currentValue">The value the property has now.</param>
-        public Vector4 Resolve(Vector4 baseValue, Vector4 currentValue)
+        public readonly Vector4 Resolve(Vector4 baseValue, Vector4 currentValue)
         {
             return new Vector4(
                   ResolveAxis(_sum.x, _weight.x, _hasHoldX, _hold.x, baseValue.x, currentValue.x)

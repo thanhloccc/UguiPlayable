@@ -7,7 +7,8 @@ namespace ApexionGame.UguiPlayable.Core
     /// <remarks>
     /// Edit-mode preview always reverts, through Timeline's property preview. In Play Mode, Unity runs the stop
     /// destroy callback one update after <c>PlayableDirector.Stop()</c>, so a reverted value is visible from the next frame.
-    /// The integer values are serialized in user timelines and must never change.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum RestoreMode
     {

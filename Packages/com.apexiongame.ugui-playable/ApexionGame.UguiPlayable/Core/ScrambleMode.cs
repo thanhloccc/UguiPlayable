@@ -4,7 +4,8 @@ namespace ApexionGame.UguiPlayable.Core
     /// Which characters a <see cref="TextChannel"/> shows at positions that are not revealed yet.
     /// </summary>
     /// <remarks>
-    /// The integer values are serialized in user timelines and must never change.
+    /// The integer values are serialized in user data: never renumber a member; add new members at the end with the
+    /// next explicit value.
     /// </remarks>
     public enum ScrambleMode
     {

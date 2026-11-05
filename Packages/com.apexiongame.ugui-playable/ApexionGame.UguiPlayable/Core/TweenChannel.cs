@@ -75,31 +75,31 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>Whether the channel animates its property.</summary>
-        public bool Enabled => _enabled;
+        public readonly bool Enabled => _enabled;
 
         /// <summary>How <see cref="From"/> and <see cref="To"/> are interpreted.</summary>
-        public ValueMode Mode => _mode;
+        public readonly ValueMode Mode => _mode;
 
         /// <summary>The start value. Ignored in <see cref="ValueMode.FromCurrent"/>.</summary>
-        public T From => _from;
+        public readonly T From => _from;
 
         /// <summary>The end value.</summary>
-        public T To => _to;
+        public readonly T To => _to;
 
         /// <summary>The ease applied to the clip's progress.</summary>
-        public EaseSetting Ease => _ease;
+        public readonly EaseSetting Ease => _ease;
 
         /// <summary>
         /// The axes this channel leaves alone, so another clip can animate them. Used by <see cref="Vector2"/>,
         /// <see cref="Vector3"/> and <see cref="Vector4"/> channels, ignored by float and color channels.
         /// </summary>
-        public AxisMask IgnoredAxes => _ignoredAxes;
+        public readonly AxisMask IgnoredAxes => _ignoredAxes;
 
         /// <summary>Whether <see cref="Captured"/> holds the value read when the clip became active.</summary>
-        public bool HasCaptured => _hasCaptured;
+        public readonly bool HasCaptured => _hasCaptured;
 
         /// <summary>The value read when the clip became active, used by <see cref="ValueMode.FromCurrent"/>.</summary>
-        public T Captured => _captured;
+        public readonly T Captured => _captured;
 
         /// <summary>
         /// Stores the property's current value as the start of a <see cref="ValueMode.FromCurrent"/> tween.

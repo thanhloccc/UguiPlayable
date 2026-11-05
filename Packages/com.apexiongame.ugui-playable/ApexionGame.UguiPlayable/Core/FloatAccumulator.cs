@@ -17,7 +17,7 @@ namespace ApexionGame.UguiPlayable.Core
         private bool _hasHold;
 
         /// <summary>Whether <see cref="Resolve"/> has anything to write this frame.</summary>
-        public bool HasContribution => _weight > 0f || _hasHold;
+        public readonly bool HasContribution => _weight > 0f || _hasHold;
 
         /// <summary>Clears the accumulator at the start of a frame.</summary>
         public void Reset()
@@ -46,7 +46,7 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>Returns the blended value.</summary>
-        public float Resolve(float baseValue)
+        public readonly float Resolve(float baseValue)
         {
             if (_weight >= 1f)
             {

@@ -8,14 +8,14 @@ namespace ApexionGame.UguiPlayable
     internal static class PlayModeSeam
     {
         /// <summary>Set by tests to force the answer. Tests must clear it in TearDown.</summary>
-        internal static bool? OverrideForTests;
+        internal static bool? s_overrideForTests;
 
         /// <summary><see cref="Application.isPlaying"/> unless a test overrides it.</summary>
         internal static bool IsPlaying
         {
             get
             {
-                var overridden = OverrideForTests;
+                var overridden = s_overrideForTests;
                 return overridden.HasValue ? overridden.Value : Application.isPlaying;
             }
         }
