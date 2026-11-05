@@ -51,6 +51,20 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string SCROLL_RECT_NO_CONTENT =
             "This ScrollRect has no Content, so there is nothing to scroll. Assign its Content.";
 
+        public const string STRENGTH = "Strength";
+        public const string FREQUENCY = "Frequency";
+        public const string ELASTICITY = "Elasticity";
+        public const string RANDOMNESS = "Randomness";
+        public const string FADE_OUT = "Fade out";
+        public const string SEED = "Seed";
+        public const string OSCILLATION_AXIS_TOOLTIP = "Add the offset on this axis. Turn it off to leave it alone.";
+        public const string FREQUENCY_TOOLTIP = "Oscillations over the clip.";
+        public const string ELASTICITY_TOOLTIP = "How long the punch keeps swinging. 0 dies out fast, 1 lasts.";
+        public const string RANDOMNESS_TOOLTIP = "0 moves all axes together along the strength, 1 moves each alone.";
+        public const string FADE_OUT_TOOLTIP = "Shake less and less until the clip ends.";
+        public const string SEED_TOOLTIP = "The same seed always gives the same shake.";
+        public const string NEW_SEED_TOOLTIP = "Pick a new random seed.";
+
         public const string TEXT_RICH_TAGS_NOTE = "Rich text tags are revealed as plain characters.";
 
         public const string TEXT_SCRAMBLE_TOOLTIP =

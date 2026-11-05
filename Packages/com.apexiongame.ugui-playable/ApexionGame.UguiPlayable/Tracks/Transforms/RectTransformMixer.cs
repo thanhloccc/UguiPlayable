@@ -44,6 +44,21 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         // to resync after another system rotated the transform.
         private Vector3 _lastRotation;
 
+        // The oscillation offsets written last frame, 0 on axes without one. The binding holds pre-offset value +
+        // last offset, so subtracting them gives the value the tween channels work from; this is what keeps an
+        // offset from drifting or leaking into FromCurrent captures.
+        private Vector3 _lastOffsetPosition;
+        private Vector3 _lastOffsetRotation;
+        private Vector3 _lastOffsetScale;
+
+        // This frame's offset sums and the axes that have one.
+        private Vector3 _offsetPosition;
+        private Vector3 _offsetRotation;
+        private Vector3 _offsetScale;
+        private AxisMask _offsetAxesPosition;
+        private AxisMask _offsetAxesRotation;
+        private AxisMask _offsetAxesScale;
+
         /// <inheritdoc/>
         protected override void CaptureBase(RectTransform binding)
         {
@@ -55,6 +70,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             _baseAnchorMin = binding.anchorMin;
             _baseAnchorMax = binding.anchorMax;
             _lastRotation = _baseRotation;
+            _lastOffsetPosition = Vector3.zero;
+            _lastOffsetRotation = Vector3.zero;
+            _lastOffsetScale = Vector3.zero;
             _wroteAnchoredPosition = AxisMask.None;
             _wroteSizeDelta = AxisMask.None;
             _wroteRotation = AxisMask.None;
@@ -107,6 +125,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             {
                 binding.localScale = AxisMaskMath.Merge(binding.localScale, _baseScale, _wroteScale);
             }
+
+            _lastOffsetPosition = Vector3.zero;
+            _lastOffsetRotation = Vector3.zero;
+            _lastOffsetScale = Vector3.zero;
         }
 
         /// <inheritdoc/>
@@ -114,6 +136,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         {
             SyncRotation(binding);
             behaviour.CaptureRotation(_lastRotation);
+
+            behaviour.CapturePreOffset(
+                  binding.anchoredPosition3D - _lastOffsetPosition
+                , binding.localScale - _lastOffsetScale
+            );
         }
 
         /// <inheritdoc/>
@@ -126,6 +153,13 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             _pivot.Reset();
             _anchorMin.Reset();
             _anchorMax.Reset();
+
+            _offsetPosition = Vector3.zero;
+            _offsetRotation = Vector3.zero;
+            _offsetScale = Vector3.zero;
+            _offsetAxesPosition = AxisMask.None;
+            _offsetAxesRotation = AxisMask.None;
+            _offsetAxesScale = AxisMask.None;
         }
 
         /// <inheritdoc/>
@@ -185,6 +219,66 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             {
                 var value = TweenChannelMath.Evaluate(anchorMax, progress, _baseAnchorMax);
                 _anchorMax.Add(value, weight, anchorMax.IgnoredAxes);
+            }
+
+            var punch = behaviour.Punch;
+
+            if (punch.Enabled)
+            {
+                AccumulateOffset(punch, isShake: false, weight, progress);
+            }
+
+            var shake = behaviour.Shake;
+
+            if (shake.Enabled)
+            {
+                AccumulateOffset(shake, isShake: true, weight, progress);
+            }
+        }
+
+        private void AccumulateOffset(in OscillationChannel channel, bool isShake, float weight, float progress)
+        {
+            var offset = OscillationMath.Evaluate(channel, progress, isShake) * weight;
+            var strength = channel.Strength;
+            var axes = ~channel.IgnoredAxes & (AxisMask.X | AxisMask.Y | AxisMask.Z);
+
+            if (strength.x == 0f)
+            {
+                axes &= ~AxisMask.X;
+            }
+
+            if (strength.y == 0f)
+            {
+                axes &= ~AxisMask.Y;
+            }
+
+            if (strength.z == 0f)
+            {
+                axes &= ~AxisMask.Z;
+            }
+
+            switch (channel.Target)
+            {
+                case OscillationTarget.Position:
+                {
+                    _offsetPosition += offset;
+                    _offsetAxesPosition |= axes;
+                    break;
+                }
+
+                case OscillationTarget.Rotation:
+                {
+                    _offsetRotation += offset;
+                    _offsetAxesRotation |= axes;
+                    break;
+                }
+
+                case OscillationTarget.Scale:
+                {
+                    _offsetScale += offset;
+                    _offsetAxesScale |= axes;
+                    break;
+                }
             }
         }
 
@@ -275,34 +369,68 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
                 _wroteSizeDelta |= _sizeDelta.ContributedAxes;
             }
 
-            if (_anchoredPosition.HasContribution)
+            var hadOffsetPosition = IsNonZero(_lastOffsetPosition);
+
+            if (_anchoredPosition.HasContribution || _offsetAxesPosition != AxisMask.None || hadOffsetPosition)
             {
-                var current = binding.anchoredPosition3D;
-                binding.anchoredPosition3D = _anchoredPosition.Resolve(_baseAnchoredPosition, current);
-                _wroteAnchoredPosition |= _anchoredPosition.ContributedAxes;
+                var pre = binding.anchoredPosition3D - _lastOffsetPosition;
+
+                if (_anchoredPosition.HasContribution)
+                {
+                    pre = _anchoredPosition.Resolve(_baseAnchoredPosition, pre);
+                }
+
+                binding.anchoredPosition3D = pre + _offsetPosition;
+                _wroteAnchoredPosition |= _anchoredPosition.ContributedAxes | _offsetAxesPosition;
+                _lastOffsetPosition = _offsetPosition;
             }
 
-            if (_rotation.HasContribution)
+            var hadOffsetRotation = IsNonZero(_lastOffsetRotation);
+
+            if (_rotation.HasContribution || _offsetAxesRotation != AxisMask.None || hadOffsetRotation)
             {
                 SyncRotation(binding);
-                _lastRotation = _rotation.Resolve(_baseRotation, _lastRotation);
-                binding.localEulerAngles = _lastRotation;
-                _wroteRotation |= _rotation.ContributedAxes;
+
+                if (_rotation.HasContribution)
+                {
+                    _lastRotation = _rotation.Resolve(_baseRotation, _lastRotation);
+                }
+
+                binding.localEulerAngles = _lastRotation + _offsetRotation;
+                _wroteRotation |= _rotation.ContributedAxes | _offsetAxesRotation;
+                _lastOffsetRotation = _offsetRotation;
             }
 
-            if (_scale.HasContribution)
+            var hadOffsetScale = IsNonZero(_lastOffsetScale);
+
+            if (_scale.HasContribution || _offsetAxesScale != AxisMask.None || hadOffsetScale)
             {
-                binding.localScale = _scale.Resolve(_baseScale, binding.localScale);
-                _wroteScale |= _scale.ContributedAxes;
+                var pre = binding.localScale - _lastOffsetScale;
+
+                if (_scale.HasContribution)
+                {
+                    pre = _scale.Resolve(_baseScale, pre);
+                }
+
+                binding.localScale = pre + _offsetScale;
+                _wroteScale |= _scale.ContributedAxes | _offsetAxesScale;
+                _lastOffsetScale = _offsetScale;
             }
         }
+
+        // Vector3's == treats tiny vectors as equal; an offset that was written must be subtracted exactly.
+        private static bool IsNonZero(Vector3 value)
+            => value.x != 0f || value.y != 0f || value.z != 0f;
 
         // Re-reads the rotation only when another system rotated the transform since this mixer last wrote it.
         private void SyncRotation(RectTransform binding)
         {
-            if (Quaternion.Angle(Quaternion.Euler(_lastRotation), binding.localRotation) > ROTATION_SYNC_DEGREES)
+            var written = Quaternion.Euler(_lastRotation + _lastOffsetRotation);
+
+            if (Quaternion.Angle(written, binding.localRotation) > ROTATION_SYNC_DEGREES)
             {
                 _lastRotation = AxisMaskMath.NormalizeEuler(binding.localEulerAngles);
+                _lastOffsetRotation = Vector3.zero;
             }
         }
     }

@@ -95,7 +95,7 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(CanvasGroupClip), "_alpha,_interactable,_blocksRaycasts")]
     [TestCase(
           typeof(RectTransformClip)
-        , "_anchoredPosition,_sizeDelta,_rotation,_scale,_pivot,_anchorMin,_anchorMax"
+        , "_anchoredPosition,_sizeDelta,_rotation,_scale,_pivot,_anchorMin,_anchorMax,_punch,_shake"
     )]
     [TestCase(typeof(GraphicClip), "_color,_alpha")]
     [TestCase(typeof(ImageClip), "_color,_alpha,_fillAmount")]
@@ -131,7 +131,13 @@ public sealed class TweenClipInspectorTests
 
         var channels = TweenClipModel.Create(_editor.serializedObject).Channels;
 
-        Assert.IsTrue(channels.All(channel => channel.Shape == ChannelShape.Tween));
+        Assert.IsTrue(channels
+            .Where(channel => channel.Shape != ChannelShape.Oscillation)
+            .All(channel => channel.Shape == ChannelShape.Tween)
+        );
+
+        Assert.AreEqual(ChannelShape.Oscillation, Find(channels, "_punch").Shape);
+        Assert.AreEqual(ChannelShape.Oscillation, Find(channels, "_shake").Shape);
         Assert.AreEqual(ChannelValueKind.Vector3, Find(channels, "_scale").ValueKind);
         Assert.AreEqual(ChannelValueKind.Vector2, Find(channels, "_sizeDelta").ValueKind);
         Assert.IsTrue(Find(channels, "_scale").HasConstrain);

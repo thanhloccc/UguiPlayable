@@ -22,6 +22,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string THRESHOLD = "_threshold";
         public const string SCRAMBLE = "_scramble";
         public const string CUSTOM_SCRAMBLE_CHARS = "_customScrambleChars";
+        public const string TARGET = "_target";
+        public const string STRENGTH = "_strength";
+        public const string FREQUENCY = "_frequency";
 
         private static readonly string[] s_gradientCorners = { "topLeft", "topRight", "bottomLeft", "bottomRight" };
 
@@ -131,6 +134,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 && child.FindPropertyRelative(SCRAMBLE) != null)
             {
                 info = new ChannelInfo(child.name, ChannelShape.Text, ChannelValueKind.Float, false);
+                enabled = enabledProperty.boolValue;
+                return true;
+            }
+
+            if (child.FindPropertyRelative(TARGET) != null
+                && child.FindPropertyRelative(STRENGTH) != null
+                && child.FindPropertyRelative(FREQUENCY) != null)
+            {
+                info = new ChannelInfo(child.name, ChannelShape.Oscillation, ChannelValueKind.Vector3, false);
                 enabled = enabledProperty.boolValue;
                 return true;
             }

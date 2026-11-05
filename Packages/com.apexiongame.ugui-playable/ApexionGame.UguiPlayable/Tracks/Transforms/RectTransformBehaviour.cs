@@ -61,6 +61,20 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         [SerializeField]
         private bool _scaleConstrainTo;
 
+        [SerializeField]
+        private OscillationChannel _punch = OscillationChannel.Punch(
+              OscillationTarget.Scale
+            , new Vector3(0.2f, 0.2f, 0f)
+            , enabled: false
+        );
+
+        [SerializeField]
+        private OscillationChannel _shake = OscillationChannel.Shake(
+              OscillationTarget.Position
+            , new Vector3(10f, 10f, 0f)
+            , enabled: false
+        );
+
         /// <summary>The <see cref="RectTransform.anchoredPosition3D"/> channel.</summary>
         public TweenChannel<Vector3> AnchoredPosition
         {
@@ -138,6 +152,24 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             set => _scaleConstrainTo = value;
         }
 
+        /// <summary>
+        /// A damped oscillation added on top of the blended result of its target, weighted by the input weight.
+        /// </summary>
+        public OscillationChannel Punch
+        {
+            get => _punch;
+            set => _punch = value;
+        }
+
+        /// <summary>
+        /// Deterministic noise added on top of the blended result of its target, weighted by the input weight.
+        /// </summary>
+        public OscillationChannel Shake
+        {
+            get => _shake;
+            set => _shake = value;
+        }
+
         /// <inheritdoc/>
         internal override bool HasEnabledChannel()
             => _anchoredPosition.Enabled
@@ -146,7 +178,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
                 || _scale.Enabled
                 || _pivot.Enabled
                 || _anchorMin.Enabled
-                || _anchorMax.Enabled;
+                || _anchorMax.Enabled
+                || _punch.Enabled
+                || _shake.Enabled;
 
         /// <inheritdoc/>
         public override void CollectPropertyNames(ICollection<string> names)
@@ -186,6 +220,41 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             {
                 names.Add(ANCHOR_MAX_PROPERTY);
             }
+
+            if (_punch.Enabled)
+            {
+                AddOscillationNames(_punch.Target, names);
+            }
+
+            if (_shake.Enabled)
+            {
+                AddOscillationNames(_shake.Target, names);
+            }
+        }
+
+        private static void AddOscillationNames(OscillationTarget target, ICollection<string> names)
+        {
+            switch (target)
+            {
+                case OscillationTarget.Position:
+                {
+                    names.Add(ANCHORED_POSITION_PROPERTY);
+                    names.Add(LOCAL_POSITION_PROPERTY);
+                    break;
+                }
+
+                case OscillationTarget.Rotation:
+                {
+                    names.Add(ROTATION_PROPERTY);
+                    break;
+                }
+
+                case OscillationTarget.Scale:
+                {
+                    names.Add(SCALE_PROPERTY);
+                    break;
+                }
+            }
         }
 
         /// <summary>
@@ -197,6 +266,24 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             if (_rotation.Enabled && _rotation.Mode == ValueMode.FromCurrent)
             {
                 _rotation.Capture(current);
+            }
+        }
+
+        /// <summary>
+        /// Re-captures the anchored position and the scale of a <see cref="ValueMode.FromCurrent"/> channel from
+        /// values without the oscillation offset, so FromCurrent never captures an offset. Runs after
+        /// <see cref="OnActivated"/>, which read the binding with the offset still on it.
+        /// </summary>
+        internal void CapturePreOffset(Vector3 anchoredPosition, Vector3 scale)
+        {
+            if (_anchoredPosition.Enabled && _anchoredPosition.Mode == ValueMode.FromCurrent)
+            {
+                _anchoredPosition.Capture(anchoredPosition);
+            }
+
+            if (_scale.Enabled && _scale.Mode == ValueMode.FromCurrent)
+            {
+                _scale.Capture(scale);
             }
         }
 

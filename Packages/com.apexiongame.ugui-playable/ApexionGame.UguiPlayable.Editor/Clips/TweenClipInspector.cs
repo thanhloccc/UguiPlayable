@@ -79,6 +79,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return StepChannelCardSection.Create(serializedObject, info);
             }
 
+            if (info.Shape == ChannelShape.Oscillation)
+            {
+                return OscillationChannelCardSection.Create(serializedObject, info);
+            }
+
             if (info.Shape == ChannelShape.Text)
             {
                 return TextChannelCardSection.Create(serializedObject, info, source);

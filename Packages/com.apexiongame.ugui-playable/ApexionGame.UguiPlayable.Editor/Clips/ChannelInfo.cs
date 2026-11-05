@@ -13,6 +13,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         /// <summary>A <c>TextChannel</c>: enabled, mode, from, to, ease, scramble, custom scramble characters.</summary>
         Text,
+
+        /// <summary>
+        /// An <c>OscillationChannel</c>: enabled, target, strength, frequency, elasticity, randomness, fade out,
+        /// seed, ignored axes.
+        /// </summary>
+        Oscillation,
     }
 
     /// <summary>
