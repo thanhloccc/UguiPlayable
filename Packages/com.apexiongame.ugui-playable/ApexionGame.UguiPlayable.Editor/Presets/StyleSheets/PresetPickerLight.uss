@@ -1,0 +1,5 @@
+.ugp-preset-picker {
+    --ugp-preset-picker-secondary: #535353;
+    --ugp-preset-picker-item-hover: #d4d4d4;
+    --ugp-preset-picker-line: #b4b4b4;
+}

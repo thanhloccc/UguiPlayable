@@ -1,13 +1,18 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UIElements;
+using ApexionGame.UguiPlayable.Editor.Common;
+using ApexionGame.UguiPlayable.Editor.Presets;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
     /// <summary>
-    /// The shared clip inspector: a header (track icon, title, "N of M channels on"), a warning when no channel is on,
-    /// then one card per channel found under <c>_template</c>. A concrete clip inspector only names itself.
+    /// The shared clip inspector: a header (track icon, title, "N of M channels on", an "Apply preset…" button), a
+    /// warning when no channel is on, then one card per channel found under <c>_template</c>. A concrete clip
+    /// inspector only names itself.
     /// </summary>
     /// <remarks>
     /// Timeline hosts this in an <c>InspectorElement</c> inside its clip inspector, so
@@ -17,6 +22,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     internal abstract class TweenClipInspector : UnityEditor.Editor
     {
         private const long BINDING_POLL_MILLISECONDS = 500;
+        private const string APPLY_PRESET_TOOLTIP = "Apply preset…";
 
         /// <summary>The title in the header, for example "Rect Transform Clip".</summary>
         protected abstract string Title { get; }
@@ -80,7 +86,42 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             header.Add(title);
 
             header.Add(count);
+
+            var applyPreset = TweenClipSections.CreateIconButton(
+                  EditorIcons.WandSparkles
+                , APPLY_PRESET_TOOLTIP
+                , OnApplyPresetClicked
+                , out _
+            );
+
+            header.Add(applyPreset);
             return header;
+
+            void OnApplyPresetClicked()
+            {
+                ShowPresetPicker(header);
+            }
+        }
+
+        /// <summary>
+        /// Opens the preset picker for every selected clip, so one pick applies to all of them in one Undo step.
+        /// </summary>
+        private void ShowPresetPicker(VisualElement anchor)
+        {
+            var assets = new List<PlayableAsset>(targets.Length);
+
+            for (var i = 0; i < targets.Length; i++)
+            {
+                if (targets[i] is PlayableAsset asset && asset.IsValid())
+                {
+                    assets.Add(asset);
+                }
+            }
+
+            if (assets.Count > 0)
+            {
+                PresetPicker.ShowApply(assets.ToArray(), PresetPicker.GetAnchor(anchor));
+            }
         }
 
         private VisualElement CreateCard(ChannelInfo info, ClipBindingSource source)
