@@ -1,11 +1,12 @@
 namespace ApexionGame.UguiPlayable.Core
 {
     /// <summary>
-    /// What a tween track does to the properties it animated when its graph stops or is destroyed.
+    /// What a tween track does to the properties it animated when its graph is destroyed
+    /// (<c>PlayableDirector.Stop()</c>, or the director disabled or destroyed). Pausing keeps the values.
     /// </summary>
     /// <remarks>
     /// Edit-mode preview always reverts, through Timeline's property preview. In Play Mode, Unity runs the stop
-    /// callbacks one update after <c>PlayableDirector.Stop()</c>, so a reverted value is visible from the next frame.
+    /// destroy callback one update after <c>PlayableDirector.Stop()</c>, so a reverted value is visible from the next frame.
     /// The integer values are serialized in user timelines and must never change.
     /// </remarks>
     public enum RestoreMode

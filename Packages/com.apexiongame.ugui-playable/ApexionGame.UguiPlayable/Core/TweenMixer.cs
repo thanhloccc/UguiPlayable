@@ -109,12 +109,11 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <inheritdoc/>
-        public override void OnGraphStop(Playable playable)
-        {
-            RestoreIfNeeded();
-        }
-
-        /// <inheritdoc/>
+        /// <remarks>
+        /// Restoring happens only when the graph is destroyed (<c>PlayableDirector.Stop()</c>, a rebuilt graph, the
+        /// director disabled or destroyed). <c>PlayableDirector.Pause()</c> stops the graph without destroying it:
+        /// values stay frozen and the base values are kept, so Relative and the hold value don't drift on resume.
+        /// </remarks>
         public override void OnPlayableDestroy(Playable playable)
         {
             RestoreIfNeeded();
