@@ -3,18 +3,34 @@ using UnityEngine;
 namespace ApexionGame.UguiPlayable.Core
 {
     /// <summary>
-    /// Blends one <see cref="Vector3"/> property for one frame. See <see cref="FloatAccumulator"/> for the rule.
+    /// Blends one <see cref="Vector3"/> property for one frame, axis by axis. See <see cref="FloatAccumulator"/> for
+    /// the rule applied to each axis.
     /// </summary>
+    /// <remarks>
+    /// A clip can skip axes (<see cref="AxisMask"/>), so each axis keeps its own weight and hold value. An axis that
+    /// no clip touched resolves to the value the binding already has.
+    /// </remarks>
     public struct Vector3Accumulator
     {
         private Vector3 _sum;
-        private float _weight;
+        private Vector3 _weight;
         private Vector3 _hold;
-        private double _holdEnd;
-        private bool _hasHold;
+        private double _holdEndX;
+        private double _holdEndY;
+        private double _holdEndZ;
+        private bool _hasHoldX;
+        private bool _hasHoldY;
+        private bool _hasHoldZ;
 
-        /// <inheritdoc cref="FloatAccumulator.HasContribution"/>
-        public bool HasContribution => _weight > 0f || _hasHold;
+        /// <summary>Whether <see cref="Resolve"/> has anything to write this frame, on any axis.</summary>
+        public bool HasContribution
+            => _weight.x > 0f || _weight.y > 0f || _weight.z > 0f || _hasHoldX || _hasHoldY || _hasHoldZ;
+
+        /// <summary>The axes that have weight or a hold value this frame.</summary>
+        public AxisMask ContributedAxes
+            => (_weight.x > 0f || _hasHoldX ? AxisMask.X : AxisMask.None)
+            | (_weight.y > 0f || _hasHoldY ? AxisMask.Y : AxisMask.None)
+            | (_weight.z > 0f || _hasHoldZ ? AxisMask.Z : AxisMask.None);
 
         /// <inheritdoc cref="FloatAccumulator.Reset"/>
         public void Reset()
@@ -25,33 +41,102 @@ namespace ApexionGame.UguiPlayable.Core
         /// <inheritdoc cref="FloatAccumulator.Add"/>
         public void Add(Vector3 value, float weight)
         {
-            _sum += value * weight;
-            _weight += weight;
+            Add(value, weight, AxisMask.None);
+        }
+
+        /// <summary>
+        /// Adds an active clip's value with its input weight, skipping <paramref name="ignoredAxes"/>.
+        /// </summary>
+        public void Add(Vector3 value, float weight, AxisMask ignoredAxes)
+        {
+            if ((ignoredAxes & AxisMask.X) == 0)
+            {
+                _sum.x += value.x * weight;
+                _weight.x += weight;
+            }
+
+            if ((ignoredAxes & AxisMask.Y) == 0)
+            {
+                _sum.y += value.y * weight;
+                _weight.y += weight;
+            }
+
+            if ((ignoredAxes & AxisMask.Z) == 0)
+            {
+                _sum.z += value.z * weight;
+                _weight.z += weight;
+            }
         }
 
         /// <inheritdoc cref="FloatAccumulator.OfferHold"/>
         public void OfferHold(Vector3 value, double endTime)
         {
-            if (_hasHold && endTime < _holdEnd)
-            {
-                return;
-            }
-
-            _hold = value;
-            _holdEnd = endTime;
-            _hasHold = true;
+            OfferHold(value, endTime, AxisMask.None);
         }
 
-        /// <inheritdoc cref="FloatAccumulator.Resolve"/>
-        public Vector3 Resolve(Vector3 baseValue)
+        /// <summary>
+        /// Offers a finished clip's end value, skipping <paramref name="ignoredAxes"/>; per axis, the clip that ended
+        /// last wins.
+        /// </summary>
+        public void OfferHold(Vector3 value, double endTime, AxisMask ignoredAxes)
         {
-            if (_weight >= 1f)
+            if ((ignoredAxes & AxisMask.X) == 0 && (_hasHoldX == false || endTime >= _holdEndX))
             {
-                return _sum / _weight;
+                _hold.x = value.x;
+                _holdEndX = endTime;
+                _hasHoldX = true;
             }
 
-            var hold = _hasHold ? _hold : baseValue;
-            return hold * (1f - _weight) + _sum;
+            if ((ignoredAxes & AxisMask.Y) == 0 && (_hasHoldY == false || endTime >= _holdEndY))
+            {
+                _hold.y = value.y;
+                _holdEndY = endTime;
+                _hasHoldY = true;
+            }
+
+            if ((ignoredAxes & AxisMask.Z) == 0 && (_hasHoldZ == false || endTime >= _holdEndZ))
+            {
+                _hold.z = value.z;
+                _holdEndZ = endTime;
+                _hasHoldZ = true;
+            }
+        }
+
+        /// <summary>
+        /// Returns the blended value. An axis with no contribution keeps its component of
+        /// <paramref name="currentValue"/>.
+        /// </summary>
+        /// <param name="baseValue">The value the property had when the track bound it.</param>
+        /// <param name="currentValue">The value the property has now.</param>
+        public Vector3 Resolve(Vector3 baseValue, Vector3 currentValue)
+        {
+            return new Vector3(
+                  ResolveAxis(_sum.x, _weight.x, _hasHoldX, _hold.x, baseValue.x, currentValue.x)
+                , ResolveAxis(_sum.y, _weight.y, _hasHoldY, _hold.y, baseValue.y, currentValue.y)
+                , ResolveAxis(_sum.z, _weight.z, _hasHoldZ, _hold.z, baseValue.z, currentValue.z)
+            );
+        }
+
+        private static float ResolveAxis(
+              float sum
+            , float weight
+            , bool hasHold
+            , float hold
+            , float baseValue
+            , float currentValue
+        )
+        {
+            if (weight <= 0f && hasHold == false)
+            {
+                return currentValue;
+            }
+
+            if (weight >= 1f)
+            {
+                return sum / weight;
+            }
+
+            return (hasHold ? hold : baseValue) * (1f - weight) + sum;
         }
     }
 }

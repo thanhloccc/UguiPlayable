@@ -29,6 +29,9 @@ namespace ApexionGame.UguiPlayable.Core
         [SerializeField]
         private EaseSetting _ease;
 
+        [SerializeField]
+        private AxisMask _ignoredAxes;
+
         [NonSerialized]
         private T _captured;
 
@@ -38,21 +41,35 @@ namespace ApexionGame.UguiPlayable.Core
         /// <summary>
         /// Creates a channel with a linear ease.
         /// </summary>
-        public TweenChannel(T from, T to, ValueMode mode = ValueMode.Absolute, bool enabled = true)
-            : this(from, to, EaseSetting.Default, mode, enabled)
+        public TweenChannel(
+              T from
+            , T to
+            , ValueMode mode = ValueMode.Absolute
+            , bool enabled = true
+            , AxisMask ignoredAxes = AxisMask.None
+        )
+            : this(from, to, EaseSetting.Default, mode, enabled, ignoredAxes)
         {
         }
 
         /// <summary>
         /// Creates a channel.
         /// </summary>
-        public TweenChannel(T from, T to, EaseSetting ease, ValueMode mode = ValueMode.Absolute, bool enabled = true)
+        public TweenChannel(
+              T from
+            , T to
+            , EaseSetting ease
+            , ValueMode mode = ValueMode.Absolute
+            , bool enabled = true
+            , AxisMask ignoredAxes = AxisMask.None
+        )
         {
             _enabled = enabled;
             _mode = mode;
             _from = from;
             _to = to;
             _ease = ease;
+            _ignoredAxes = ignoredAxes;
             _captured = default;
             _hasCaptured = false;
         }
@@ -71,6 +88,12 @@ namespace ApexionGame.UguiPlayable.Core
 
         /// <summary>The ease applied to the clip's progress.</summary>
         public EaseSetting Ease => _ease;
+
+        /// <summary>
+        /// The axes this channel leaves alone, so another clip can animate them. Used by <see cref="Vector2"/> and
+        /// <see cref="Vector3"/> channels, ignored by float and color channels.
+        /// </summary>
+        public AxisMask IgnoredAxes => _ignoredAxes;
 
         /// <summary>Whether <see cref="Captured"/> holds the value read when the clip became active.</summary>
         public bool HasCaptured => _hasCaptured;

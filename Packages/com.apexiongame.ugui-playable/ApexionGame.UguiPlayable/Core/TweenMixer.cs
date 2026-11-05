@@ -86,6 +86,7 @@ namespace ApexionGame.UguiPlayable.Core
                     {
                         _active[i] = true;
                         behaviour.OnActivated(binding);
+                        OnInputActivated(behaviour, binding);
                     }
 
                     Accumulate(behaviour, weight, window.ToProgress(input.GetTime()));
@@ -117,6 +118,14 @@ namespace ApexionGame.UguiPlayable.Core
         public override void OnPlayableDestroy(Playable playable)
         {
             RestoreIfNeeded();
+        }
+
+        /// <summary>
+        /// Called right after <see cref="TweenBehaviour.OnActivated"/>, for captures that need the mixer's own state
+        /// (for example a rotation the mixer keeps unwrapped).
+        /// </summary>
+        protected virtual void OnInputActivated(TBehaviour behaviour, TBinding binding)
+        {
         }
 
         /// <summary>Stores the bound component's current values as the base values.</summary>
