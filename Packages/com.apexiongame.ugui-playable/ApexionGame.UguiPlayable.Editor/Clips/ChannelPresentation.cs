@@ -5,6 +5,7 @@ using UnityEngine;
 using ApexionGame.UguiPlayable.Editor.Common;
 using ApexionGame.UguiPlayable.Tracks.Controls;
 using ApexionGame.UguiPlayable.Tracks.Layout;
+using ApexionGame.UguiPlayable.Tracks.Transforms;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
@@ -51,6 +52,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string TEXT = "_text";
         public const string PUNCH = "_punch";
         public const string SHAKE = "_shake";
+        public const string ROTATION_MODE = "_rotationMode";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -130,6 +132,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         /// </summary>
         public static bool IsUnsetWhenNegative(Type clipType)
             => clipType == typeof(LayoutElementClip);
+
+        /// <summary>
+        /// The template field that holds the channel's rotation mode, or null when the channel has none. Only the
+        /// rotation of a <see cref="RectTransformClip"/> has one.
+        /// </summary>
+        public static string GetRotationModePath(Type clipType, string name)
+            => clipType == typeof(RectTransformClip) && name == ROTATION ? ROTATION_MODE : null;
 
         private readonly record struct Entry(string DisplayName, Func<Texture2D> Icon);
     }

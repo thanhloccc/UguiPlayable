@@ -72,6 +72,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string SEED_TOOLTIP = "The same seed always gives the same shake.";
         public const string NEW_SEED_TOOLTIP = "Pick a new random seed.";
 
+        public const string ROTATION_PATH = "Path";
+        public const string ROTATION_EULER = "Euler";
+        public const string ROTATION_SHORTEST = "Shortest";
+        public const string SHORTEST_PATH_NOTE =
+            "Turns the short way. Axis toggles are ignored; a full turn becomes no turn.";
+
         public const string TEXT_RICH_TAGS_NOTE = "Rich text tags are revealed as plain characters.";
 
         public const string TEXT_SCRAMBLE_TOOLTIP =

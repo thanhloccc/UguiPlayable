@@ -38,6 +38,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         private TweenChannel<Vector3> _rotation = new(Vector3.zero, Vector3.zero, enabled: false);
 
         [SerializeField]
+        private RotationMode _rotationMode;
+
+        [SerializeField]
         private TweenChannel<Vector3> _scale = new(Vector3.one, Vector3.one, enabled: false);
 
         [SerializeField]
@@ -90,10 +93,21 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         }
 
         /// <summary>The <see cref="Transform.localEulerAngles"/> channel, blended per axis in degrees.</summary>
+        /// <remarks>See <see cref="RotationMode"/> for the shortest-path alternative.</remarks>
         public TweenChannel<Vector3> Rotation
         {
             get => _rotation;
             set => _rotation = value;
+        }
+
+        /// <summary>
+        /// How the rotation channel turns. <see cref="Transforms.RotationMode.Euler"/> (the default) blends each euler
+        /// angle; <see cref="Transforms.RotationMode.ShortestPath"/> turns the short way and ignores the axis toggles.
+        /// </summary>
+        public RotationMode RotationMode
+        {
+            get => _rotationMode;
+            set => _rotationMode = value;
         }
 
         /// <summary>The <see cref="Transform.localScale"/> channel.</summary>

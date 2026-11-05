@@ -14,10 +14,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
     public sealed class RectTransformMixer : TweenMixer<RectTransform, RectTransformBehaviour>
     {
         private const float ROTATION_SYNC_DEGREES = 0.01f;
+        private const AxisMask ROTATION_AXES = AxisMask.X | AxisMask.Y | AxisMask.Z;
 
         private Vector3 _baseAnchoredPosition;
         private Vector2 _baseSizeDelta;
         private Vector3 _baseRotation;
+        private Quaternion _baseRotationQ;
         private Vector3 _baseScale;
         private Vector2 _basePivot;
         private Vector2 _baseAnchorMin;
@@ -26,6 +28,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         private Vector3Accumulator _anchoredPosition;
         private Vector2Accumulator _sizeDelta;
         private Vector3Accumulator _rotation;
+        private QuaternionAccumulator _rotationQ;
+        private QuaternionAccumulator _rotationQAll;
         private Vector3Accumulator _scale;
         private Vector2Accumulator _pivot;
         private Vector2Accumulator _anchorMin;
@@ -43,6 +47,17 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         // come back as a flipped decomposition (X in [0, 90] ∪ [270, 360)), so rotation never reads it back except
         // to resync after another system rotated the transform.
         private Vector3 _lastRotation;
+
+        // The rotation this mixer last wrote, before the offset, as a quaternion. On the quaternion path it is the
+        // exact value; on the euler path it is rebuilt from _lastRotation.
+        private Quaternion _lastRotationQ;
+
+        // Whether the last rotation write took the quaternion path, and whether any write since the capture did.
+        private bool _lastWriteQuaternion;
+        private bool _wroteRotationQuaternion;
+
+        // The latest end time among this frame's Euler holds, or negative infinity without one.
+        private double _eulerHoldEnd;
 
         // The oscillation offsets written last frame, 0 on axes without one. The binding holds pre-offset value +
         // last offset, so subtracting them gives the value the tween channels work from; this is what keeps an
@@ -69,7 +84,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             _basePivot = binding.pivot;
             _baseAnchorMin = binding.anchorMin;
             _baseAnchorMax = binding.anchorMax;
+            _baseRotationQ = binding.localRotation;
             _lastRotation = _baseRotation;
+            _lastRotationQ = _baseRotationQ;
+            _lastWriteQuaternion = false;
+            _wroteRotationQuaternion = false;
             _lastOffsetPosition = Vector3.zero;
             _lastOffsetRotation = Vector3.zero;
             _lastOffsetScale = Vector3.zero;
@@ -115,7 +134,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
                 );
             }
 
-            if (_wroteRotation != AxisMask.None)
+            if (_wroteRotationQuaternion)
+            {
+                binding.localRotation = _baseRotationQ;
+            }
+            else if (_wroteRotation != AxisMask.None)
             {
                 SyncRotation(binding);
                 binding.localEulerAngles = AxisMaskMath.Merge(_lastRotation, _baseRotation, _wroteRotation);
@@ -149,6 +172,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
             _anchoredPosition.Reset();
             _sizeDelta.Reset();
             _rotation.Reset();
+            _rotationQ.Reset();
+            _rotationQAll.Reset();
+            _eulerHoldEnd = double.NegativeInfinity;
             _scale.Reset();
             _pivot.Reset();
             _anchorMin.Reset();
@@ -185,8 +211,18 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
 
             if (rotation.Enabled)
             {
-                var value = TweenChannelMath.Evaluate(rotation, progress, _baseRotation);
-                _rotation.Add(value, weight, rotation.IgnoredAxes);
+                if (behaviour.RotationMode == RotationMode.ShortestPath)
+                {
+                    var q = EvaluateRotation(rotation, progress, _baseRotationQ);
+                    _rotationQ.Add(q, weight);
+                    _rotationQAll.Add(q, weight);
+                }
+                else
+                {
+                    var value = TweenChannelMath.Evaluate(rotation, progress, _baseRotation);
+                    _rotation.Add(value, weight, rotation.IgnoredAxes);
+                    _rotationQAll.Add(ToEulerQuaternion(value, rotation.IgnoredAxes), weight);
+                }
             }
 
             var scale = behaviour.Scale;
@@ -305,8 +341,19 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
 
             if (rotation.Enabled)
             {
-                var value = TweenChannelMath.Evaluate(rotation, 1f, _baseRotation);
-                _rotation.OfferHold(value, endTime, rotation.IgnoredAxes);
+                if (behaviour.RotationMode == RotationMode.ShortestPath)
+                {
+                    var q = EvaluateRotation(rotation, 1f, _baseRotationQ);
+                    _rotationQ.OfferHold(q, endTime);
+                    _rotationQAll.OfferHold(q, endTime);
+                }
+                else
+                {
+                    var value = TweenChannelMath.Evaluate(rotation, 1f, _baseRotation);
+                    _rotation.OfferHold(value, endTime, rotation.IgnoredAxes);
+                    _rotationQAll.OfferHold(ToEulerQuaternion(value, rotation.IgnoredAxes), endTime);
+                    _eulerHoldEnd = endTime > _eulerHoldEnd ? endTime : _eulerHoldEnd;
+                }
             }
 
             var scale = behaviour.Scale;
@@ -387,7 +434,21 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
 
             var hadOffsetRotation = IsNonZero(_lastOffsetRotation);
 
-            if (_rotation.HasContribution || _offsetAxesRotation != AxisMask.None || hadOffsetRotation)
+            if (UsesQuaternionPath())
+            {
+                SyncRotation(binding);
+
+                var q = _rotationQAll.Resolve(_baseRotationQ, _lastRotationQ);
+
+                binding.localRotation = q * Quaternion.Euler(_offsetRotation);
+                _lastRotationQ = q;
+                _lastRotation = AxisMaskMath.NormalizeEuler(q.eulerAngles);
+                _lastWriteQuaternion = true;
+                _wroteRotationQuaternion = true;
+                _wroteRotation |= ROTATION_AXES;
+                _lastOffsetRotation = _offsetRotation;
+            }
+            else if (_rotation.HasContribution || _offsetAxesRotation != AxisMask.None || hadOffsetRotation)
             {
                 SyncRotation(binding);
 
@@ -399,6 +460,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
                 binding.localEulerAngles = _lastRotation + _offsetRotation;
                 _wroteRotation |= _rotation.ContributedAxes | _offsetAxesRotation;
                 _lastOffsetRotation = _offsetRotation;
+                _lastRotationQ = Quaternion.Euler(_lastRotation);
+                _lastWriteQuaternion = false;
             }
 
             var hadOffsetScale = IsNonZero(_lastOffsetScale);
@@ -425,12 +488,52 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         // Re-reads the rotation only when another system rotated the transform since this mixer last wrote it.
         private void SyncRotation(RectTransform binding)
         {
-            var written = Quaternion.Euler(_lastRotation + _lastOffsetRotation);
+            var written = _lastWriteQuaternion
+                ? _lastRotationQ * Quaternion.Euler(_lastOffsetRotation)
+                : Quaternion.Euler(_lastRotation + _lastOffsetRotation);
 
             if (Quaternion.Angle(written, binding.localRotation) > ROTATION_SYNC_DEGREES)
             {
+                _lastRotationQ = binding.localRotation;
                 _lastRotation = AxisMaskMath.NormalizeEuler(binding.localEulerAngles);
                 _lastOffsetRotation = Vector3.zero;
+            }
+        }
+
+        // D24, with a hold counted as a contributing input: a weighted Shortest-path input this frame, or, when no
+        // input weighs on the rotation, a Shortest-path clip that finished last (a tie goes to Shortest path).
+        private bool UsesQuaternionPath()
+        {
+            if (_rotationQ.Weight > 0f)
+            {
+                return true;
+            }
+
+            return _rotationQAll.Weight <= 0f && _rotationQ.HasHold && _rotationQ.HoldEndTime >= _eulerHoldEnd;
+        }
+
+        // An Euler input on the quaternion path: its ignored axes take the last written angles, as on the euler path.
+        private Quaternion ToEulerQuaternion(Vector3 value, AxisMask ignoredAxes)
+            => Quaternion.Euler(AxisMaskMath.Merge(_lastRotation, value, ROTATION_AXES & ~ignoredAxes));
+
+        private static Quaternion EvaluateRotation(in TweenChannel<Vector3> channel, float progress, Quaternion baseQ)
+        {
+            var eased = channel.Ease.Evaluate(progress);
+            var to = Quaternion.Euler(channel.To);
+
+            switch (channel.Mode)
+            {
+                case ValueMode.Relative:
+                    return baseQ * Quaternion.SlerpUnclamped(Quaternion.Euler(channel.From), to, eased);
+
+                case ValueMode.FromCurrent:
+                {
+                    var from = channel.HasCaptured ? Quaternion.Euler(channel.Captured) : baseQ;
+                    return Quaternion.SlerpUnclamped(from, to, eased);
+                }
+
+                default:
+                    return Quaternion.SlerpUnclamped(Quaternion.Euler(channel.From), to, eased);
             }
         }
     }

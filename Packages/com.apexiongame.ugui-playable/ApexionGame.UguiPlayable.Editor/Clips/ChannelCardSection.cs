@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Common;
+using ApexionGame.UguiPlayable.Tracks.Transforms;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
@@ -14,6 +15,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     internal sealed class ChannelCardSection
     {
         private static readonly string[] s_modeLabels = { "Absolute", "Relative", "From current" };
+        private static readonly string[] s_rotationModeLabels = {
+              TweenClipTexts.ROTATION_EULER
+            , TweenClipTexts.ROTATION_SHORTEST
+        };
         private static readonly string[] s_axisClasses = {
               TweenClipSections.AXIS_BUTTON_X_USS_CLASS_NAME
             , TweenClipSections.AXIS_BUTTON_Y_USS_CLASS_NAME
@@ -31,6 +36,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private readonly SerializedProperty _ignoredAxes;
         private readonly SerializedProperty _from;
         private readonly SerializedProperty _to;
+        private readonly SerializedProperty _rotationMode;
         private readonly bool _warnsNegative;
 
         private readonly VisualElement _card = new();
@@ -85,6 +91,17 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 _body.Add(CreateAxesRow());
             }
 
+            var rotationModePath = ChannelPresentation.GetRotationModePath(
+                  serializedObject.targetObject.GetType()
+                , info.Name
+            );
+
+            if (rotationModePath != null)
+            {
+                _rotationMode = template.FindPropertyRelative(rotationModePath);
+                _body.Add(CreateRotationModeRow());
+            }
+
             _note = TweenClipSections.CreateNote(string.Empty);
             _body.Add(_note);
 
@@ -107,6 +124,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_mode, _ => RefreshState());
             _card.TrackPropertyValue(_ignoredAxes, _ => RefreshState());
+
+            if (_rotationMode != null)
+            {
+                _card.TrackPropertyValue(_rotationMode, _ => RefreshState());
+            }
 
             if (_warnsNegative)
             {
@@ -223,6 +245,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             row.Add(_axisGroup);
             return row;
         }
+
+        private VisualElement CreateRotationModeRow()
+        {
+            var row = TweenClipSections.CreateRow(TweenClipTexts.ROTATION_PATH);
+            var control = SegmentedControl.Create(s_rotationModeLabels);
+
+            row.Add(control.BindEnum(_rotationMode, s_rotationModeLabels.Length));
+            return row;
+        }
+
+        private bool IsShortestPath()
+            => _rotationMode != null && _rotationMode.enumValueIndex == (int)RotationMode.ShortestPath;
 
         private static int GetDimension(ChannelValueKind kind)
             => kind switch {
@@ -570,6 +604,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _fromRow.Root.style.display = mode == ValueMode.FromCurrent ? DisplayStyle.None : DisplayStyle.Flex;
             _note.text = GetNote(mode);
 
+            if (IsShortestPath())
+            {
+                _note.text = _note.text.Length == 0
+                    ? TweenClipTexts.SHORTEST_PATH_NOTE
+                    : _note.text + "\n" + TweenClipTexts.SHORTEST_PATH_NOTE;
+            }
+
             // A size below 0 is "not set" to uGUI; the note is for the ends the clip really uses.
             if (HasNegativeEnd(mode))
             {
@@ -618,6 +659,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             }
 
             _axisGroup?.SetValueWithoutNotify(new ToggleButtonGroupState(animated, _axisButtons.Length));
+            _axisGroup?.SetEnabled(IsShortestPath() == false);
         }
 
         private static void RefreshLink(ValueRow row)
