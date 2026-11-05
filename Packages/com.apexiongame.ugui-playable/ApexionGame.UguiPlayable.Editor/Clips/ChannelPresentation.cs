@@ -38,6 +38,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string PREFERRED_HEIGHT = "_preferredHeight";
         public const string FLEXIBLE_WIDTH = "_flexibleWidth";
         public const string FLEXIBLE_HEIGHT = "_flexibleHeight";
+        public const string FONT_SIZE = "_fontSize";
+        public const string CHARACTER_SPACING = "_characterSpacing";
+        public const string WORD_SPACING = "_wordSpacing";
+        public const string LINE_SPACING = "_lineSpacing";
+        public const string PARAGRAPH_SPACING = "_paragraphSpacing";
+        public const string VISIBLE_RATIO = "_visibleRatio";
+        public const string COLOR_GRADIENT = "_colorGradient";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -64,6 +71,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [PREFERRED_HEIGHT] = new("Preferred Height", static () => EditorIcons.Ruler),
             [FLEXIBLE_WIDTH] = new("Flexible Width", static () => EditorIcons.Ruler),
             [FLEXIBLE_HEIGHT] = new("Flexible Height", static () => EditorIcons.Ruler),
+            [FONT_SIZE] = new("Font Size", static () => EditorIcons.CaseSensitive),
+            [CHARACTER_SPACING] = new("Character Spacing", static () => EditorIcons.Space),
+            [WORD_SPACING] = new("Word Spacing", static () => EditorIcons.Space),
+            [LINE_SPACING] = new("Line Spacing", static () => EditorIcons.Baseline),
+            [PARAGRAPH_SPACING] = new("Paragraph Spacing", static () => EditorIcons.Pilcrow),
+            [VISIBLE_RATIO] = new("Visible Ratio", static () => EditorIcons.TextCursor),
+            [COLOR_GRADIENT] = new("Color Gradient", static () => EditorIcons.Paintbrush),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
@@ -92,7 +106,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         /// </summary>
         public static bool IsNormalized(Type clipType, string name)
             => name switch {
-                ALPHA or FILL_AMOUNT or SIZE => true,
+                ALPHA or FILL_AMOUNT or SIZE or VISIBLE_RATIO => true,
                 VALUE => clipType == typeof(ScrollbarClip),
                 _ => false,
             };

@@ -40,6 +40,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             "This RectTransform's size is driven by a ContentSizeFitter or AspectRatioFitter; animated size is "
             + "overwritten on layout rebuild.";
 
+        public const string GRADIENT_OFF_NOTE =
+            "Color Gradient is off on the bound text, so the gradient is not shown. Turn it on in the text's "
+            + "Extra Settings.";
+
         public const string SCROLL_RECT_NO_CONTENT =
             "This ScrollRect has no Content, so there is nothing to scroll. Assign its Content.";
 

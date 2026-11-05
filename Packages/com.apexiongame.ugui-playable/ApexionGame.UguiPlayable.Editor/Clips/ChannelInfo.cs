@@ -22,6 +22,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         Vector3,
         Vector4,
         Color,
+
+        /// <summary>A <c>TMPro.VertexGradient</c>: four corner colors.</summary>
+        VertexGradient,
     }
 
     /// <summary>

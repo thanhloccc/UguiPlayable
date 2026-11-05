@@ -3,7 +3,8 @@
     "rootNamespace": "ApexionGame.UguiPlayable",
     "references": [
         "Unity.Timeline",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

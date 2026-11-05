@@ -119,6 +119,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _source.Changed += UpdatePipettes;
 
+            if (info.ValueKind == ChannelValueKind.VertexGradient)
+            {
+                _source.Changed += RefreshState;
+            }
+
             RefreshState();
             UpdatePipettes();
         }
@@ -291,6 +296,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     break;
                 }
 
+                case ChannelValueKind.VertexGradient:
+                    field = CreateGradientGrid(value);
+                    break;
+
                 case ChannelValueKind.Vector2:
                 {
                     var vector2Field = new Vector2Field();
@@ -320,6 +329,40 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             }
 
             field.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
+            return field;
+        }
+
+        // Four corner colors in a 2x2 grid: top row left/right, bottom row left/right.
+        private static VisualElement CreateGradientGrid(SerializedProperty value)
+        {
+            var grid = new VisualElement();
+            grid.AddToClassList(TweenClipSections.GRADIENT_USS_CLASS_NAME);
+
+            grid.Add(CreateGradientRow(value, "topLeft", "TL", "topRight", "TR"));
+            grid.Add(CreateGradientRow(value, "bottomLeft", "BL", "bottomRight", "BR"));
+            return grid;
+        }
+
+        private static VisualElement CreateGradientRow(
+              SerializedProperty value
+            , string leftName
+            , string leftCaption
+            , string rightName
+            , string rightCaption
+        )
+        {
+            var row = new VisualElement();
+            row.AddToClassList(TweenClipSections.GRADIENT_ROW_USS_CLASS_NAME);
+            row.Add(CreateCornerField(value.FindPropertyRelative(leftName), leftCaption));
+            row.Add(CreateCornerField(value.FindPropertyRelative(rightName), rightCaption));
+            return row;
+        }
+
+        private static ColorField CreateCornerField(SerializedProperty corner, string caption)
+        {
+            var field = new ColorField(caption);
+            field.AddToClassList(TweenClipSections.GRADIENT_FIELD_USS_CLASS_NAME);
+            field.BindProperty(corner);
             return field;
         }
 
@@ -444,6 +487,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         private void OnPipetteClicked(SerializedProperty target)
         {
+            if (_info.ValueKind == ChannelValueKind.VertexGradient)
+            {
+                CopyGradient(target);
+                return;
+            }
+
             if (BindingValueReader.TryRead(_info.Name, _source.Binding, out var sample) == false)
             {
                 return;
@@ -474,6 +523,21 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     break;
             }
 
+            _serializedObject.ApplyModifiedProperties();
+        }
+
+        private void CopyGradient(SerializedProperty target)
+        {
+            if (BindingValueReader.TryReadGradient(_source.Binding, out var gradient) == false)
+            {
+                return;
+            }
+
+            _serializedObject.Update();
+            target.FindPropertyRelative("topLeft").colorValue = gradient.topLeft;
+            target.FindPropertyRelative("topRight").colorValue = gradient.topRight;
+            target.FindPropertyRelative("bottomLeft").colorValue = gradient.bottomLeft;
+            target.FindPropertyRelative("bottomRight").colorValue = gradient.bottomRight;
             _serializedObject.ApplyModifiedProperties();
         }
 
@@ -512,6 +576,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 _note.text = _note.text.Length == 0
                     ? TweenClipTexts.NEGATIVE_UNSET_NOTE
                     : _note.text + "\n" + TweenClipTexts.NEGATIVE_UNSET_NOTE;
+            }
+
+            // The gradient is only drawn while the bound text has Color Gradient on.
+            if (_info.ValueKind == ChannelValueKind.VertexGradient
+                && BindingValueReader.IsVertexGradientOff(_source.Binding))
+            {
+                _note.text = _note.text.Length == 0
+                    ? TweenClipTexts.GRADIENT_OFF_NOTE
+                    : _note.text + "\n" + TweenClipTexts.GRADIENT_OFF_NOTE;
             }
 
             _note.style.display = _note.text.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;

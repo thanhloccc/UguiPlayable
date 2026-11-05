@@ -133,6 +133,20 @@ namespace ApexionGame.UguiPlayable.Core
         /// <summary>Writes the base values back, for the properties this mixer wrote.</summary>
         protected abstract void RestoreBase(TBinding binding);
 
+        /// <summary>
+        /// Writes back the base values of properties that are not serialized, so Timeline's edit-mode preview cannot
+        /// revert them (for example <c>TMP_Text.maxVisibleCharacters</c>).
+        /// </summary>
+        /// <remarks>
+        /// Preview API: this hook may change before 1.0. It is called when the graph is destroyed in Edit Mode, before
+        /// the base is cleared, whatever the <see cref="RestoreMode"/> is: in Edit Mode Timeline reverts the
+        /// serialized properties itself but cannot revert these. Timeline's window flushes the destroy at once when
+        /// the preview stops. The default does nothing.
+        /// </remarks>
+        protected virtual void RestoreUnserialized(TBinding binding)
+        {
+        }
+
         /// <summary>Resets the accumulators.</summary>
         protected abstract void BeginFrame();
 
@@ -147,9 +161,17 @@ namespace ApexionGame.UguiPlayable.Core
 
         private void RestoreIfNeeded()
         {
-            if (_restoreMode == RestoreMode.Revert && _hasBase && _binding.IsValid())
+            if (_hasBase && _binding.IsValid())
             {
-                RestoreBase(_binding);
+                if (Application.isPlaying == false)
+                {
+                    RestoreUnserialized(_binding);
+                }
+
+                if (_restoreMode == RestoreMode.Revert)
+                {
+                    RestoreBase(_binding);
+                }
             }
 
             _hasBase = false;

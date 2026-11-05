@@ -21,6 +21,8 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string VALUE = "_value";
         public const string THRESHOLD = "_threshold";
 
+        private static readonly string[] s_gradientCorners = { "topLeft", "topRight", "bottomLeft", "bottomRight" };
+
         private const string CONSTRAIN_FROM_SUFFIX = "ConstrainFrom";
         private const string CONSTRAIN_TO_SUFFIX = "ConstrainTo";
 
@@ -153,10 +155,30 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     kind = ChannelValueKind.Color;
                     return true;
 
+                case SerializedPropertyType.Generic when IsVertexGradient(from):
+                    kind = ChannelValueKind.VertexGradient;
+                    return true;
+
                 default:
                     kind = default;
                     return false;
             }
+        }
+
+        // A VertexGradient is a Generic struct with four Color corners.
+        private static bool IsVertexGradient(SerializedProperty from)
+        {
+            for (var i = 0; i < s_gradientCorners.Length; i++)
+            {
+                var corner = from.FindPropertyRelative(s_gradientCorners[i]);
+
+                if (corner == null || corner.propertyType != SerializedPropertyType.Color)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

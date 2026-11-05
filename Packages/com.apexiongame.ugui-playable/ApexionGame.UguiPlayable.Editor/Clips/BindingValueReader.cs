@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -87,13 +88,74 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.EFFECT_DISTANCE:
                     return TryReadShadow(binding, shadow => shadow.effectDistance, out value);
 
+                case ChannelPresentation.FONT_SIZE:
+                    return TryReadText(binding, text => text.fontSize, out value);
+
+                case ChannelPresentation.CHARACTER_SPACING:
+                    return TryReadText(binding, text => text.characterSpacing, out value);
+
+                case ChannelPresentation.WORD_SPACING:
+                    return TryReadText(binding, text => text.wordSpacing, out value);
+
+                case ChannelPresentation.LINE_SPACING:
+                    return TryReadText(binding, text => text.lineSpacing, out value);
+
+                case ChannelPresentation.PARAGRAPH_SPACING:
+                    return TryReadText(binding, text => text.paragraphSpacing, out value);
+
+                case ChannelPresentation.VISIBLE_RATIO:
+                    return TryReadText(binding, GetVisibleRatio, out value);
+
                 default:
                     return false;
             }
         }
 
         public static bool CanRead(string channelName, Object binding)
-            => TryRead(channelName, binding, out _);
+            => channelName == ChannelPresentation.COLOR_GRADIENT
+                ? TryReadGradient(binding, out _)
+                : TryRead(channelName, binding, out _);
+
+        /// <summary>
+        /// Reads <see cref="TMP_Text.colorGradient"/>. A vertex gradient has four colors, which a Vector4 cannot hold,
+        /// so it has its own reader.
+        /// </summary>
+        public static bool TryReadGradient(Object binding, out VertexGradient value)
+        {
+            if (TryResolve<TMP_Text>(binding, out var text))
+            {
+                value = text.colorGradient;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Whether the binding is a text whose vertex gradient is switched off, so a gradient channel has no visible
+        /// effect.
+        /// </summary>
+        public static bool IsVertexGradientOff(Object binding)
+            => TryResolve<TMP_Text>(binding, out var text) && text.enableVertexGradient == false;
+
+        private static float GetVisibleRatio(TMP_Text text)
+        {
+            var count = text.textInfo.characterCount;
+            return count > 0 && text.maxVisibleCharacters < count ? text.maxVisibleCharacters / (float)count : 1f;
+        }
+
+        private static bool TryReadText(Object binding, System.Func<TMP_Text, float> read, out Vector4 value)
+        {
+            if (TryResolve<TMP_Text>(binding, out var text))
+            {
+                value = new Vector4(read(text), 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
 
         // Euler angles read as 0..360. A from/to authored as -90 would look like 270, so map each axis to -180..180.
         private static Vector3 Normalize(Vector3 euler)

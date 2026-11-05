@@ -16,6 +16,7 @@ using ApexionGame.UguiPlayable.Tracks.Effects;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
 using ApexionGame.UguiPlayable.Tracks.Layout;
+using ApexionGame.UguiPlayable.Tracks.Text;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
 using Button = UnityEngine.UIElements.Button;
 using Image = UnityEngine.UI.Image;
@@ -72,6 +73,7 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(RawImageClip))]
     [TestCase(typeof(ShadowClip))]
     [TestCase(typeof(LayoutElementClip))]
+    [TestCase(typeof(TmpTextClip))]
     public void Inspector_BuildsWithoutABinding(Type clipType)
     {
         Create(clipType);
@@ -103,6 +105,10 @@ public sealed class TweenClipInspectorTests
     [TestCase(
           typeof(LayoutElementClip)
         , "_minWidth,_minHeight,_preferredWidth,_preferredHeight,_flexibleWidth,_flexibleHeight"
+    )]
+    [TestCase(
+          typeof(TmpTextClip)
+        , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient"
     )]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
@@ -607,6 +613,91 @@ public sealed class TweenClipInspectorTests
         scrollRect.content = (RectTransform)content.transform;
 
         Assert.IsTrue(BindingValueReader.TryRead("_normalizedPosition", scrollRect, out _));
+    }
+
+    [Test]
+    public void TmpTextClip_DrawsTheGradientAsAGridOfFourColorFieldsWithoutAxes()
+    {
+        Create(typeof(TmpTextClip));
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+
+        Assert.AreEqual(ChannelValueKind.VertexGradient, Find(channels, "_colorGradient").ValueKind);
+        Assert.AreEqual(ChannelValueKind.Float, Find(channels, "_visibleRatio").ValueKind);
+
+        var card = ChannelCardSection.Create(serializedObject, Find(channels, "_colorGradient"), new ClipBindingSource(_clip));
+
+        // From and to, four corners each, and no axes row.
+        Assert.AreEqual(8, card.Query<ColorField>().ToList().Count);
+        Assert.AreEqual(4, card.Query<VisualElement>(className: TweenClipSections.GRADIENT_ROW_USS_CLASS_NAME).ToList().Count);
+        Assert.AreEqual(0, card.Query<Button>(className: TweenClipSections.AXIS_BUTTON_USS_CLASS_NAME).ToList().Count);
+    }
+
+    [Test]
+    public void TmpTextClip_DrawsTheVisibleRatioAsASlider()
+    {
+        Create(typeof(TmpTextClip));
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+        var card = ChannelCardSection.Create(serializedObject, Find(channels, "_visibleRatio"), new ClipBindingSource(_clip));
+
+        Assert.AreEqual(2, card.Query<UnityEngine.UIElements.Slider>().ToList().Count);
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsATmpText()
+    {
+        _gameObject = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer));
+
+        var text = _gameObject.AddComponent<TMPro.TextMeshProUGUI>();
+        text.fontSize = 20f;
+        text.characterSpacing = 1f;
+        text.wordSpacing = 2f;
+        text.lineSpacing = 3f;
+        text.paragraphSpacing = 4f;
+        text.colorGradient = new TMPro.VertexGradient(Color.red, Color.green, Color.blue, Color.black);
+
+        var expected = new (string Name, float Value)[] {
+            ("_fontSize", 20f),
+            ("_characterSpacing", 1f),
+            ("_wordSpacing", 2f),
+            ("_lineSpacing", 3f),
+            ("_paragraphSpacing", 4f),
+            ("_visibleRatio", 1f),
+        };
+
+        foreach (var (name, value) in expected)
+        {
+            Assert.IsTrue(BindingValueReader.TryRead(name, text, out var read), name);
+            Assert.AreEqual(value, read.x, 0.0001f, name);
+        }
+
+        Assert.IsTrue(BindingValueReader.TryReadGradient(text, out var gradient));
+        Assert.AreEqual(Color.red, gradient.topLeft);
+        Assert.AreEqual(Color.green, gradient.topRight);
+        Assert.AreEqual(Color.blue, gradient.bottomLeft);
+        Assert.AreEqual(Color.black, gradient.bottomRight);
+        Assert.IsTrue(BindingValueReader.CanRead("_colorGradient", _gameObject));
+        Assert.IsTrue(BindingValueReader.TryRead("_alpha", text, out _));
+        Assert.IsTrue(BindingValueReader.TryRead("_color", text, out _));
+    }
+
+    [Test]
+    public void BindingValueReader_NotesAGradientOnlyWhileItIsSwitchedOff()
+    {
+        _gameObject = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer));
+
+        var text = _gameObject.AddComponent<TMPro.TextMeshProUGUI>();
+
+        Assert.IsTrue(BindingValueReader.IsVertexGradientOff(text));
+
+        text.enableVertexGradient = true;
+
+        Assert.IsFalse(BindingValueReader.IsVertexGradientOff(text));
+        Assert.IsFalse(BindingValueReader.IsVertexGradientOff(null));
+        Assert.IsFalse(BindingValueReader.TryReadGradient(null, out _));
     }
 
     private static ChannelInfo Find(System.Collections.Generic.IReadOnlyList<ChannelInfo> channels, string name)

@@ -5,7 +5,8 @@
         "ApexionGame.UguiPlayable",
         "Unity.Timeline",
         "Unity.Timeline.Editor",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"
