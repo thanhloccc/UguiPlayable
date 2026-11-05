@@ -227,6 +227,82 @@ public sealed class TweenClipInspectorTests
     }
 
     [Test]
+    public void RotationModePath_IsOnlyOnTheRectTransformRotation()
+    {
+        Assert.AreEqual(
+              "_rotationMode"
+            , ChannelPresentation.GetRotationModePath(typeof(RectTransformClip), ChannelPresentation.ROTATION)
+        );
+
+        Assert.IsNull(ChannelPresentation.GetRotationModePath(typeof(RectTransformClip), ChannelPresentation.SCALE));
+        Assert.IsNull(ChannelPresentation.GetRotationModePath(typeof(GraphicClip), ChannelPresentation.ROTATION));
+
+        Create(typeof(RectTransformClip));
+
+        var path = TweenClipModel.TEMPLATE + "." + ChannelPresentation.ROTATION_MODE;
+
+        Assert.IsNotNull(_editor.serializedObject.FindProperty(path));
+    }
+
+    [UnityTest]
+    public IEnumerator RotationCard_PathRowWritesTheModeInOneUndoStep_AndShortestPathDisablesTheAxes()
+    {
+        Create(typeof(RectTransformClip));
+
+        var clip = (RectTransformClip)_clip;
+        var root = BuildInHost();
+        yield return Frames();
+
+        var pathRows = root.Query<VisualElement>(className: TweenClipSections.ROW_USS_CLASS_NAME)
+            .ToList()
+            .Where(IsPathRow)
+            .ToList();
+
+        Assert.AreEqual(1, pathRows.Count, "no other card has the row");
+
+        var card = FindCard(pathRows[0]);
+        var cardName = card.Q<Label>(className: TweenClipSections.CARD_NAME_USS_CLASS_NAME);
+        var pathControl = pathRows[0].Q<ToggleButtonGroup>();
+        var axes = card.Q<ToggleButtonGroup>(className: TweenClipSections.AXIS_GROUP_USS_CLASS_NAME);
+        var note = card.Q<Label>(className: TweenClipSections.NOTE_USS_CLASS_NAME);
+
+        Assert.AreEqual("Rotation", cardName.text);
+        Assert.AreEqual(RotationMode.Euler, clip.Template.RotationMode);
+        Assert.IsTrue(axes.enabledSelf);
+
+        Undo.IncrementCurrentGroup();
+        pathControl.value = SegmentedControl.ToState((int)RotationMode.ShortestPath, 2);
+        yield return Frames();
+
+        Assert.AreEqual(RotationMode.ShortestPath, clip.Template.RotationMode);
+        Assert.IsFalse(axes.enabledSelf, "Shortest path ignores the axis toggles");
+        Assert.IsTrue(note.text.Contains(TweenClipTexts.SHORTEST_PATH_NOTE));
+
+        Undo.PerformUndo();
+        yield return Frames();
+
+        Assert.AreEqual(RotationMode.Euler, clip.Template.RotationMode, "one undo reverts the path");
+        Assert.IsTrue(axes.enabledSelf);
+        Assert.IsFalse(note.text.Contains(TweenClipTexts.SHORTEST_PATH_NOTE));
+    }
+
+    private static bool IsPathRow(VisualElement row)
+    {
+        var label = row.Q<Label>(className: TweenClipSections.ROW_LABEL_USS_CLASS_NAME);
+        return label != null && label.text == TweenClipTexts.ROTATION_PATH;
+    }
+
+    private static VisualElement FindCard(VisualElement element)
+    {
+        while (element != null && element.ClassListContains(TweenClipSections.CARD_USS_CLASS_NAME) == false)
+        {
+            element = element.parent;
+        }
+
+        return element;
+    }
+
+    [Test]
     public void Pipette_IsDisabledWithoutATimelineBinding()
     {
         Create(typeof(RectTransformClip));
