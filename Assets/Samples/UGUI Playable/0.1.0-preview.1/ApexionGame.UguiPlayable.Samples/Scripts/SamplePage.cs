@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace ApexionGame.UguiPlayable.Samples.PageFlow
+namespace ApexionGame.UguiPlayable.Samples
 {
     /// <summary>
     /// Plays a page's Show and Hide timelines. It sits on the page root (screen, popup or overlay prefab) next to

@@ -1,6 +1,6 @@
 {
-    "name": "ApexionGame.UguiPlayable.Samples.Basics",
-    "rootNamespace": "ApexionGame.UguiPlayable.Samples.Basics",
+    "name": "ApexionGame.UguiPlayable.Samples",
+    "rootNamespace": "ApexionGame.UguiPlayable.Samples",
     "references": [
         "ApexionGame.UguiPlayable",
         "Unity.Timeline",
