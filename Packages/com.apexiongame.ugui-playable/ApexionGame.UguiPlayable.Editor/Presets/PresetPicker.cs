@@ -50,7 +50,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
         private const float WIDTH = 340f;
         private const float HEIGHT = 420f;
         private const float MIN_HEIGHT = 200f;
-        private const string ALL_CATEGORIES = "All";
+        internal const string ALL_CATEGORIES = "All";
         private const string ADD_TITLE = "Add Preset";
         private const string APPLY_TITLE = "Apply Preset";
         private const string BINDING_ROOT_LABEL = "Binding root";
@@ -238,7 +238,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
             => $"This timeline is shared by {count} other director{(count == 1 ? string.Empty : "s")}; "
                 + "they would get unbound tracks.";
 
-        private static bool Matches(TweenPreset preset, string query, string category)
+        internal static bool Matches(TweenPreset preset, string query, string category)
         {
             var inCategory = category == ALL_CATEGORIES
                 || string.Equals(preset.Category, category, StringComparison.Ordinal);

@@ -267,7 +267,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
             EditorApplication.projectChanged += ClearUsageCache;
         }
 
-        private static int BeginGroup(string name)
+        internal static int BeginGroup(string name)
         {
             Undo.IncrementCurrentGroup();
             Undo.SetCurrentGroupName(name);
@@ -333,7 +333,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
         /// Copies the package's track settings (restore mode, send callbacks) that the track type has. Never
         /// <c>CopySerialized</c>: that would copy the clip list too.
         /// </summary>
-        private static void CopyTrackSettings(TrackAsset source, TrackAsset track)
+        internal static void CopyTrackSettings(TrackAsset source, TrackAsset track)
         {
             var from = new SerializedObject(source);
             var to = new SerializedObject(track);
@@ -351,7 +351,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
             to.ApplyModifiedProperties();
         }
 
-        private static void AddClips(
+        internal static void AddClips(
               TrackAsset sourceTrack
             , TrackAsset track
             , double startTime
@@ -502,7 +502,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
             return copy;
         }
 
-        private static void RecordPrefabInstance(PlayableDirector director)
+        internal static void RecordPrefabInstance(PlayableDirector director)
         {
             if (PrefabUtility.IsPartOfPrefabInstance(director))
             {
@@ -630,7 +630,7 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
         /// <summary>
         /// Binds created tracks by the preset's paths from the binding root, recording the director once.
         /// </summary>
-        private sealed class Binder
+        internal sealed class Binder
         {
             private readonly TweenPreset _preset;
             private readonly PlayableDirector _director;
@@ -692,13 +692,13 @@ namespace ApexionGame.UguiPlayable.Editor.Presets
                 RecordPrefabInstance(_director);
             }
 
-            private static Type GetBindingType(TrackAsset track)
+            public static Type GetBindingType(TrackAsset track)
             {
                 var attributes = track.GetType().GetCustomAttributes(typeof(TrackBindingTypeAttribute), true);
                 return attributes.Length > 0 ? ((TrackBindingTypeAttribute)attributes[0]).type : null;
             }
 
-            private static Object ResolveBinding(Transform transform, Type type)
+            public static Object ResolveBinding(Transform transform, Type type)
             {
                 if (type == null)
                 {

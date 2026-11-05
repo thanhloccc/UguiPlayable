@@ -64,6 +64,8 @@ namespace ApexionGame.UguiPlayable.Editor.Common
         public const string TOGGLE_RIGHT = "toggle-right";
         public const string TEXT_SELECT = "text-select";
         public const string WAND_SPARKLES = "wand-sparkles";
+        public const string LIBRARY = "library";
+        public const string LIST_ORDERED = "list-ordered";
 
         private static readonly string[] s_names = {
             LAYERS, MOVE, PALETTE, IMAGE, LINK, UNLINK, PIPETTE, CHART_SPLINE,
@@ -72,7 +74,7 @@ namespace ApexionGame.UguiPlayable.Editor.Common
             SLIDERS_HORIZONTAL, GALLERY_VERTICAL, SCROLL, CHEVRONS_LEFT_RIGHT, WALLPAPER, FRAME, COPY, RULER,
             COLUMNS_3, GRID_3X3, MOVE_HORIZONTAL, TYPE, CASE_SENSITIVE, SPACE, BASELINE, PILCROW, TEXT_CURSOR,
             PAINTBRUSH, WHOLE_WORD, ACTIVITY, VIBRATE, DICES,
-            TOGGLE_RIGHT, TEXT_SELECT, WAND_SPARKLES,
+            TOGGLE_RIGHT, TEXT_SELECT, WAND_SPARKLES, LIBRARY, LIST_ORDERED,
         };
 
         private static readonly Texture2D[] s_darkIcons = new Texture2D[s_names.Length];
@@ -217,6 +219,12 @@ namespace ApexionGame.UguiPlayable.Editor.Common
 
         /// <summary>Presets: Apply preset, and the default preset icon.</summary>
         public static Texture2D WandSparkles => Get(44);
+
+        /// <summary>Preset browser window.</summary>
+        public static Texture2D Library => Get(45);
+
+        /// <summary>Stagger recipe.</summary>
+        public static Texture2D ListOrdered => Get(46);
 
         /// <summary>
         /// Returns the icon called <paramref name="name"/> (one of <see cref="Names"/>) for the current skin.

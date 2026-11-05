@@ -1,0 +1,7 @@
+.ugp-preset-browser {
+    --ugp-preset-browser-secondary: #bdbdbd;
+    --ugp-preset-browser-line: #454545;
+    --ugp-preset-browser-panel: #2d2d2d;
+    --ugp-preset-browser-item-hover: #3e3e3e;
+    --ugp-preset-browser-item-selected: #2c5d87;
+}
