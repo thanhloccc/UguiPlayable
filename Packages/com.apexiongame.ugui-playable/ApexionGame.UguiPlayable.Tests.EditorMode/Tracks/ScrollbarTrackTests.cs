@@ -57,7 +57,7 @@ public sealed class ScrollbarTrackTests
         }
 
         _created.Clear();
-        PlayModeSeam.OverrideForTests = null;
+        PlayModeSeam.s_overrideForTests = null;
     }
 
     [Test]
@@ -230,7 +230,7 @@ public sealed class ScrollbarTrackTests
         _scrollbar.value = 0.3f;
         _track.RestoreMode = RestoreMode.Revert;
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = true;
+        PlayModeSeam.s_overrideForTests = true;
         AddClip(0d, 1d, new ScrollbarBehaviour());
         EvaluateAt(0.5d);
 
@@ -258,7 +258,7 @@ public sealed class ScrollbarTrackTests
     private int ScrubWithListener(bool sendCallbacks, bool playing)
     {
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = playing;
+        PlayModeSeam.s_overrideForTests = playing;
         AddClip(0d, 1d, new ScrollbarBehaviour());
 
         var calls = 0;
@@ -308,7 +308,7 @@ public sealed class ScrollbarTrackTests
         before = contentRect.anchoredPosition;
 
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = true;
+        PlayModeSeam.s_overrideForTests = true;
         AddClip(0d, 1d, new ScrollbarBehaviour());
         EvaluateAt(0.5d);
 

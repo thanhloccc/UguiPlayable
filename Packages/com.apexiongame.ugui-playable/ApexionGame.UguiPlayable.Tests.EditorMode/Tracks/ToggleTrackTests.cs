@@ -63,7 +63,7 @@ public sealed class ToggleTrackTests
         }
 
         _created.Clear();
-        PlayModeSeam.OverrideForTests = null;
+        PlayModeSeam.s_overrideForTests = null;
     }
 
     [Test]
@@ -166,7 +166,7 @@ public sealed class ToggleTrackTests
     public void Evaluate_WritesNothingWhenTheValueDoesNotChange()
     {
         _track.SendCallbacks = true;
-        PlayModeSeam.OverrideForTests = true;
+        PlayModeSeam.s_overrideForTests = true;
         AddClip(0d, 1d, new StepChannel(true));
 
         var calls = 0;
@@ -187,7 +187,7 @@ public sealed class ToggleTrackTests
         _a.SetIsOnWithoutNotify(true);
         _track.RestoreMode = RestoreMode.Revert;
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = true;
+        PlayModeSeam.s_overrideForTests = true;
         AddClip(0d, 1d, new StepChannel(true));
         EvaluateAt(0.75d);
         Assert.That(_b.isOn, Is.True);
@@ -288,7 +288,7 @@ public sealed class ToggleTrackTests
     private int ScrubWithListener(bool sendCallbacks, bool playing)
     {
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = playing;
+        PlayModeSeam.s_overrideForTests = playing;
         AddClip(0d, 1d, new StepChannel(true));
         AddClip(1d, 1d, new StepChannel(false));
 

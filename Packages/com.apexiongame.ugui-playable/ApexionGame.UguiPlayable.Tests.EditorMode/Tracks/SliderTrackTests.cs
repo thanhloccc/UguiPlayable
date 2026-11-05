@@ -57,7 +57,7 @@ public sealed class SliderTrackTests
         }
 
         _created.Clear();
-        PlayModeSeam.OverrideForTests = null;
+        PlayModeSeam.s_overrideForTests = null;
     }
 
     [Test]
@@ -222,7 +222,7 @@ public sealed class SliderTrackTests
         _slider.value = 0.3f;
         _track.RestoreMode = RestoreMode.Revert;
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = true;
+        PlayModeSeam.s_overrideForTests = true;
         AddClip(0d, 1d, new TweenChannel<float>(0f, 1f));
         EvaluateAt(0.5d);
 
@@ -250,7 +250,7 @@ public sealed class SliderTrackTests
     private int ScrubWithListener(bool sendCallbacks, bool playing)
     {
         _track.SendCallbacks = sendCallbacks;
-        PlayModeSeam.OverrideForTests = playing;
+        PlayModeSeam.s_overrideForTests = playing;
         AddClip(0d, 1d, new TweenChannel<float>(0f, 1f));
 
         var calls = 0;
