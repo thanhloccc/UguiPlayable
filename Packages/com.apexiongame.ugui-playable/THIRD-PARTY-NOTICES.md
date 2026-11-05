@@ -1,7 +1,8 @@
 # Third-Party Notices
 
-UGUI Playable contains code ported from the projects below. Each ported file
-keeps a `// Ported from …` header naming its source.
+UGUI Playable contains code ported from, or ordered after, the projects below. Each ported file keeps a
+`// Ported from …` header naming its source. Each section gives the source, what was taken, and the full licence
+text.
 
 ## EncosyTower
 
@@ -23,12 +24,99 @@ Ported files (paths relative to `Packages/com.laicasaane.encosy-tower/`):
 - `ApexionGame.UguiPlayable.Editor/Internal/ThrowHelper.cs` from `EncosyTower.Core/Editor/ThrowHelper.cs` and
   `EncosyTower.Core/Debugging/ThrowHelper.cs`
 
+```text
+MIT License
+
+Copyright (c) 2026 Laicasaane
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## .NET (dotnet/runtime)
+
+- Source: https://github.com/dotnet/runtime
+- License: MIT, Copyright (c) .NET Foundation and Contributors
+
+These files came in through the EncosyTower ports above and keep their .NET Foundation headers:
+
+- `ApexionGame.UguiPlayable/Internal/ThrowHelper.cs`
+- `ApexionGame.UguiPlayable/Internal/System.Diagnostics/StackTraceHiddenAttribute.cs`
+- `ApexionGame.UguiPlayable/Internal/System.Runtime.CompilerServices/CallerArgumentExpressionAttribute.cs`
+- `ApexionGame.UguiPlayable.Editor/Internal/System.Runtime.CompilerServices/IsExternalInit.cs`
+
+```text
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ## TweenPlayables
 
 - Source: https://github.com/AnnulusGames/TweenPlayables
 - License: MIT, Copyright (c) 2023 Annulus Games
 
-Ported files: none yet.
+No code was copied. `ScrambleMode` (`ApexionGame.UguiPlayable/Core/ScrambleMode.cs`) and the easing enum
+(`ApexionGame.UguiPlayable/Easing/Ease.cs`) repeat its member order.
+
+```text
+MIT License
+
+Copyright (c) 2023 Annulus Games
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## Lucide
 
@@ -36,14 +124,15 @@ Ported files: none yet.
 - License: ISC, Copyright (c) 2026 Lucide Icons and Contributors. Some icons derive from Feather (MIT,
   Copyright (c) 2013-present Cole Bemis); both licenses are reproduced below.
 
-Icons used (rendered to PNG in dark and light colours at 16 px and 32 px, under
-`ApexionGame.UguiPlayable.Editor/Common/Icons/`): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
+Icons used (rendered to PNG in dark and light colours at 16 px and 32 px (`@2x`), under
+`ApexionGame.UguiPlayable.Editor/Common/Icons/`; the 32 px files are used on high-DPI screens): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
 `pipette`, `chart-spline`, `scaling`, `rotate-cw`, `scale-3d`, `crosshair`, `anchor`, `blend`, `percent`,
 `mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`, `sliders-horizontal`, `gallery-vertical`, `scroll`, `chevrons-left-right`, `wallpaper`, `frame`, `copy`, `ruler`, `columns-3`, `grid-3x3`, `move-horizontal`, `type`, `case-sensitive`, `space`, `baseline`, `pilcrow`, `text-cursor`, `paintbrush`, `whole-word`, `activity`, `vibrate`, `dices`. `move`, `link`,
 `crosshair`, `percent`, `chevron-down`, `chevron-right` and `type` are Feather-derived.
 
-The sample (`Samples~/ApexionGame.UguiPlayable.Samples/Art/Icons/`) uses `x` and `arrow-left`,
-rendered white at 64 px.
+The sample uses `x` and `arrow-left`, rendered white at 64 px. In this repository they live in
+`Assets/Samples/UGUI Playable/<version>/ApexionGame.UguiPlayable.Samples/Art/Icons/`; the released package ships
+them in `Samples~/ApexionGame.UguiPlayable.Samples/Art/Icons/`.
 
 ```text
 ISC License
