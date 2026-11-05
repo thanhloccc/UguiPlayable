@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Core;
+using ApexionGame.UguiPlayable.Easing;
 
 namespace ApexionGame.UguiPlayable.Tracks.Groups
 {
@@ -43,6 +44,25 @@ namespace ApexionGame.UguiPlayable.Tracks.Groups
         {
             get => _blocksRaycasts;
             set => _blocksRaycasts = value;
+        }
+
+        /// <inheritdoc/>
+        internal override bool HasEnabledChannel()
+            => _alpha.Enabled
+                || _interactable.Enabled
+                || _blocksRaycasts.Enabled;
+
+        /// <inheritdoc/>
+        internal override bool TryGetFirstEnabledEase(out EaseSetting ease)
+        {
+            if (_alpha.Enabled)
+            {
+                ease = _alpha.Ease;
+                return true;
+            }
+
+            ease = default;
+            return false;
         }
 
         /// <inheritdoc/>

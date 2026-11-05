@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using ApexionGame.UguiPlayable.Core;
+using ApexionGame.UguiPlayable.Easing;
 
 namespace ApexionGame.UguiPlayable.Tracks.Graphics
 {
@@ -47,6 +48,37 @@ namespace ApexionGame.UguiPlayable.Tracks.Graphics
         {
             get => _fillAmount;
             set => _fillAmount = value;
+        }
+
+        /// <inheritdoc/>
+        internal override bool HasEnabledChannel()
+            => _color.Enabled
+                || _alpha.Enabled
+                || _fillAmount.Enabled;
+
+        /// <inheritdoc/>
+        internal override bool TryGetFirstEnabledEase(out EaseSetting ease)
+        {
+            if (_color.Enabled)
+            {
+                ease = _color.Ease;
+                return true;
+            }
+
+            if (_alpha.Enabled)
+            {
+                ease = _alpha.Ease;
+                return true;
+            }
+
+            if (_fillAmount.Enabled)
+            {
+                ease = _fillAmount.Ease;
+                return true;
+            }
+
+            ease = default;
+            return false;
         }
 
         /// <inheritdoc/>

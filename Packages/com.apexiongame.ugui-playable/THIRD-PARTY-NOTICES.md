@@ -17,6 +17,8 @@ Ported files (paths relative to `Packages/com.laicasaane.encosy-tower/`):
   `EncosyTower.Core/System.Runtime.CompilerServices/CallerArgumentExpressionAttribute.cs`
 - `ApexionGame.UguiPlayable/Internal/System.Diagnostics/StackTraceHiddenAttribute.cs` from
   `EncosyTower.Core/System.Diagnostics/StackTraceHiddenAttribute.cs`
+- `ApexionGame.UguiPlayable.Editor/Internal/System.Runtime.CompilerServices/IsExternalInit.cs` from
+  `EncosyTower.Core/System.Runtime.CompilerServices/IsExternalInit.cs`
 - `ApexionGame.UguiPlayable.Editor/Internal/EditorAssets.cs` from `EncosyTower.Core/Editor/EditorAPI.cs`
 - `ApexionGame.UguiPlayable.Editor/Internal/ThrowHelper.cs` from `EncosyTower.Core/Editor/ThrowHelper.cs` and
   `EncosyTower.Core/Debugging/ThrowHelper.cs`
@@ -36,7 +38,9 @@ Ported files: none yet.
 
 Icons used (rendered to PNG in dark and light colours at 16 px and 32 px, under
 `ApexionGame.UguiPlayable.Editor/Common/Icons/`): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
-`pipette`, `chart-spline`. `move` and `link` are Feather-derived.
+`pipette`, `chart-spline`, `scaling`, `rotate-cw`, `scale-3d`, `crosshair`, `anchor`, `blend`, `percent`,
+`mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`. `move`, `link`,
+`crosshair`, `percent`, `chevron-down` and `chevron-right` are Feather-derived.
 
 The sample (`Samples~/ApexionGame.UguiPlayable.Samples/Art/Icons/`) uses `x` and `arrow-left`,
 rendered white at 64 px.

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Core;
+using ApexionGame.UguiPlayable.Easing;
 
 namespace ApexionGame.UguiPlayable.Tracks.Transforms
 {
@@ -136,6 +137,65 @@ namespace ApexionGame.UguiPlayable.Tracks.Transforms
         {
             get => _scaleConstrainTo;
             set => _scaleConstrainTo = value;
+        }
+
+        /// <inheritdoc/>
+        internal override bool HasEnabledChannel()
+            => _anchoredPosition.Enabled
+                || _sizeDelta.Enabled
+                || _rotation.Enabled
+                || _scale.Enabled
+                || _pivot.Enabled
+                || _anchorMin.Enabled
+                || _anchorMax.Enabled;
+
+        /// <inheritdoc/>
+        internal override bool TryGetFirstEnabledEase(out EaseSetting ease)
+        {
+            if (_anchoredPosition.Enabled)
+            {
+                ease = _anchoredPosition.Ease;
+                return true;
+            }
+
+            if (_sizeDelta.Enabled)
+            {
+                ease = _sizeDelta.Ease;
+                return true;
+            }
+
+            if (_rotation.Enabled)
+            {
+                ease = _rotation.Ease;
+                return true;
+            }
+
+            if (_scale.Enabled)
+            {
+                ease = _scale.Ease;
+                return true;
+            }
+
+            if (_pivot.Enabled)
+            {
+                ease = _pivot.Ease;
+                return true;
+            }
+
+            if (_anchorMin.Enabled)
+            {
+                ease = _anchorMin.Ease;
+                return true;
+            }
+
+            if (_anchorMax.Enabled)
+            {
+                ease = _anchorMax.Ease;
+                return true;
+            }
+
+            ease = default;
+            return false;
         }
 
         /// <inheritdoc/>
