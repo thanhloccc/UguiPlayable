@@ -223,6 +223,26 @@ MonoBehaviour:
     _sizeDeltaConstrainTo: 0
     _scaleConstrainFrom: 0
     _scaleConstrainTo: 0
+    _punch:
+      _enabled: 0
+      _target: 2
+      _strength: {x: 0.2, y: 0.2, z: 0}
+      _frequency: 4
+      _elasticity: 0.5
+      _randomness: 0.5
+      _fadeOut: 1
+      _seed: 0
+      _ignoredAxes: 0
+    _shake:
+      _enabled: 0
+      _target: 0
+      _strength: {x: 10, y: 10, z: 0}
+      _frequency: 10
+      _elasticity: 0.5
+      _randomness: 0.5
+      _fadeOut: 1
+      _seed: 0
+      _ignoredAxes: 0
 --- !u!114 &-8684389865071544965
 MonoBehaviour:
   m_ObjectHideFlags: 1
