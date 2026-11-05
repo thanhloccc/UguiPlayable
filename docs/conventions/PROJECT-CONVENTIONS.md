@@ -248,4 +248,5 @@ The package ships **one sample** (Owner decision 2026-11-05), laid out like Enco
   `CHANGELOG.md`, then the version commit (COMMIT-CONVENTIONS §5).
 - Users install through the Git URL
   `https://github.com/<owner>/<repo>.git?path=Packages/com.apexiongame.ugui-playable`
-  (optionally `#<tag>`). Tags are `v<version>`.
+  (optionally `#<tag>`). Tags are the bare version, with no `v` prefix
+  (`0.1.0-preview.2`), which OpenUPM reads as SemVer.

@@ -1,5 +1,9 @@
 # UGUI Playable
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Unity 6000.3+](https://img.shields.io/badge/Unity-6000.3%2B-black?logo=unity)](https://unity.com/releases/editor/archive)
+[![Version](https://img.shields.io/github/v/tag/thanhloccc/UguiPlayable?include_prereleases&sort=semver&label=version)](https://github.com/thanhloccc/UguiPlayable/tags)
+
 Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI in Unity: move, fade, scale, recolor and fill
 UI elements on a Timeline instead of writing tween code.
 

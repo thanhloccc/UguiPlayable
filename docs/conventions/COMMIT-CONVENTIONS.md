@@ -151,6 +151,6 @@ this order:
 2. Commit vendored EncosyTower updates under their `EncosyTower` topics.
 3. Commit the `package.json` version, the `Samples~` deployment and the
    `CHANGELOG.md` release section as `Version <version>`, then tag
-   `v<version>`.
+   `<version>` (no `v` prefix, e.g. `0.1.0-preview.2`).
 
 Skip a step when the release does not change that output.
