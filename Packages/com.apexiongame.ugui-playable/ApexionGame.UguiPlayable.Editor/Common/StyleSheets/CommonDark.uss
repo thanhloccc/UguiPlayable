@@ -1,0 +1,14 @@
+.ugp-common-section {
+    --ugp-common-section-background: #303030;
+    --ugp-common-section-line: #454545;
+    --ugp-common-section-secondary: #bdbdbd;
+}
+
+.ugp-switch {
+    --ugp-switch-track-off: #1f1f1f;
+    --ugp-switch-track-on: #2f7fd0;
+    --ugp-switch-track-border: #5a5a5a;
+    --ugp-switch-track-hover: #8a8a8a;
+    --ugp-switch-knob: #a8a8a8;
+    --ugp-switch-knob-on: #ffffff;
+}

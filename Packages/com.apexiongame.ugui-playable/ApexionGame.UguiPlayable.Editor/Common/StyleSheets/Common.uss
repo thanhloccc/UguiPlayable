@@ -1,0 +1,70 @@
+.ugp-common-section {
+    margin-top: 6px;
+    padding: 6px;
+    border-radius: 3px;
+    background-color: var(--ugp-common-section-background);
+}
+
+.ugp-common-section__header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 22px;
+    margin-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--ugp-common-section-line);
+}
+
+.ugp-common-section__heading {
+    flex-grow: 1;
+    -unity-font-style: bold;
+}
+
+.ugp-common-section__note {
+    white-space: normal;
+    color: var(--ugp-common-section-secondary);
+}
+
+/* Bool switch: a Toggle drawn as a pill. The checkmark element becomes the knob. */
+.ugp-switch .unity-toggle__input {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    width: 28px;
+    height: 14px;
+    margin-left: 3px;
+    padding: 0;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: var(--ugp-switch-track-border);
+    background-color: var(--ugp-switch-track-off);
+}
+
+.ugp-switch .unity-toggle__checkmark {
+    width: 8px;
+    height: 8px;
+    margin: 0 0 0 2px;
+    border-radius: 4px;
+    background-image: none;
+    background-color: var(--ugp-switch-knob);
+    transition-property: translate;
+    transition-duration: 0.1s;
+}
+
+.ugp-switch .unity-toggle__input:checked {
+    background-color: var(--ugp-switch-track-on);
+    border-color: var(--ugp-switch-track-on);
+}
+
+.ugp-switch .unity-toggle__input:checked > .unity-toggle__checkmark {
+    background-image: none;
+    background-color: var(--ugp-switch-knob-on);
+    translate: 14px 0;
+}
+
+.ugp-switch:hover .unity-toggle__input {
+    border-color: var(--ugp-switch-track-hover);
+}
+
+.ugp-switch:disabled {
+    opacity: 0.5;
+}
