@@ -29,7 +29,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             var root = TweenClipSections.CreateRoot();
 
             var model = TweenClipModel.Create(serializedObject);
-            var source = new ClipBindingSource(target);
+            var source = new ClipBindingSource(targets);
 
             var count = new Label();
             count.AddToClassList(TweenClipSections.COUNT_USS_CLASS_NAME);
@@ -53,6 +53,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             }
 
             RefreshSummary(count, warning);
+            MultiEdit.PollWhileMultiple(root, serializedObject, () => RefreshSummary(count, warning));
 
             source.Refresh();
             root.schedule.Execute(source.Refresh).Every(BINDING_POLL_MILLISECONDS);
@@ -118,7 +119,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             var model = TweenClipModel.Create(serializedObject);
 
-            count.text = TweenClipTexts.FormatChannelCount(model.EnabledCount, model.Channels.Count);
+            count.text = TweenClipTexts.FormatChannelCount(
+                  model.MinEnabledCount
+                , model.EnabledCount
+                , model.Channels.Count
+            );
             warning.style.display = model.HasEnabledChannel ? DisplayStyle.None : DisplayStyle.Flex;
         }
     }

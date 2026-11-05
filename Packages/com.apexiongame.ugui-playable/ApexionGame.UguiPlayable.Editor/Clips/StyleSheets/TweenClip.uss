@@ -165,6 +165,11 @@
     border-bottom-color: rgba(0, 0, 0, 0);
 }
 
+.ugp-tween-card__axis-group > .ugp-tween-card__axis-button.ugp-tween-card__axis-button--mixed {
+    -unity-font-style: italic;
+    border-bottom-color: var(--ugp-tween-card-axis-off-text);
+}
+
 .ugp-tween-card__axis-button--x.ugp-tween-card__axis-button--on {
     color: var(--ugp-tween-card-axis-x);
     border-bottom-color: var(--ugp-tween-card-axis-x);

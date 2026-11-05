@@ -24,6 +24,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string NO_TIMELINE = "Open the clip in a Timeline window to use the binding.";
         public const string NO_TRACK = "The clip was not found in the open Timeline.";
         public const string NO_BINDING = "The track has no binding.";
+        public const string MIXED_BINDINGS = "The selected clips are bound to different objects.";
         public const string UNSUPPORTED_BINDING = "The bound object has no value for this channel.";
         public const string TEXT_FROM_CURRENT_NOTE = "Starts from the text shown when the clip becomes active.";
         public const string ENABLED_TOOLTIP = "Turn this channel on or off.";
@@ -87,5 +88,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         public static string FormatChannelCount(int enabled, int total)
             => $"{enabled} of {total} channels on";
+
+        /// <summary>
+        /// The summary for several clips: "N of K" when every clip has the same count, "N-M of K" otherwise.
+        /// </summary>
+        public static string FormatChannelCount(int minEnabled, int maxEnabled, int total)
+            => minEnabled == maxEnabled
+                ? FormatChannelCount(minEnabled, total)
+                : $"{minEnabled}\u2013{maxEnabled} of {total} channels on";
     }
 }

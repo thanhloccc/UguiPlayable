@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Text;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(TmpTextClip))]
+    [CustomEditor(typeof(TmpTextClip)), CanEditMultipleObjects]
     internal sealed class TmpTextClipInspector : TweenClipInspector
     {
         protected override string Title => "TMP Text Clip";

@@ -47,6 +47,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         private readonly Button[] _axisButtons;
         private ToggleButtonGroup _axisGroup;
+        private ulong _shownAnimated;
         private readonly ValueRow _fromRow;
         private readonly ValueRow _toRow;
 
@@ -123,6 +124,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_mode, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
             _card.TrackPropertyValue(_ignoredAxes, _ => RefreshState());
 
             if (_rotationMode != null)
@@ -256,7 +258,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         }
 
         private bool IsShortestPath()
-            => _rotationMode != null && _rotationMode.enumValueIndex == (int)RotationMode.ShortestPath;
+            => _rotationMode != null
+                && _rotationMode.hasMultipleDifferentValues == false
+                && _rotationMode.enumValueIndex == (int)RotationMode.ShortestPath;
 
         private static int GetDimension(ChannelValueKind kind)
             => kind switch {
@@ -347,7 +351,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     // No constrain rule for four components, so the field binds directly. The component labels
                     // follow the channel's captions (for example X/Y/W/H for a UV rect).
                     var vector4Field = new Vector4Field();
-                    vector4Field.BindProperty(value);
+                    VectorFieldBinder.Bind(vector4Field, value);
                     ApplyCaptions(vector4Field);
                     field = vector4Field;
                     break;
@@ -419,102 +423,57 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             });
         }
 
-        // Vector fields are not bound directly: the constrain rule rewrites the other axes in the same write, so the
-        // edit and the rewrite land in one Undo step. While an edit is in progress (the field has focus, or a label
-        // is being dragged) the other axes scale from the vector the edit started with, so a transient 0 while typing
-        // does not wipe them.
+        // Vector fields are not bound with BindProperty: an edit writes only the axes that changed, so several selected
+        // clips keep their other axes, and the constrain rule rewrites the other axes in the same Undo step.
         private void BindVector2(Vector2Field field, SerializedProperty value, SerializedProperty constrain)
-        {
-            field.SetValueWithoutNotify(value.vector2Value);
-
-            var edit = TrackEdit(field, () => value.vector2Value);
-
-            field.RegisterValueChangedCallback(evt => {
-                _serializedObject.Update();
-
-                var result = (Vector2)Constrain(edit, evt.previousValue, evt.newValue, constrain, 2);
-                value.vector2Value = result;
-                _serializedObject.ApplyModifiedProperties();
-                field.SetValueWithoutNotify(result);
-            });
-
-            field.TrackPropertyValue(value, p => field.SetValueWithoutNotify(p.vector2Value));
-        }
+            => VectorFieldBinder.Bind(field, value, constrain, _ignoredAxes);
 
         private void BindVector3(Vector3Field field, SerializedProperty value, SerializedProperty constrain)
-        {
-            field.SetValueWithoutNotify(value.vector3Value);
+            => VectorFieldBinder.Bind(field, value, constrain, _ignoredAxes);
 
-            var edit = TrackEdit(field, () => value.vector3Value);
-
-            field.RegisterValueChangedCallback(evt => {
-                _serializedObject.Update();
-
-                var result = Constrain(edit, evt.previousValue, evt.newValue, constrain, 3);
-                value.vector3Value = result;
-                _serializedObject.ApplyModifiedProperties();
-                field.SetValueWithoutNotify(result);
-            });
-
-            field.TrackPropertyValue(value, p => field.SetValueWithoutNotify(p.vector3Value));
-        }
-
-        private static VectorEdit TrackEdit(VisualElement field, System.Func<Vector3> read)
-        {
-            var edit = new VectorEdit();
-
-            field.RegisterCallback<FocusInEvent>(_ => edit.Focus(read), TrickleDown.TrickleDown);
-            field.RegisterCallback<FocusOutEvent>(_ => edit.Blur(field), TrickleDown.TrickleDown);
-            field.RegisterCallback<PointerDownEvent>(_ => edit.Press(read), TrickleDown.TrickleDown);
-            field.RegisterCallback<PointerUpEvent>(_ => edit.Release(field), TrickleDown.TrickleDown);
-            field.RegisterCallback<PointerCaptureOutEvent>(_ => edit.Release(field), TrickleDown.TrickleDown);
-            return edit;
-        }
-
-        private Vector3 Constrain(
-              VectorEdit edit
-            , Vector3 previous
-            , Vector3 next
-            , SerializedProperty constrain
-            , int dimension
-        )
-        {
-            if (constrain == null || constrain.boolValue == false)
-            {
-                return next;
-            }
-
-            var baseValue = edit.IsActive ? edit.Base : previous;
-
-            return ConstrainMath.Apply(baseValue, previous, next, (AxisMask)_ignoredAxes.enumValueFlag, dimension);
-        }
-
+        // A button is on when every clip animates the axis; a click sets or clears that axis on all clips. Axes the
+        // clips disagree on show as mixed, and a click turns them on. The other axes are left as they are on each clip.
         private void OnAxesChanged(ToggleButtonGroupState state)
         {
-            var ignored = 0;
+            var changed = new System.Collections.Generic.List<int>();
 
             for (var i = 0; i < _axisButtons.Length; i++)
             {
-                if (state[i] == false)
+                if (state[i] != ((_shownAnimated & (1UL << i)) != 0UL))
                 {
-                    ignored |= 1 << i;
+                    changed.Add(i);
                 }
             }
 
-            if (ignored == _ignoredAxes.enumValueFlag)
+            if (changed.Count == 0)
             {
                 return;
             }
 
             _serializedObject.Update();
-            _ignoredAxes.enumValueFlag = ignored;
-            _serializedObject.ApplyModifiedProperties();
+
+            var path = _ignoredAxes.propertyPath;
+
+            MultiEdit.WriteEach(_serializedObject, (each, _) => {
+                var property = each.FindProperty(path);
+                var ignored = property.enumValueFlag;
+
+                for (var i = 0; i < changed.Count; i++)
+                {
+                    var bit = 1 << changed[i];
+                    ignored = state[changed[i]] ? ignored & ~bit : ignored | bit;
+                }
+
+                property.enumValueFlag = ignored;
+            });
+
+            RefreshState();
         }
 
         private void OnLinkClicked(SerializedProperty constrain)
         {
             _serializedObject.Update();
-            constrain.boolValue = constrain.boolValue == false;
+            constrain.boolValue = MultiEdit.IsAllOn(constrain) == false;
             _serializedObject.ApplyModifiedProperties();
             RefreshState();
         }
@@ -579,7 +538,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            if (_enabled.boolValue == false)
+            if (MultiEdit.IsAnyOn(_enabled) == false)
             {
                 return;
             }
@@ -592,8 +551,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
+            var enabled = MultiEdit.IsAnyOn(_enabled);
             var expanded = IsExpanded;
+            var modeMixed = _mode.hasMultipleDifferentValues;
             var mode = (ValueMode)_mode.enumValueIndex;
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);
@@ -601,8 +561,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _chevron.style.visibility = enabled ? Visibility.Visible : Visibility.Hidden;
             _chevronImage.image = expanded ? EditorIcons.ChevronDown : EditorIcons.ChevronRight;
 
-            _fromRow.Root.style.display = mode == ValueMode.FromCurrent ? DisplayStyle.None : DisplayStyle.Flex;
-            _note.text = GetNote(mode);
+            // The From row is hidden only when every clip starts from the current value.
+            var fromHidden = modeMixed == false && mode == ValueMode.FromCurrent;
+
+            _fromRow.Root.style.display = fromHidden ? DisplayStyle.None : DisplayStyle.Flex;
+            _note.text = modeMixed ? string.Empty : GetNote(mode);
 
             if (IsShortestPath())
             {
@@ -612,7 +575,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             }
 
             // A size below 0 is "not set" to uGUI; the note is for the ends the clip really uses.
-            if (HasNegativeEnd(mode))
+            if (modeMixed == false && HasNegativeEnd(mode))
             {
                 _note.text = _note.text.Length == 0
                     ? TweenClipTexts.NEGATIVE_UNSET_NOTE
@@ -643,14 +606,28 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return;
             }
 
-            var ignored = (AxisMask)_ignoredAxes.enumValueFlag;
+            var masks = MultiEdit.ReadEach(_serializedObject, _ignoredAxes.propertyPath, p => (AxisMask)p.enumValueFlag);
 
             var animated = 0UL;
 
             for (var i = 0; i < _axisButtons.Length; i++)
             {
-                var isOn = ConstrainMath.IsIgnored(ignored, i) == false;
+                var animatedCount = 0;
+
+                for (var j = 0; j < masks.Length; j++)
+                {
+                    if (ConstrainMath.IsIgnored(masks[j], i) == false)
+                    {
+                        animatedCount++;
+                    }
+                }
+
+                // On only when every clip animates the axis; an axis the clips disagree on is mixed.
+                var isOn = animatedCount == masks.Length;
+                var isMixed = animatedCount > 0 && isOn == false;
+
                 _axisButtons[i].EnableInClassList(TweenClipSections.AXIS_BUTTON_ON_USS_CLASS_NAME, isOn);
+                _axisButtons[i].EnableInClassList(TweenClipSections.AXIS_BUTTON_MIXED_USS_CLASS_NAME, isMixed);
 
                 if (isOn)
                 {
@@ -658,6 +635,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 }
             }
 
+            _shownAnimated = animated;
             _axisGroup?.SetValueWithoutNotify(new ToggleButtonGroupState(animated, _axisButtons.Length));
             _axisGroup?.SetEnabled(IsShortestPath() == false);
         }
@@ -669,7 +647,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return;
             }
 
-            var isOn = row.Constrain.boolValue;
+            var isOn = MultiEdit.IsAllOn(row.Constrain);
             row.Link.EnableInClassList(TweenClipSections.ICON_BUTTON_ON_USS_CLASS_NAME, isOn);
             row.LinkImage.image = isOn ? EditorIcons.Link : EditorIcons.Unlink;
         }
@@ -687,7 +665,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             }
 
             // A pipette writes the bound object's absolute value, which is wrong for an offset.
-            if ((ValueMode)_mode.enumValueIndex == ValueMode.Relative)
+            if (AnyRelative())
             {
                 available = false;
                 tooltip = TweenClipTexts.PIPETTE_RELATIVE_TOOLTIP;
@@ -697,6 +675,21 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _fromRow.Pipette.tooltip = tooltip;
             _toRow.Pipette.SetEnabled(available);
             _toRow.Pipette.tooltip = tooltip;
+        }
+
+        private bool AnyRelative()
+        {
+            var modes = MultiEdit.ReadEach(_serializedObject, _mode.propertyPath, p => p.enumValueIndex);
+
+            for (var i = 0; i < modes.Length; i++)
+            {
+                if ((ValueMode)modes[i] == ValueMode.Relative)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         // Relative ends are offsets and from-current has no From, so only the absolute ends can be read as "unset".
@@ -722,63 +715,6 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
                 default:
                     return string.Empty;
-            }
-        }
-
-        // The vector a field had when the current edit started.
-        private sealed class VectorEdit
-        {
-            private bool _focused;
-            private bool _pressed;
-
-            public Vector3 Base { get; private set; }
-
-            public bool IsActive { get; private set; }
-
-            public void Focus(System.Func<Vector3> read)
-            {
-                _focused = true;
-                Begin(read);
-            }
-
-            public void Press(System.Func<Vector3> read)
-            {
-                _pressed = true;
-                Begin(read);
-            }
-
-            public void Blur(VisualElement field)
-            {
-                _focused = false;
-                End(field);
-            }
-
-            public void Release(VisualElement field)
-            {
-                _pressed = false;
-                End(field);
-            }
-
-            private void Begin(System.Func<Vector3> read)
-            {
-                if (IsActive)
-                {
-                    return;
-                }
-
-                Base = read();
-                IsActive = true;
-            }
-
-            // Deferred, so a value committed on blur still sees the base.
-            private void End(VisualElement field)
-            {
-                field.schedule.Execute(() => {
-                    if (_focused == false && _pressed == false)
-                    {
-                        IsActive = false;
-                    }
-                });
             }
         }
 

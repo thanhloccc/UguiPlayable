@@ -90,6 +90,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             body.Add(CreateRow(PIVOT_LABEL, pivot));
 
             _card.TrackPropertyValue(_order, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             RefreshState();
         }
@@ -143,32 +144,26 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             return row;
         }
 
+        // Each selected clip gets its own new seed, in one Undo step.
         private void OnNewSeedClicked()
         {
-            _serializedObject.Update();
-            _seed.intValue = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-            _serializedObject.ApplyModifiedProperties();
+            var path = _seed.propertyPath;
+
+            MultiEdit.WriteEach(_serializedObject, (each, _) => {
+                each.FindProperty(path).intValue = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            });
         }
 
         // A negative index or count has no meaning; the field accepts any int, so the value is clamped on blur.
         private void ClampToZero(SerializedProperty value)
-        {
-            _serializedObject.Update();
-
-            if (value.intValue >= 0)
-            {
-                return;
-            }
-
-            value.intValue = 0;
-            _serializedObject.ApplyModifiedProperties();
-        }
+            => MultiEdit.ClampToZero(_serializedObject, value);
 
         private void RefreshState()
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var isRandom = _order.enumValueIndex == (int)CharacterOrder.Random;
+            // The seed shows when any selected clip uses the random order.
+            var isRandom = _order.hasMultipleDifferentValues || _order.enumValueIndex == (int)CharacterOrder.Random;
 
             _seedRow.style.display = isRandom ? DisplayStyle.Flex : DisplayStyle.None;
         }

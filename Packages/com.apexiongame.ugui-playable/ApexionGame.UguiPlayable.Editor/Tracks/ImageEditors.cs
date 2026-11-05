@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Graphics;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(ImageClip))]
+    [CustomEditor(typeof(ImageClip)), CanEditMultipleObjects]
     internal sealed class ImageClipInspector : TweenClipInspector
     {
         protected override string Title => "Image Clip";

@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Graphics;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(RawImageClip))]
+    [CustomEditor(typeof(RawImageClip)), CanEditMultipleObjects]
     internal sealed class RawImageClipInspector : TweenClipInspector
     {
         protected override string Title => "Raw Image Clip";

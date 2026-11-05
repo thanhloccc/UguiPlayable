@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Transforms;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(RectTransformClip))]
+    [CustomEditor(typeof(RectTransformClip)), CanEditMultipleObjects]
     internal sealed class RectTransformClipInspector : TweenClipInspector
     {
         protected override string Title => "Rect Transform Clip";

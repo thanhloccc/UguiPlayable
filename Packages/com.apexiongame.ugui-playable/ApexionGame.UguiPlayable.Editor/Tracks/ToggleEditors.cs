@@ -26,7 +26,7 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
         }
     }
 
-    [CustomEditor(typeof(ToggleClip))]
+    [CustomEditor(typeof(ToggleClip)), CanEditMultipleObjects]
     internal sealed class ToggleClipInspector : TweenClipInspector
     {
         protected override string Title => "Toggle Clip";

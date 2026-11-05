@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 
@@ -36,24 +37,63 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private const string CONSTRAIN_TO_SUFFIX = "ConstrainTo";
 
         private readonly List<ChannelInfo> _channels;
-        private readonly int _enabledCount;
+        private readonly int _minEnabledCount;
+        private readonly int _maxEnabledCount;
 
         public TweenClipModel(List<ChannelInfo> channels, int enabledCount)
+            : this(channels, enabledCount, enabledCount)
+        {
+        }
+
+        public TweenClipModel(List<ChannelInfo> channels, int minEnabledCount, int maxEnabledCount)
         {
             _channels = channels;
-            _enabledCount = enabledCount;
+            _minEnabledCount = minEnabledCount;
+            _maxEnabledCount = maxEnabledCount;
         }
 
         public IReadOnlyList<ChannelInfo> Channels => _channels;
 
-        public int EnabledCount => _enabledCount;
+        /// <summary>The most channels any selected clip has on; the count of the clip when only one is selected.</summary>
+        public int EnabledCount => _maxEnabledCount;
 
-        public bool HasEnabledChannel => _enabledCount > 0;
+        /// <summary>The fewest channels any selected clip has on.</summary>
+        public int MinEnabledCount => _minEnabledCount;
+
+        /// <summary>True when at least one selected clip has a channel on.</summary>
+        public bool HasEnabledChannel => _maxEnabledCount > 0;
 
         /// <summary>
-        /// Reads the channels of the first target of <paramref name="serializedObject"/>.
+        /// Reads the channels of the first target of <paramref name="serializedObject"/>, and the enabled count of
+        /// every target (the clips share one type, so they share the channels).
         /// </summary>
         public static TweenClipModel Create(SerializedObject serializedObject)
+        {
+            var model = CreateForFirstTarget(serializedObject);
+
+            if (serializedObject.isEditingMultipleObjects == false)
+            {
+                return model;
+            }
+
+            var min = int.MaxValue;
+            var max = 0;
+            var targets = serializedObject.targetObjects;
+
+            for (var i = 0; i < targets.Length; i++)
+            {
+                using var each = new SerializedObject(targets[i]);
+
+                var count = CreateForFirstTarget(each).EnabledCount;
+
+                min = Math.Min(min, count);
+                max = Math.Max(max, count);
+            }
+
+            return new TweenClipModel(new List<ChannelInfo>(model._channels), min == int.MaxValue ? 0 : min, max);
+        }
+
+        private static TweenClipModel CreateForFirstTarget(SerializedObject serializedObject)
         {
             var channels = new List<ChannelInfo>();
             var enabledCount = 0;

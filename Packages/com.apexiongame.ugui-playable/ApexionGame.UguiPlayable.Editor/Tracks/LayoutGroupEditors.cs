@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Layout;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(LayoutGroupClip))]
+    [CustomEditor(typeof(LayoutGroupClip)), CanEditMultipleObjects]
     internal sealed class LayoutGroupClipInspector : TweenClipInspector
     {
         protected override string Title => "Layout Group Clip";

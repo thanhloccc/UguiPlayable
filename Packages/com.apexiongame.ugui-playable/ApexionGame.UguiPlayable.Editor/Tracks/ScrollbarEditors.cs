@@ -10,7 +10,7 @@ using ApexionGame.UguiPlayable.Tracks.Controls;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(ScrollbarClip))]
+    [CustomEditor(typeof(ScrollbarClip)), CanEditMultipleObjects]
     internal sealed class ScrollbarClipInspector : TweenClipInspector
     {
         protected override string Title => "Scrollbar Clip";

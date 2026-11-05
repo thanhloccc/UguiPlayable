@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Effects;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(ShadowClip))]
+    [CustomEditor(typeof(ShadowClip)), CanEditMultipleObjects]
     internal sealed class ShadowClipInspector : TweenClipInspector
     {
         protected override string Title => "Shadow Clip";

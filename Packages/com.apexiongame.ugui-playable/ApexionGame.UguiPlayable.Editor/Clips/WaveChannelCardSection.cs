@@ -67,7 +67,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             var amplitudeField = new Vector3Field();
             amplitudeField.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
-            amplitudeField.BindProperty(channel.FindPropertyRelative(TweenClipModel.AMPLITUDE));
+            VectorFieldBinder.Bind(amplitudeField, channel.FindPropertyRelative(TweenClipModel.AMPLITUDE));
             _body.Add(CreateRow(AMPLITUDE, amplitudeField));
 
             var cycles = channel.FindPropertyRelative(TweenClipModel.CYCLES);
@@ -83,6 +83,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _body.Add(CreateRow(PHASE, phaseField));
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             RefreshState();
         }
@@ -134,23 +135,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         // A negative cycle count has no meaning; the field accepts any float, so the value is clamped on blur.
         private void ClampCycles(SerializedProperty cycles)
-        {
-            _serializedObject.Update();
-
-            if (cycles.floatValue >= 0f)
-            {
-                return;
-            }
-
-            cycles.floatValue = 0f;
-            _serializedObject.ApplyModifiedProperties();
-        }
+            => MultiEdit.ClampToZero(_serializedObject, cycles);
 
         private void ToggleExpanded()
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            if (_enabled.boolValue == false)
+            if (MultiEdit.IsAnyOn(_enabled) == false)
             {
                 return;
             }
@@ -163,7 +154,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
+            var enabled = MultiEdit.IsAnyOn(_enabled);
             var expanded = IsExpanded;
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);

@@ -9,7 +9,7 @@ using ApexionGame.UguiPlayable.Tracks.Groups;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(CanvasGroupClip))]
+    [CustomEditor(typeof(CanvasGroupClip)), CanEditMultipleObjects]
     internal sealed class CanvasGroupClipInspector : TweenClipInspector
     {
         protected override string Title => "Canvas Group Clip";

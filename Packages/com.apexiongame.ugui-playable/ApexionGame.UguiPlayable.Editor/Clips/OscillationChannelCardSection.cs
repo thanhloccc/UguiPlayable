@@ -45,6 +45,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private readonly Button[] _axisButtons = new Button[AXIS_COUNT];
 
         private ToggleButtonGroup _axisGroup;
+        private ulong _shownAnimated;
 
         private OscillationChannelCardSection(SerializedObject serializedObject, ChannelInfo info)
         {
@@ -77,7 +78,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _body.Add(CreateAxesRow());
 
             var strengthField = new Vector3Field();
-            strengthField.BindProperty(channel.FindPropertyRelative(TweenClipModel.STRENGTH));
+            VectorFieldBinder.Bind(strengthField, channel.FindPropertyRelative(TweenClipModel.STRENGTH));
             strengthField.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
             _body.Add(CreateRow(TweenClipTexts.STRENGTH, strengthField));
 
@@ -114,6 +115,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_ignoredAxes, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             RefreshState();
         }
@@ -222,54 +224,63 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             return row;
         }
 
+        // Each selected clip gets its own new seed, in one Undo step.
         private void OnNewSeedClicked()
         {
-            _serializedObject.Update();
-            _seed.intValue = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-            _serializedObject.ApplyModifiedProperties();
+            var path = _seed.propertyPath;
+
+            MultiEdit.WriteEach(_serializedObject, (each, _) => {
+                each.FindProperty(path).intValue = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            });
         }
 
         // A negative frequency has no meaning; the field accepts any float, so the value is clamped on blur.
         private void ClampFrequency(SerializedProperty frequency)
-        {
-            _serializedObject.Update();
+            => MultiEdit.ClampToZero(_serializedObject, frequency);
 
-            if (frequency.floatValue >= 0f)
-            {
-                return;
-            }
-
-            frequency.floatValue = 0f;
-            _serializedObject.ApplyModifiedProperties();
-        }
-
+        // Only the axes whose button changed are written, so the clips keep their other axes.
         private void OnAxesChanged(ToggleButtonGroupState state)
         {
-            var ignored = 0;
+            var changed = new System.Collections.Generic.List<int>();
 
             for (var i = 0; i < AXIS_COUNT; i++)
             {
-                if (state[i] == false)
+                if (state[i] != ((_shownAnimated & (1UL << i)) != 0UL))
                 {
-                    ignored |= 1 << i;
+                    changed.Add(i);
                 }
             }
 
-            if (ignored == _ignoredAxes.enumValueFlag)
+            if (changed.Count == 0)
             {
                 return;
             }
 
             _serializedObject.Update();
-            _ignoredAxes.enumValueFlag = ignored;
-            _serializedObject.ApplyModifiedProperties();
+
+            var path = _ignoredAxes.propertyPath;
+
+            MultiEdit.WriteEach(_serializedObject, (each, _) => {
+                var property = each.FindProperty(path);
+                var ignored = property.enumValueFlag;
+
+                for (var i = 0; i < changed.Count; i++)
+                {
+                    var bit = 1 << changed[i];
+                    ignored = state[changed[i]] ? ignored & ~bit : ignored | bit;
+                }
+
+                property.enumValueFlag = ignored;
+            });
+
+            RefreshState();
         }
 
         private void ToggleExpanded()
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            if (_enabled.boolValue == false)
+            if (MultiEdit.IsAnyOn(_enabled) == false)
             {
                 return;
             }
@@ -282,7 +293,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
+            var enabled = MultiEdit.IsAnyOn(_enabled);
             var expanded = IsExpanded;
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);
@@ -290,13 +301,27 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _chevron.style.visibility = enabled ? Visibility.Visible : Visibility.Hidden;
             _chevronImage.image = expanded ? EditorIcons.ChevronDown : EditorIcons.ChevronRight;
 
-            var ignored = (AxisMask)_ignoredAxes.enumValueFlag;
+            var masks = MultiEdit.ReadEach(_serializedObject, _ignoredAxes.propertyPath, p => (AxisMask)p.enumValueFlag);
             var animated = 0UL;
 
             for (var i = 0; i < AXIS_COUNT; i++)
             {
-                var isOn = ConstrainMath.IsIgnored(ignored, i) == false;
+                var animatedCount = 0;
+
+                for (var j = 0; j < masks.Length; j++)
+                {
+                    if (ConstrainMath.IsIgnored(masks[j], i) == false)
+                    {
+                        animatedCount++;
+                    }
+                }
+
+                // On only when every clip adds the axis; an axis the clips disagree on is mixed.
+                var isOn = animatedCount == masks.Length;
+                var isMixed = animatedCount > 0 && isOn == false;
+
                 _axisButtons[i].EnableInClassList(TweenClipSections.AXIS_BUTTON_ON_USS_CLASS_NAME, isOn);
+                _axisButtons[i].EnableInClassList(TweenClipSections.AXIS_BUTTON_MIXED_USS_CLASS_NAME, isMixed);
 
                 if (isOn)
                 {
@@ -304,6 +329,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 }
             }
 
+            _shownAnimated = animated;
             _axisGroup.SetValueWithoutNotify(new ToggleButtonGroupState(animated, AXIS_COUNT));
         }
     }

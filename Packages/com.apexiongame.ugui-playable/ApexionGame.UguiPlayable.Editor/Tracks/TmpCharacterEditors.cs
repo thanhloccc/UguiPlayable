@@ -127,7 +127,7 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
             };
     }
 
-    [CustomEditor(typeof(TmpCharacterClip))]
+    [CustomEditor(typeof(TmpCharacterClip)), CanEditMultipleObjects]
     internal sealed class TmpCharacterClipInspector : TweenClipInspector
     {
         protected override string Title => "TMP Characters Clip";

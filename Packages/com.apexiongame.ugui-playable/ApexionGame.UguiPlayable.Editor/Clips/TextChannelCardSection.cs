@@ -90,6 +90,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.TrackPropertyValue(_from, _ => RefreshState());
             _card.TrackPropertyValue(_to, _ => RefreshState());
             _card.TrackPropertyValue(_scramble, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             _source.Changed += UpdatePipettes;
 
@@ -173,7 +174,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _serializedObject.Update();
 
-            if (IsFromCurrent() == (mode == ValueMode.FromCurrent))
+            if (_mode.hasMultipleDifferentValues == false && IsFromCurrent() == (mode == ValueMode.FromCurrent))
             {
                 return;
             }
@@ -201,15 +202,19 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
-            var fromCurrent = IsFromCurrent();
+            var enabled = MultiEdit.IsAnyOn(_enabled);
+            var modeMixed = _mode.hasMultipleDifferentValues;
+            var fromCurrent = modeMixed == false && IsFromCurrent();
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);
             _body.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
-            _modeGroup.SetValueWithoutNotify(SegmentedControl.ToState(fromCurrent ? 1 : 0, s_modeLabels.Length));
+            _modeGroup.SetValueWithoutNotify(
+                SegmentedControl.ToState(modeMixed ? -1 : fromCurrent ? 1 : 0, s_modeLabels.Length)
+            );
 
             _fromRow.style.display = fromCurrent ? DisplayStyle.None : DisplayStyle.Flex;
-            _customRow.style.display = _scramble.enumValueIndex == (int)ScrambleMode.Custom
+            _customRow.style.display = _scramble.hasMultipleDifferentValues
+                || _scramble.enumValueIndex == (int)ScrambleMode.Custom
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
 

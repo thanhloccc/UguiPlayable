@@ -76,6 +76,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_from, _ => RefreshState());
             _card.TrackPropertyValue(_to, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             if (constrainFrom != null)
             {
@@ -200,41 +201,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private bool IsNormalized()
             => ChannelPresentation.IsNormalized(_serializedObject.targetObject.GetType(), _info.Name);
 
-        // Not bound directly: the constrain rule rewrites the other axis in the same write, so the edit and the
-        // rewrite land in one Undo step. While the field has focus the ratio comes from the vector the edit started
-        // with, so a transient 0 while typing does not wipe the other axis.
+        // Not bound with BindProperty: an edit writes only the axes that changed, and the constrain rule rewrites the
+        // other axis in the same Undo step.
         private void BindVector2(Vector2Field field, SerializedProperty value, SerializedProperty constrain)
-        {
-            field.SetValueWithoutNotify(value.vector2Value);
-
-            var edit = new VectorEdit();
-
-            field.RegisterCallback<FocusInEvent>(_ => edit.Begin(value.vector2Value), TrickleDown.TrickleDown);
-            field.RegisterCallback<FocusOutEvent>(_ => edit.End(field), TrickleDown.TrickleDown);
-
-            field.RegisterValueChangedCallback(evt => {
-                _serializedObject.Update();
-
-                var result = evt.newValue;
-
-                if (constrain != null && constrain.boolValue)
-                {
-                    var baseValue = edit.IsActive ? edit.Base : evt.previousValue;
-                    result = ConstrainMath.Apply(baseValue, evt.previousValue, evt.newValue, AxisMask.None, 2);
-                }
-
-                value.vector2Value = result;
-                _serializedObject.ApplyModifiedProperties();
-                field.SetValueWithoutNotify(result);
-            });
-
-            field.TrackPropertyValue(value, p => field.SetValueWithoutNotify(p.vector2Value));
-        }
+            => VectorFieldBinder.Bind(field, value, constrain);
 
         private void OnLinkClicked(SerializedProperty constrain)
         {
             _serializedObject.Update();
-            constrain.boolValue = constrain.boolValue == false;
+            constrain.boolValue = MultiEdit.IsAllOn(constrain) == false;
             _serializedObject.ApplyModifiedProperties();
             RefreshState();
         }
@@ -243,7 +218,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            if (_enabled.boolValue == false)
+            if (MultiEdit.IsAnyOn(_enabled) == false)
             {
                 return;
             }
@@ -256,7 +231,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
+            var enabled = MultiEdit.IsAnyOn(_enabled);
             var expanded = IsExpanded;
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);
@@ -303,34 +278,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     return;
                 }
 
-                var isOn = _constrain.boolValue;
+                var isOn = MultiEdit.IsAllOn(_constrain);
                 _button.EnableInClassList(TweenClipSections.ICON_BUTTON_ON_USS_CLASS_NAME, isOn);
                 _image.image = isOn ? EditorIcons.Link : EditorIcons.Unlink;
-            }
-        }
-
-        // The vector the field had when the current edit started.
-        private sealed class VectorEdit
-        {
-            public Vector2 Base { get; private set; }
-
-            public bool IsActive { get; private set; }
-
-            public void Begin(Vector2 value)
-            {
-                if (IsActive)
-                {
-                    return;
-                }
-
-                Base = value;
-                IsActive = true;
-            }
-
-            // Deferred, so a value committed on blur still sees the base.
-            public void End(VisualElement field)
-            {
-                field.schedule.Execute(() => IsActive = false);
             }
         }
     }

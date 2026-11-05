@@ -56,6 +56,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_threshold, _ => RefreshState());
+            MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
             RefreshState();
         }
@@ -89,11 +90,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         {
             _serializedObject.UpdateIfRequiredOrScript();
 
-            var enabled = _enabled.boolValue;
+            var enabled = MultiEdit.IsAnyOn(_enabled);
 
             _card.EnableInClassList(TweenClipSections.CARD_DISABLED_USS_CLASS_NAME, enabled == false);
             _body.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
-            _percent.text = $"{Mathf.RoundToInt(_threshold.floatValue * 100f)}%";
+            _percent.text = _threshold.hasMultipleDifferentValues
+                ? "-"
+                : $"{Mathf.RoundToInt(_threshold.floatValue * 100f)}%";
         }
     }
 }

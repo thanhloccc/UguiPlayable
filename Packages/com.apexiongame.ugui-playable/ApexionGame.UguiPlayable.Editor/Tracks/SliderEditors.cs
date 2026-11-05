@@ -10,7 +10,7 @@ using ApexionGame.UguiPlayable.Tracks.Controls;
 
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
-    [CustomEditor(typeof(SliderClip))]
+    [CustomEditor(typeof(SliderClip)), CanEditMultipleObjects]
     internal sealed class SliderClipInspector : TweenClipInspector
     {
         protected override string Title => "Slider Clip";
