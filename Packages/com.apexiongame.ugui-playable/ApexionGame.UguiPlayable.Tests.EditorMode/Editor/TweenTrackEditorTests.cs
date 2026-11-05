@@ -244,6 +244,8 @@ public sealed class TweenTrackEditorTests
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ShadowTrack>(null, "h"), new ShadowTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<LayoutElementTrack>(null, "i"), new LayoutElementTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<TmpTextTrack>(null, "j"), new TmpTextTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<LayoutGroupTrack>(null, "k"), new LayoutGroupTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<GridLayoutGroupTrack>(null, "l"), new GridLayoutGroupTrackEditor()));
     }
 
     [Test]
@@ -294,6 +296,16 @@ public sealed class TweenTrackEditorTests
         var tmpClip = tmp.CreateClip<TmpTextClip>();
         new TmpTextClipEditor().OnCreate(tmpClip, tmp, null);
 
+        var group = _timeline.CreateTrack<LayoutGroupTrack>(null, "M");
+        var groupClip = group.CreateClip<LayoutGroupClip>();
+        new LayoutGroupClipEditor().OnCreate(groupClip, group, null);
+
+        var grid = _timeline.CreateTrack<GridLayoutGroupTrack>(null, "N");
+        var gridClip = grid.CreateClip<GridLayoutGroupClip>();
+        new GridLayoutGroupClipEditor().OnCreate(gridClip, grid, null);
+
+        Assert.AreEqual("Layout Group", groupClip.displayName);
+        Assert.AreEqual("Grid Layout Group", gridClip.displayName);
         Assert.AreEqual("TMP Text", tmpClip.displayName);
         Assert.AreEqual("Layout Element", layoutClip.displayName);
         Assert.AreEqual("Raw Image", rawClip.displayName);

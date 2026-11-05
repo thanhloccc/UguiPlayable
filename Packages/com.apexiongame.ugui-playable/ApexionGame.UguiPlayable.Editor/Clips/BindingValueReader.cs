@@ -88,6 +88,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.EFFECT_DISTANCE:
                     return TryReadShadow(binding, shadow => shadow.effectDistance, out value);
 
+                case ChannelPresentation.SPACING:
+                    return TryReadSpacing(binding, out value);
+
+                case ChannelPresentation.CELL_SIZE:
+                    return TryReadGrid(binding, grid => grid.cellSize, out value);
+
+                case ChannelPresentation.PADDING:
+                    return TryReadPadding(binding, out value);
+
                 case ChannelPresentation.FONT_SIZE:
                     return TryReadText(binding, text => text.fontSize, out value);
 
@@ -296,6 +305,43 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             if (TryResolve<LayoutElement>(binding, out var element))
             {
                 value = new Vector4(read(element), 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        // Grid layout groups animate a Vector2 spacing; the horizontal and vertical groups a float one, read into x.
+        private static bool TryReadSpacing(Object binding, out Vector4 value)
+        {
+            if (binding is HorizontalOrVerticalLayoutGroup group || TryResolve(binding, out group))
+            {
+                value = new Vector4(group.spacing, 0f, 0f, 0f);
+                return true;
+            }
+
+            return TryReadGrid(binding, grid => grid.spacing, out value);
+        }
+
+        private static bool TryReadGrid(Object binding, System.Func<GridLayoutGroup, Vector2> read, out Vector4 value)
+        {
+            if (TryResolve<GridLayoutGroup>(binding, out var grid))
+            {
+                value = read(grid);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadPadding(Object binding, out Vector4 value)
+        {
+            if (TryResolve<LayoutGroup>(binding, out var group) && group.padding != null)
+            {
+                var padding = group.padding;
+                value = new Vector4(padding.left, padding.right, padding.top, padding.bottom);
                 return true;
             }
 

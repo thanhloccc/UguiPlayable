@@ -73,6 +73,8 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(RawImageClip))]
     [TestCase(typeof(ShadowClip))]
     [TestCase(typeof(LayoutElementClip))]
+    [TestCase(typeof(LayoutGroupClip))]
+    [TestCase(typeof(GridLayoutGroupClip))]
     [TestCase(typeof(TmpTextClip))]
     public void Inspector_BuildsWithoutABinding(Type clipType)
     {
@@ -106,6 +108,8 @@ public sealed class TweenClipInspectorTests
           typeof(LayoutElementClip)
         , "_minWidth,_minHeight,_preferredWidth,_preferredHeight,_flexibleWidth,_flexibleHeight"
     )]
+    [TestCase(typeof(LayoutGroupClip), "_spacing,_padding")]
+    [TestCase(typeof(GridLayoutGroupClip), "_spacing,_cellSize,_padding")]
     [TestCase(
           typeof(TmpTextClip)
         , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient"

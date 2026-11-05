@@ -38,6 +38,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string PREFERRED_HEIGHT = "_preferredHeight";
         public const string FLEXIBLE_WIDTH = "_flexibleWidth";
         public const string FLEXIBLE_HEIGHT = "_flexibleHeight";
+        public const string SPACING = "_spacing";
+        public const string CELL_SIZE = "_cellSize";
+        public const string PADDING = "_padding";
         public const string FONT_SIZE = "_fontSize";
         public const string CHARACTER_SPACING = "_characterSpacing";
         public const string WORD_SPACING = "_wordSpacing";
@@ -71,6 +74,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [PREFERRED_HEIGHT] = new("Preferred Height", static () => EditorIcons.Ruler),
             [FLEXIBLE_WIDTH] = new("Flexible Width", static () => EditorIcons.Ruler),
             [FLEXIBLE_HEIGHT] = new("Flexible Height", static () => EditorIcons.Ruler),
+            [SPACING] = new("Spacing", static () => EditorIcons.MoveHorizontal),
+            [CELL_SIZE] = new("Cell Size", static () => EditorIcons.Scaling),
+            [PADDING] = new("Padding", static () => EditorIcons.MoveHorizontal),
             [FONT_SIZE] = new("Font Size", static () => EditorIcons.CaseSensitive),
             [CHARACTER_SPACING] = new("Character Spacing", static () => EditorIcons.Space),
             [WORD_SPACING] = new("Word Spacing", static () => EditorIcons.Space),
@@ -86,6 +92,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         // L/R/T/B, for example).
         private static readonly Dictionary<string, string[]> s_axisCaptions = new() {
             [UV_RECT] = new[] { "X", "Y", "W", "H" },
+            [PADDING] = new[] { "L", "R", "T", "B" },
         };
 
         /// <summary>
