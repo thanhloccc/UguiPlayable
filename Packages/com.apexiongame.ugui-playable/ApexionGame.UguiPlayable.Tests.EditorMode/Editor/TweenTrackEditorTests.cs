@@ -10,6 +10,7 @@ using ApexionGame.UguiPlayable.Tracks.Controls;
 using ApexionGame.UguiPlayable.Tracks.Effects;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
+using ApexionGame.UguiPlayable.Tracks.Layout;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
 using Object = UnityEngine.Object;
 
@@ -240,6 +241,7 @@ public sealed class TweenTrackEditorTests
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ScrollRectTrack>(null, "f"), new ScrollRectTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<RawImageTrack>(null, "g"), new RawImageTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ShadowTrack>(null, "h"), new ShadowTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<LayoutElementTrack>(null, "i"), new LayoutElementTrackEditor()));
     }
 
     [Test]
@@ -282,6 +284,11 @@ public sealed class TweenTrackEditorTests
         var shadowClip = shadow.CreateClip<ShadowClip>();
         new ShadowClipEditor().OnCreate(shadowClip, shadow, null);
 
+        var layout = _timeline.CreateTrack<LayoutElementTrack>(null, "K");
+        var layoutClip = layout.CreateClip<LayoutElementClip>();
+        new LayoutElementClipEditor().OnCreate(layoutClip, layout, null);
+
+        Assert.AreEqual("Layout Element", layoutClip.displayName);
         Assert.AreEqual("Raw Image", rawClip.displayName);
         Assert.AreEqual("Shadow", shadowClip.displayName);
         Assert.AreEqual("Slider", sliderClip.displayName);

@@ -15,6 +15,7 @@ using ApexionGame.UguiPlayable.Tracks.Controls;
 using ApexionGame.UguiPlayable.Tracks.Effects;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
+using ApexionGame.UguiPlayable.Tracks.Layout;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
 using Button = UnityEngine.UIElements.Button;
 using Image = UnityEngine.UI.Image;
@@ -70,6 +71,7 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(ScrollRectClip))]
     [TestCase(typeof(RawImageClip))]
     [TestCase(typeof(ShadowClip))]
+    [TestCase(typeof(LayoutElementClip))]
     public void Inspector_BuildsWithoutABinding(Type clipType)
     {
         Create(clipType);
@@ -98,6 +100,10 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(ScrollRectClip), "_normalizedPosition")]
     [TestCase(typeof(RawImageClip), "_color,_alpha,_uvRect")]
     [TestCase(typeof(ShadowClip), "_effectColor,_effectDistance")]
+    [TestCase(
+          typeof(LayoutElementClip)
+        , "_minWidth,_minHeight,_preferredWidth,_preferredHeight,_flexibleWidth,_flexibleHeight"
+    )]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
         Create(clipType);
@@ -482,6 +488,89 @@ public sealed class TweenClipInspectorTests
     }
 
     [Test]
+    public void LayoutElementCard_NotesANegativeEndOnlyWhenTheChannelUsesIt()
+    {
+        Create(typeof(LayoutElementClip));
+
+        var clip = (LayoutElementClip)_clip;
+        clip.Template.PreferredWidth = new TweenChannel<float>(-1f, 100f);
+        clip.Template.PreferredHeight = new TweenChannel<float>(0f, 100f);
+        clip.Template.MinWidth = new TweenChannel<float>(-1f, 100f, ValueMode.Relative);
+        clip.Template.MinHeight = new TweenChannel<float>(-1f, 100f, ValueMode.FromCurrent);
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+
+        Assert.AreEqual(TweenClipTexts.NEGATIVE_UNSET_NOTE, GetNoteText(serializedObject, channels, "_preferredWidth"));
+        Assert.AreEqual(string.Empty, GetNoteText(serializedObject, channels, "_preferredHeight"));
+        Assert.IsTrue(GetNoteText(serializedObject, channels, "_minWidth").Contains("Offsets"));
+        Assert.IsFalse(GetNoteText(serializedObject, channels, "_minWidth").Contains("not set"), "relative offsets");
+        Assert.IsFalse(GetNoteText(serializedObject, channels, "_minHeight").Contains("not set"), "from is unused");
+
+        clip.Template.MinHeight = new TweenChannel<float>(0f, -1f, ValueMode.FromCurrent);
+        serializedObject.Update();
+
+        var fromCurrent = GetNoteText(serializedObject, channels, "_minHeight");
+
+        Assert.IsTrue(fromCurrent.Contains("Starts from"));
+        Assert.IsTrue(fromCurrent.Contains(TweenClipTexts.NEGATIVE_UNSET_NOTE));
+    }
+
+    [Test]
+    public void OtherClips_NeverNoteANegativeEnd()
+    {
+        Create(typeof(SliderClip));
+
+        var clip = (SliderClip)_clip;
+        clip.Template.Value = new TweenChannel<float>(-1f, -5f);
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+
+        Assert.AreEqual(string.Empty, GetNoteText(serializedObject, channels, "_value"));
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsALayoutElement()
+    {
+        _gameObject = new GameObject("Item", typeof(RectTransform), typeof(LayoutElement));
+
+        var element = _gameObject.GetComponent<LayoutElement>();
+        element.minWidth = 1f;
+        element.minHeight = 2f;
+        element.preferredWidth = 3f;
+        element.preferredHeight = 4f;
+        element.flexibleWidth = 5f;
+        element.flexibleHeight = 6f;
+
+        var expected = new (string Name, float Value)[] {
+            ("_minWidth", 1f),
+            ("_minHeight", 2f),
+            ("_preferredWidth", 3f),
+            ("_preferredHeight", 4f),
+            ("_flexibleWidth", 5f),
+            ("_flexibleHeight", 6f),
+        };
+
+        foreach (var (name, value) in expected)
+        {
+            Assert.IsTrue(BindingValueReader.TryRead(name, element, out var read), name);
+            Assert.AreEqual(value, read.x, 0.0001f, name);
+        }
+
+        var plain = new GameObject("Plain", typeof(RectTransform));
+
+        try
+        {
+            Assert.IsFalse(BindingValueReader.TryRead("_minWidth", plain, out _));
+        }
+        finally
+        {
+            Object.DestroyImmediate(plain);
+        }
+    }
+
+    [Test]
     public void BindingValueReader_ReadsTheUvRectAndTheShadow()
     {
         _gameObject = new GameObject("Raw", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
@@ -542,6 +631,19 @@ public sealed class TweenClipInspectorTests
         Assert.IsTrue(axes[3].ClassListContains(TweenClipSections.AXIS_BUTTON_W_USS_CLASS_NAME));
         // The test channel is named _uvRect, so its components are captioned X/Y/W/H.
         Assert.AreEqual("H", axes[3].text);
+    }
+
+    private static string GetNoteText(
+          SerializedObject serializedObject
+        , System.Collections.Generic.IReadOnlyList<ChannelInfo> channels
+        , string name
+    )
+    {
+        var source = new ClipBindingSource(serializedObject.targetObject);
+        var card = ChannelCardSection.Create(serializedObject, Find(channels, name), source);
+        var note = card.Q<Label>(className: TweenClipSections.NOTE_USS_CLASS_NAME);
+
+        return note.style.display == DisplayStyle.None ? string.Empty : note.text;
     }
 
     private void Create(Type clipType)

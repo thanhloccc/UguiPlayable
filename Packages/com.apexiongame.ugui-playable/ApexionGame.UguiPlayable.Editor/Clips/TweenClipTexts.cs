@@ -30,7 +30,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string RESTORE_REVERT_NOTE = "Revert: the bound object returns to its earlier value when stopped.";
         public const string LAYOUT_WARNING =
             "This RectTransform is positioned by a LayoutGroup; animated position (and size, if the group controls it) "
-            + "is overwritten on layout rebuild. Animate a child, or add a LayoutElement with Ignore Layout.";
+            + "is overwritten on layout rebuild. Animate its size with a Layout Element track, animate a child, or add "
+            + "a LayoutElement with Ignore Layout.";
+
+        public const string NEGATIVE_UNSET_NOTE =
+            "A negative value means \"not set\": the layout group ignores this size while the value is below 0.";
 
         public const string SIZE_FITTER_WARNING =
             "This RectTransform's size is driven by a ContentSizeFitter or AspectRatioFitter; animated size is "

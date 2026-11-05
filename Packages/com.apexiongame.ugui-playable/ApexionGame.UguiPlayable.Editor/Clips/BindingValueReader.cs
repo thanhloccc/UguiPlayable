@@ -60,6 +60,24 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.NORMALIZED_POSITION:
                     return TryReadScrollPosition(binding, out value);
 
+                case ChannelPresentation.MIN_WIDTH:
+                    return TryReadLayout(binding, element => element.minWidth, out value);
+
+                case ChannelPresentation.MIN_HEIGHT:
+                    return TryReadLayout(binding, element => element.minHeight, out value);
+
+                case ChannelPresentation.PREFERRED_WIDTH:
+                    return TryReadLayout(binding, element => element.preferredWidth, out value);
+
+                case ChannelPresentation.PREFERRED_HEIGHT:
+                    return TryReadLayout(binding, element => element.preferredHeight, out value);
+
+                case ChannelPresentation.FLEXIBLE_WIDTH:
+                    return TryReadLayout(binding, element => element.flexibleWidth, out value);
+
+                case ChannelPresentation.FLEXIBLE_HEIGHT:
+                    return TryReadLayout(binding, element => element.flexibleHeight, out value);
+
                 case ChannelPresentation.UV_RECT:
                     return TryReadUvRect(binding, out value);
 
@@ -204,6 +222,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             {
                 var rect = rawImage.uvRect;
                 value = new Vector4(rect.x, rect.y, rect.width, rect.height);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadLayout(Object binding, System.Func<LayoutElement, float> read, out Vector4 value)
+        {
+            if (TryResolve<LayoutElement>(binding, out var element))
+            {
+                value = new Vector4(read(element), 0f, 0f, 0f);
                 return true;
             }
 

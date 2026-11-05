@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Editor.Common;
 using ApexionGame.UguiPlayable.Tracks.Controls;
+using ApexionGame.UguiPlayable.Tracks.Layout;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
@@ -31,6 +32,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string UV_RECT = "_uvRect";
         public const string EFFECT_COLOR = "_effectColor";
         public const string EFFECT_DISTANCE = "_effectDistance";
+        public const string MIN_WIDTH = "_minWidth";
+        public const string MIN_HEIGHT = "_minHeight";
+        public const string PREFERRED_WIDTH = "_preferredWidth";
+        public const string PREFERRED_HEIGHT = "_preferredHeight";
+        public const string FLEXIBLE_WIDTH = "_flexibleWidth";
+        public const string FLEXIBLE_HEIGHT = "_flexibleHeight";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -51,6 +58,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [UV_RECT] = new("UV Rect", static () => EditorIcons.Frame),
             [EFFECT_COLOR] = new("Effect Color", static () => EditorIcons.Palette),
             [EFFECT_DISTANCE] = new("Effect Distance", static () => EditorIcons.Move),
+            [MIN_WIDTH] = new("Min Width", static () => EditorIcons.Ruler),
+            [MIN_HEIGHT] = new("Min Height", static () => EditorIcons.Ruler),
+            [PREFERRED_WIDTH] = new("Preferred Width", static () => EditorIcons.Ruler),
+            [PREFERRED_HEIGHT] = new("Preferred Height", static () => EditorIcons.Ruler),
+            [FLEXIBLE_WIDTH] = new("Flexible Width", static () => EditorIcons.Ruler),
+            [FLEXIBLE_HEIGHT] = new("Flexible Height", static () => EditorIcons.Ruler),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
@@ -83,6 +96,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 VALUE => clipType == typeof(ScrollbarClip),
                 _ => false,
             };
+
+        /// <summary>
+        /// Whether a negative value of the clip's float channels means "not set" to uGUI, as for every
+        /// <c>LayoutElement</c> size.
+        /// </summary>
+        public static bool IsUnsetWhenNegative(Type clipType)
+            => clipType == typeof(LayoutElementClip);
 
         private readonly record struct Entry(string DisplayName, Func<Texture2D> Icon);
     }

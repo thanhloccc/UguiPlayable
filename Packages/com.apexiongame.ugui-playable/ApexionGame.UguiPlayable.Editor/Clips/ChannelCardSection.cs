@@ -29,6 +29,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private readonly SerializedProperty _enabled;
         private readonly SerializedProperty _mode;
         private readonly SerializedProperty _ignoredAxes;
+        private readonly SerializedProperty _from;
+        private readonly SerializedProperty _to;
+        private readonly bool _warnsNegative;
 
         private readonly VisualElement _card = new();
         private readonly VisualElement _body = new();
@@ -53,6 +56,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _enabled = channel.FindPropertyRelative(TweenClipModel.ENABLED);
             _mode = channel.FindPropertyRelative(TweenClipModel.MODE);
             _ignoredAxes = channel.FindPropertyRelative(TweenClipModel.IGNORED_AXES);
+            _from = channel.FindPropertyRelative(TweenClipModel.FROM);
+            _to = channel.FindPropertyRelative(TweenClipModel.TO);
+
+            _warnsNegative = info.ValueKind == ChannelValueKind.Float
+                && ChannelPresentation.IsUnsetWhenNegative(serializedObject.targetObject.GetType());
+
             _expandKey = TweenClipSections.GetExpandKey(serializedObject.targetObject, channel.propertyPath);
 
             _card.AddToClassList(TweenClipSections.CARD_USS_CLASS_NAME);
@@ -98,6 +107,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_mode, _ => RefreshState());
             _card.TrackPropertyValue(_ignoredAxes, _ => RefreshState());
+
+            if (_warnsNegative)
+            {
+                _card.TrackPropertyValue(_from, _ => RefreshState());
+                _card.TrackPropertyValue(_to, _ => RefreshState());
+            }
+
             TrackConstrain(_fromRow);
             TrackConstrain(_toRow);
 
@@ -489,7 +505,16 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             _fromRow.Root.style.display = mode == ValueMode.FromCurrent ? DisplayStyle.None : DisplayStyle.Flex;
             _note.text = GetNote(mode);
-            _note.style.display = mode == ValueMode.Absolute ? DisplayStyle.None : DisplayStyle.Flex;
+
+            // A size below 0 is "not set" to uGUI; the note is for the ends the clip really uses.
+            if (HasNegativeEnd(mode))
+            {
+                _note.text = _note.text.Length == 0
+                    ? TweenClipTexts.NEGATIVE_UNSET_NOTE
+                    : _note.text + "\n" + TweenClipTexts.NEGATIVE_UNSET_NOTE;
+            }
+
+            _note.style.display = _note.text.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;
 
             RefreshAxes();
             UpdatePipettes();
@@ -557,6 +582,17 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _fromRow.Pipette.tooltip = tooltip;
             _toRow.Pipette.SetEnabled(available);
             _toRow.Pipette.tooltip = tooltip;
+        }
+
+        // Relative ends are offsets and from-current has no From, so only the absolute ends can be read as "unset".
+        private bool HasNegativeEnd(ValueMode mode)
+        {
+            if (_warnsNegative == false || mode == ValueMode.Relative)
+            {
+                return false;
+            }
+
+            return _to.floatValue < 0f || (mode == ValueMode.Absolute && _from.floatValue < 0f);
         }
 
         private static string GetNote(ValueMode mode)
