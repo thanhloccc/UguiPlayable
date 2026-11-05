@@ -48,6 +48,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string PARAGRAPH_SPACING = "_paragraphSpacing";
         public const string VISIBLE_RATIO = "_visibleRatio";
         public const string COLOR_GRADIENT = "_colorGradient";
+        public const string TEXT = "_text";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -84,6 +85,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [PARAGRAPH_SPACING] = new("Paragraph Spacing", static () => EditorIcons.Pilcrow),
             [VISIBLE_RATIO] = new("Visible Ratio", static () => EditorIcons.TextCursor),
             [COLOR_GRADIENT] = new("Color Gradient", static () => EditorIcons.Paintbrush),
+            [TEXT] = new("Text", static () => EditorIcons.WholeWord),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };

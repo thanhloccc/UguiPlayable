@@ -142,6 +142,22 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         }
 
         /// <summary>
+        /// Reads <see cref="TMP_Text.text"/> for the text channel. An editor-time read, so the string it may build is
+        /// fine.
+        /// </summary>
+        public static bool TryReadText(Object binding, out string value)
+        {
+            if (TryResolve<TMP_Text>(binding, out var text))
+            {
+                value = text.text;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+
+        /// <summary>
         /// Whether the binding is a text whose vertex gradient is switched off, so a gradient channel has no visible
         /// effect.
         /// </summary>

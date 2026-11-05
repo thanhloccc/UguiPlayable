@@ -112,7 +112,7 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(GridLayoutGroupClip), "_spacing,_cellSize,_padding")]
     [TestCase(
           typeof(TmpTextClip)
-        , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient"
+        , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient,_text"
     )]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
@@ -648,6 +648,38 @@ public sealed class TweenClipInspectorTests
         var card = ChannelCardSection.Create(serializedObject, Find(channels, "_visibleRatio"), new ClipBindingSource(_clip));
 
         Assert.AreEqual(2, card.Query<UnityEngine.UIElements.Slider>().ToList().Count);
+    }
+
+    [Test]
+    public void TmpTextClip_DrawsTheTextChannelAsATextCard()
+    {
+        Create(typeof(TmpTextClip));
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+        var info = Find(channels, "_text");
+
+        Assert.AreEqual(ChannelShape.Text, info.Shape);
+
+        var card = TextChannelCardSection.Create(serializedObject, info, new ClipBindingSource(_clip));
+
+        // From, to and the custom characters.
+        Assert.AreEqual(3, card.Query<TextField>().ToList().Count);
+        Assert.AreEqual(1, card.Query<EnumField>().ToList().Count);
+        Assert.AreEqual(2, card.Query<Button>(className: TweenClipSections.ICON_BUTTON_USS_CLASS_NAME).ToList().Count);
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsTheTextOfATmpText()
+    {
+        _gameObject = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer));
+
+        var text = _gameObject.AddComponent<TMPro.TextMeshProUGUI>();
+        text.text = "LEVEL 1";
+
+        Assert.IsTrue(BindingValueReader.TryReadText(text, out var value));
+        Assert.AreEqual("LEVEL 1", value);
+        Assert.IsFalse(BindingValueReader.TryReadText(null, out _));
     }
 
     [Test]

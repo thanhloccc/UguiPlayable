@@ -20,6 +20,8 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string IGNORED_AXES = "_ignoredAxes";
         public const string VALUE = "_value";
         public const string THRESHOLD = "_threshold";
+        public const string SCRAMBLE = "_scramble";
+        public const string CUSTOM_SCRAMBLE_CHARS = "_customScrambleChars";
 
         private static readonly string[] s_gradientCorners = { "topLeft", "topRight", "bottomLeft", "bottomRight" };
 
@@ -117,6 +119,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     && template.FindPropertyRelative(GetConstrainName(child.name, false)) != null;
 
                 info = new ChannelInfo(child.name, ChannelShape.Tween, valueKind, hasConstrain);
+                enabled = enabledProperty.boolValue;
+                return true;
+            }
+
+            if (from != null
+                && to != null
+                && mode != null
+                && from.propertyType == SerializedPropertyType.String
+                && to.propertyType == SerializedPropertyType.String
+                && child.FindPropertyRelative(SCRAMBLE) != null)
+            {
+                info = new ChannelInfo(child.name, ChannelShape.Text, ChannelValueKind.Float, false);
                 enabled = enabledProperty.boolValue;
                 return true;
             }

@@ -100,6 +100,22 @@
     margin: 0;
 }
 
+.ugp-tween-card__row-label--text {
+    width: 58px;
+}
+
+.ugp-tween-card__row--top {
+    align-items: flex-start;
+}
+
+.ugp-tween-card__text-field {
+    min-height: 44px;
+}
+
+.ugp-tween-card__text-field .unity-base-text-field__input {
+    white-space: normal;
+}
+
 .ugp-tween-card__gradient {
     flex-direction: column;
 }

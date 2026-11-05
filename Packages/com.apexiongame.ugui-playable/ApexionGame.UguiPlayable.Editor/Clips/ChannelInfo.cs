@@ -1,7 +1,7 @@
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
     /// <summary>
-    /// The two channel layouts a tween clip's template can hold.
+    /// The channel layouts a tween clip's template can hold.
     /// </summary>
     internal enum ChannelShape
     {
@@ -10,6 +10,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         /// <summary>A <c>StepChannel</c>: enabled, value, threshold.</summary>
         Step,
+
+        /// <summary>A <c>TextChannel</c>: enabled, mode, from, to, ease, scramble, custom scramble characters.</summary>
+        Text,
     }
 
     /// <summary>
@@ -31,7 +34,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     /// One channel found under a clip's <c>_template</c>.
     /// </summary>
     /// <param name="Name">The serialized field name of the channel, for example <c>_anchoredPosition</c>.</param>
-    /// <param name="Shape">Whether the channel is a tween or a step channel.</param>
+    /// <param name="Shape">Whether the channel is a tween, a step or a text channel.</param>
     /// <param name="ValueKind">The from/to value type. Unused for a step channel.</param>
     /// <param name="HasConstrain">Whether the template has <c>&lt;Name&gt;ConstrainFrom/To</c> sibling bools.</param>
     internal readonly record struct ChannelInfo(

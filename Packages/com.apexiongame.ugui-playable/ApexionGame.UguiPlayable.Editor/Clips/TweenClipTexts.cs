@@ -11,6 +11,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string TO = "To";
         public const string VALUE = "Value";
         public const string AT = "At";
+        public const string MODE = "Mode";
+        public const string SCRAMBLE = "Scramble";
+        public const string CHARACTERS = "Chars";
         public const string AXIS_TOOLTIP = "Animate this axis. Turn it off to leave the axis unchanged.";
         public const string FROM_CURRENT_NOTE = "Starts from the value the property has when the clip becomes active.";
         public const string RELATIVE_NOTE = "Offsets added to the value the property had when the track bound it.";
@@ -22,6 +25,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string NO_TRACK = "The clip was not found in the open Timeline.";
         public const string NO_BINDING = "The track has no binding.";
         public const string UNSUPPORTED_BINDING = "The bound object has no value for this channel.";
+        public const string TEXT_FROM_CURRENT_NOTE = "Starts from the text shown when the clip becomes active.";
         public const string ENABLED_TOOLTIP = "Turn this channel on or off.";
         public const string NAME = "Name";
         public const string TRACK_LOCKED = "The track is locked in the Timeline window.";
@@ -46,6 +50,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         public const string SCROLL_RECT_NO_CONTENT =
             "This ScrollRect has no Content, so there is nothing to scroll. Assign its Content.";
+
+        public const string TEXT_RICH_TAGS_NOTE = "Rich text tags are revealed as plain characters.";
+
+        public const string TEXT_SCRAMBLE_TOOLTIP =
+            "The characters shown at positions that are not revealed yet and differ from the target.";
+
+        public const string TEXT_CUSTOM_TOOLTIP = "The characters used when Scramble is Custom. Empty means no scramble.";
 
         public static string FormatChannelCount(int enabled, int total)
             => $"{enabled} of {total} channels on";

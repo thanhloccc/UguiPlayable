@@ -39,6 +39,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string GRADIENT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__gradient";
         public const string GRADIENT_ROW_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__gradient-row";
         public const string GRADIENT_FIELD_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__gradient-field";
+        public const string ROW_TOP_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__row--top";
+        public const string ROW_LABEL_TEXT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__row-label--text";
+        public const string TEXT_FIELD_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__text-field";
         public const string PERCENT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__percent";
 
         private const string EXPAND_KEY_PREFIX = "ugp.tween-clip.expanded";

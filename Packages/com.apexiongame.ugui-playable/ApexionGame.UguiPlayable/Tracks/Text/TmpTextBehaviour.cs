@@ -9,8 +9,8 @@ using ApexionGame.UguiPlayable.Tracks.Graphics;
 namespace ApexionGame.UguiPlayable.Tracks.Text
 {
     /// <summary>
-    /// The channels of a <see cref="TmpTextClip"/>: color, alpha, font size, four spacings, the typewriter ratio and
-    /// the vertex gradient.
+    /// The channels of a <see cref="TmpTextClip"/>: color, alpha, font size, four spacings, the typewriter ratio, the
+    /// vertex gradient and the string tween.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -27,6 +27,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// The gradient channel writes <see cref="TMP_Text.colorGradient"/> only. TMP shows it when
     /// <see cref="TMP_Text.enableVertexGradient"/> is on, which the track leaves as it is.
     /// </para>
+    /// <para>
+    /// The text channel is off by default. It is not blended and writes <see cref="TMP_Text.text"/> through the
+    /// mixer's character buffer; rich-text tags are revealed as plain characters.
+    /// </para>
     /// </remarks>
     [Serializable]
     public sealed class TmpTextBehaviour : TweenBehaviour
@@ -40,6 +44,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         internal const string LINE_SPACING_PROPERTY = "m_lineSpacing";
         internal const string PARAGRAPH_SPACING_PROPERTY = "m_paragraphSpacing";
         internal const string COLOR_GRADIENT_PROPERTY = "m_fontColorGradient";
+        internal const string TEXT_PROPERTY = "m_text";
 
         /// <summary>The value of <see cref="TMP_Text.maxVisibleCharacters"/> that shows every character.</summary>
         internal const int ALL_CHARACTERS = 99999;
@@ -74,6 +79,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             , new VertexGradient(UnityEngine.Color.white)
             , enabled: false
         );
+
+        [SerializeField]
+        private TextChannel _text = new(string.Empty, string.Empty, enabled: false);
 
         /// <summary>The <see cref="Graphic.color"/> channel.</summary>
         public TweenChannel<Color> Color
@@ -141,6 +149,13 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             set => _colorGradient = value;
         }
 
+        /// <summary>The <see cref="TMP_Text.text"/> channel: the string tween.</summary>
+        public TextChannel Text
+        {
+            get => _text;
+            set => _text = value;
+        }
+
         /// <inheritdoc/>
         internal override bool HasEnabledChannel()
             => _color.Enabled
@@ -151,7 +166,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 || _lineSpacing.Enabled
                 || _paragraphSpacing.Enabled
                 || _visibleRatio.Enabled
-                || _colorGradient.Enabled;
+                || _colorGradient.Enabled
+                || _text.Enabled;
 
         /// <inheritdoc/>
         /// <remarks>The visible ratio is not serialized by TMP, so it registers no property.</remarks>
@@ -192,6 +208,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             if (_colorGradient.Enabled)
             {
                 names.Add(COLOR_GRADIENT_PROPERTY);
+            }
+
+            if (_text.Enabled)
+            {
+                names.Add(TEXT_PROPERTY);
             }
         }
 
@@ -234,6 +255,19 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _paragraphSpacing.ClearCapture();
             _visibleRatio.ClearCapture();
             _colorGradient.ClearCapture();
+            _text.ClearCapture();
+        }
+
+        /// <summary>
+        /// Stores the text a <see cref="ValueMode.FromCurrent"/> text tween starts from. The mixer calls it, because
+        /// reading <see cref="TMP_Text.text"/> allocates when TMP's backing array is dirty.
+        /// </summary>
+        internal void CaptureText(string current)
+        {
+            if (_text.Enabled && _text.Mode == ValueMode.FromCurrent)
+            {
+                _text.Capture(current);
+            }
         }
 
         /// <summary>
