@@ -2,6 +2,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Timeline;
@@ -313,6 +314,29 @@ public sealed class TweenTrackEditorTests
         Assert.AreEqual("Slider", sliderClip.displayName);
         Assert.AreEqual("Scrollbar", barClip.displayName);
         Assert.AreEqual("Scroll Rect", scrollClip.displayName);
+    }
+
+    [TestCase(typeof(SliderTrack), true)]
+    [TestCase(typeof(ScrollbarTrack), true)]
+    [TestCase(typeof(ScrollRectTrack), false)]
+    [TestCase(typeof(CanvasGroupTrack), false)]
+    public void TrackInspector_ShowsTheSendCallbacksSwitchOnlyForSliderAndScrollbar(System.Type trackType, bool expected)
+    {
+        var track = _timeline.CreateTrack(trackType, null, "Track");
+        var editor = UnityEditor.Editor.CreateEditor(track);
+
+        try
+        {
+            var root = editor.CreateInspectorGUI();
+            var toggles = root.Query<UnityEngine.UIElements.Toggle>().ToList();
+            var bound = toggles.Find(t => t.bindingPath == TweenTrackInspector.SEND_CALLBACKS);
+
+            Assert.That(bound != null, Is.EqualTo(expected));
+        }
+        finally
+        {
+            Object.DestroyImmediate(editor);
+        }
     }
 
     private static Texture2D GetIcon(TrackAsset track, UnityEditor.Timeline.TrackEditor editor)

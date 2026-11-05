@@ -57,6 +57,7 @@ public sealed class SliderTrackTests
         }
 
         _created.Clear();
+        PlayModeSeam.OverrideForTests = null;
     }
 
     [Test]
@@ -187,6 +188,78 @@ public sealed class SliderTrackTests
         var allocated = TrackTestSupport.MeasureEvaluateAllocation(_director);
 
         Assert.That(allocated, Is.Zero);
+    }
+
+    [Test]
+    public void SendCallbacks_IsOffByDefault()
+    {
+        Assert.That(_track.SendCallbacks, Is.False);
+    }
+
+    [TestCase(false, true)]
+    [TestCase(false, false)]
+    [TestCase(true, false)]
+    public void Evaluate_DoesNotRaiseOnValueChanged(bool sendCallbacks, bool playing)
+    {
+        var calls = ScrubWithListener(sendCallbacks, playing);
+
+        Assert.That(calls, Is.Zero);
+        Assert.That(_slider.value, Is.EqualTo(1f).Within(TOLERANCE), "the value is still written");
+    }
+
+    [Test]
+    public void Evaluate_RaisesOnValueChangedOncePerChangedValue_WhenOnAndPlaying()
+    {
+        var calls = ScrubWithListener(true, true);
+
+        Assert.That(calls, Is.EqualTo(3));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Revert_RestoresTheBase_WithoutCallingListeners(bool sendCallbacks)
+    {
+        _slider.value = 0.3f;
+        _track.RestoreMode = RestoreMode.Revert;
+        _track.SendCallbacks = sendCallbacks;
+        PlayModeSeam.OverrideForTests = true;
+        AddClip(0d, 1d, new TweenChannel<float>(0f, 1f));
+        EvaluateAt(0.5d);
+
+        var calls = 0;
+        _slider.onValueChanged.AddListener(_ => calls++);
+        StopMixer();
+
+        Assert.That(_slider.value, Is.EqualTo(0.3f).Within(TOLERANCE));
+        Assert.That(calls, Is.Zero);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void Mixer_CarriesTheTrackFlag(bool sendCallbacks)
+    {
+        _track.SendCallbacks = sendCallbacks;
+        AddClip(0d, 1d, new TweenChannel<float>(0f, 1f));
+        EvaluateAt(0.5d);
+
+        var mixer = (ScriptPlayable<SliderMixer>)_director.playableGraph.GetRootPlayable(0).GetInput(0);
+
+        Assert.That(mixer.GetBehaviour().SendCallbacks, Is.EqualTo(sendCallbacks));
+    }
+
+    private int ScrubWithListener(bool sendCallbacks, bool playing)
+    {
+        _track.SendCallbacks = sendCallbacks;
+        PlayModeSeam.OverrideForTests = playing;
+        AddClip(0d, 1d, new TweenChannel<float>(0f, 1f));
+
+        var calls = 0;
+        _slider.onValueChanged.AddListener(_ => calls++);
+
+        EvaluateAt(0.25d);
+        EvaluateAt(0.5d);
+        EvaluateAt(1d);
+        return calls;
     }
 
     private TimelineClip AddClip(double start, double duration, TweenChannel<float> value)
