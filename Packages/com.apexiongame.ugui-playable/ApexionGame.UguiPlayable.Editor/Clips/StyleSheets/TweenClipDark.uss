@@ -6,9 +6,9 @@
     --ugp-tween-card-toggle-on-text: #ffffff;
     --ugp-tween-card-axis-border: #1e1e1e;
     --ugp-tween-card-axis-off: #383838;
-    --ugp-tween-card-axis-off-text: #8a8a8a;
+    --ugp-tween-card-axis-off-text: #7c7c7c;
     --ugp-tween-card-axis-hover: rgba(255, 255, 255, 0.06);
-    --ugp-tween-card-axis-x: #c4493e;
-    --ugp-tween-card-axis-y: #5e9b2f;
-    --ugp-tween-card-axis-z: #3a73c4;
+    --ugp-tween-card-axis-x: #ff6b5e;
+    --ugp-tween-card-axis-y: #8fd14f;
+    --ugp-tween-card-axis-z: #5ea2ff;
 }

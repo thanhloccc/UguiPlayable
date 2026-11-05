@@ -38,6 +38,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private readonly Label _note;
 
         private readonly Button[] _axisButtons;
+        private ToggleButtonGroup _axisGroup;
         private readonly ValueRow _fromRow;
         private readonly ValueRow _toRow;
 
@@ -164,8 +165,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             for (var i = 0; i < count; i++)
             {
-                var axis = i;
-                var button = new Button(() => OnAxisClicked(axis)) {
+                var button = new Button {
                     text = s_axisNames[i],
                     tooltip = TweenClipTexts.AXIS_TOOLTIP,
                 };
@@ -178,18 +178,28 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             return buttons;
         }
 
+        // The same Unity ToggleButtonGroup as the mode control, with multiple selection: a selected button is an
+        // animated axis. The axis colour is only an accent (text and underline), so the row matches the header.
         private VisualElement CreateAxesRow()
         {
             var row = TweenClipSections.CreateRow(TweenClipTexts.AXES);
-            var group = new VisualElement();
-            group.AddToClassList(TweenClipSections.AXIS_GROUP_USS_CLASS_NAME);
+
+            _axisGroup = new ToggleButtonGroup {
+                isMultipleSelection = true,
+                allowEmptySelection = true,
+            };
+
+            CommonStyleSheetPaths.AddTo(_axisGroup);
+            _axisGroup.AddToClassList(SegmentedControl.USS_CLASS_NAME);
+            _axisGroup.AddToClassList(TweenClipSections.AXIS_GROUP_USS_CLASS_NAME);
 
             for (var i = 0; i < _axisButtons.Length; i++)
             {
-                group.Add(_axisButtons[i]);
+                _axisGroup.Add(_axisButtons[i]);
             }
 
-            row.Add(group);
+            _axisGroup.RegisterValueChangedCallback(evt => OnAxesChanged(evt.newValue));
+            row.Add(_axisGroup);
             return row;
         }
 
@@ -348,10 +358,25 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             return ConstrainMath.Apply(baseValue, previous, next, (AxisMask)_ignoredAxes.enumValueFlag, dimension);
         }
 
-        private void OnAxisClicked(int axis)
+        private void OnAxesChanged(ToggleButtonGroupState state)
         {
+            var ignored = 0;
+
+            for (var i = 0; i < _axisButtons.Length; i++)
+            {
+                if (state[i] == false)
+                {
+                    ignored |= 1 << i;
+                }
+            }
+
+            if (ignored == _ignoredAxes.enumValueFlag)
+            {
+                return;
+            }
+
             _serializedObject.Update();
-            _ignoredAxes.enumValueFlag ^= 1 << axis;
+            _ignoredAxes.enumValueFlag = ignored;
             _serializedObject.ApplyModifiedProperties();
         }
 
@@ -439,11 +464,20 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             var ignored = (AxisMask)_ignoredAxes.enumValueFlag;
 
+            var animated = 0UL;
+
             for (var i = 0; i < _axisButtons.Length; i++)
             {
                 var isOn = ConstrainMath.IsIgnored(ignored, i) == false;
                 _axisButtons[i].EnableInClassList(TweenClipSections.AXIS_BUTTON_ON_USS_CLASS_NAME, isOn);
+
+                if (isOn)
+                {
+                    animated |= 1UL << i;
+                }
             }
+
+            _axisGroup?.SetValueWithoutNotify(new ToggleButtonGroupState(animated, _axisButtons.Length));
         }
 
         private static void RefreshLink(ValueRow row)
