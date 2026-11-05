@@ -55,6 +55,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _seed = template.FindPropertyRelative(ORDER_SEED);
 
             _card.AddToClassList(TweenClipSections.CARD_USS_CLASS_NAME);
+            _card.AddToClassList(TweenClipSections.CARD_WIDE_LABELS_USS_CLASS_NAME);
             _card.Add(CreateHeader());
 
             var body = new VisualElement();

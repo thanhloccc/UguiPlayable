@@ -42,6 +42,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string GRADIENT_FIELD_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__gradient-field";
         public const string ROW_TOP_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__row--top";
         public const string ROW_LABEL_TEXT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__row-label--text";
+
+        // On a card whose row labels are longer than From/To (Strength, Frequency, Amplitude…).
+        public const string CARD_WIDE_LABELS_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "--wide-labels";
         public const string TEXT_FIELD_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__text-field";
         public const string PERCENT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__percent";
 

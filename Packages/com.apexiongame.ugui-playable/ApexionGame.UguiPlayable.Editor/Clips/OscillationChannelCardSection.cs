@@ -63,6 +63,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _expandKey = TweenClipSections.GetExpandKey(serializedObject.targetObject, channel.propertyPath);
 
             _card.AddToClassList(TweenClipSections.CARD_USS_CLASS_NAME);
+            _card.AddToClassList(TweenClipSections.CARD_WIDE_LABELS_USS_CLASS_NAME);
             _body.AddToClassList(TweenClipSections.CARD_BODY_USS_CLASS_NAME);
 
             _chevron = TweenClipSections.CreateIconButton(

@@ -90,7 +90,14 @@
 .ugp-tween-card__row-label {
     width: 44px;
     flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--ugp-tween-clip-secondary);
+}
+
+.ugp-tween-card--wide-labels .ugp-tween-card__row-label {
+    width: 80px;
 }
 
 .ugp-tween-card__field {
