@@ -1,7 +1,9 @@
 .ugp-easing-ease-setting,
 .ugp-easing-ease-setting__preview {
-    --ugp-easing-ease-setting-preview-background: #f0f0f0;
-    --ugp-easing-ease-setting-preview-border: #b4b4b4;
-    --ugp-easing-ease-setting-curve: #1a6fc2;
-    --ugp-easing-ease-setting-baseline: #c4c4c4;
+    --ugp-easing-ease-setting-preview-background: #f4f4f4;
+    --ugp-easing-ease-setting-preview-border: #c2c2c2;
+    --ugp-easing-ease-setting-curve: #1f6fbf;
+    --ugp-easing-ease-setting-grid: rgba(0, 0, 0, 0.06);
+    --ugp-easing-ease-setting-baseline: rgba(0, 0, 0, 0.2);
+    --ugp-easing-ease-setting-overshoot: rgba(230, 140, 20, 0.08);
 }

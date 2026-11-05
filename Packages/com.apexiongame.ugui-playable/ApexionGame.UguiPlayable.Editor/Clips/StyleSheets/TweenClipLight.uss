@@ -4,4 +4,11 @@
     --ugp-tween-card-border: #b4b4b4;
     --ugp-tween-card-toggle-on: #7db3e8;
     --ugp-tween-card-toggle-on-text: #000000;
+    --ugp-tween-card-axis-border: #a8a8a8;
+    --ugp-tween-card-axis-off: #e2e2e2;
+    --ugp-tween-card-axis-off-text: #7a7a7a;
+    --ugp-tween-card-axis-hover: rgba(0, 0, 0, 0.06);
+    --ugp-tween-card-axis-x: #d1503f;
+    --ugp-tween-card-axis-y: #5f9e2c;
+    --ugp-tween-card-axis-z: #3c74c8;
 }

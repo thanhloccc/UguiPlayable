@@ -31,6 +31,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string ICON_BUTTON_ON_USS_CLASS_NAME = ICON_BUTTON_USS_CLASS_NAME + "--on";
         public const string AXIS_BUTTON_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__axis-button";
         public const string AXIS_BUTTON_ON_USS_CLASS_NAME = AXIS_BUTTON_USS_CLASS_NAME + "--on";
+        public const string AXIS_GROUP_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__axis-group";
+        public const string AXIS_BUTTON_X_USS_CLASS_NAME = AXIS_BUTTON_USS_CLASS_NAME + "--x";
+        public const string AXIS_BUTTON_Y_USS_CLASS_NAME = AXIS_BUTTON_USS_CLASS_NAME + "--y";
+        public const string AXIS_BUTTON_Z_USS_CLASS_NAME = AXIS_BUTTON_USS_CLASS_NAME + "--z";
         public const string PERCENT_USS_CLASS_NAME = CARD_USS_CLASS_NAME + "__percent";
 
         private const string EXPAND_KEY_PREFIX = "ugp.tween-clip.expanded";

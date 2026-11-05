@@ -16,6 +16,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private static readonly string[] s_modeLabels = { "Absolute", "Relative", "From current" };
         private static readonly string[] s_axisNames = { "X", "Y", "Z" };
 
+        private static readonly string[] s_axisClasses = {
+              TweenClipSections.AXIS_BUTTON_X_USS_CLASS_NAME
+            , TweenClipSections.AXIS_BUTTON_Y_USS_CLASS_NAME
+            , TweenClipSections.AXIS_BUTTON_Z_USS_CLASS_NAME
+        };
+
         private readonly SerializedObject _serializedObject;
         private readonly ChannelInfo _info;
         private readonly ClipBindingSource _source;
@@ -165,6 +171,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 };
 
                 button.AddToClassList(TweenClipSections.AXIS_BUTTON_USS_CLASS_NAME);
+                button.AddToClassList(s_axisClasses[i]);
                 buttons[i] = button;
             }
 
@@ -174,12 +181,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private VisualElement CreateAxesRow()
         {
             var row = TweenClipSections.CreateRow(TweenClipTexts.AXES);
+            var group = new VisualElement();
+            group.AddToClassList(TweenClipSections.AXIS_GROUP_USS_CLASS_NAME);
 
             for (var i = 0; i < _axisButtons.Length; i++)
             {
-                row.Add(_axisButtons[i]);
+                group.Add(_axisButtons[i]);
             }
 
+            row.Add(group);
             return row;
         }
 
