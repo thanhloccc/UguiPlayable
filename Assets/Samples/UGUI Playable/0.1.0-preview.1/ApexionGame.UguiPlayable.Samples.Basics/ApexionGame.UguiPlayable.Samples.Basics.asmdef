@@ -1,0 +1,19 @@
+{
+    "name": "ApexionGame.UguiPlayable.Samples.Basics",
+    "rootNamespace": "ApexionGame.UguiPlayable.Samples.Basics",
+    "references": [
+        "ApexionGame.UguiPlayable",
+        "Unity.Timeline",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
