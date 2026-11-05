@@ -39,8 +39,8 @@ Ported files: none yet.
 Icons used (rendered to PNG in dark and light colours at 16 px and 32 px, under
 `ApexionGame.UguiPlayable.Editor/Common/Icons/`): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
 `pipette`, `chart-spline`, `scaling`, `rotate-cw`, `scale-3d`, `crosshair`, `anchor`, `blend`, `percent`,
-`mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`. `move`, `link`,
-`crosshair`, `percent`, `chevron-down` and `chevron-right` are Feather-derived.
+`mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`, `sliders-horizontal`, `gallery-vertical`, `scroll`, `chevrons-left-right`, `wallpaper`, `frame`, `copy`, `ruler`, `columns-3`, `grid-3x3`, `move-horizontal`, `type`, `case-sensitive`, `space`, `baseline`, `pilcrow`, `text-cursor`, `paintbrush`, `whole-word`, `activity`, `vibrate`. `move`, `link`,
+`crosshair`, `percent`, `chevron-down`, `chevron-right` and `type` are Feather-derived.
 
 The sample (`Samples~/ApexionGame.UguiPlayable.Samples/Art/Icons/`) uses `x` and `arrow-left`,
 rendered white at 64 px.

@@ -38,11 +38,35 @@ namespace ApexionGame.UguiPlayable.Editor.Common
         public const string TRIANGLE_ALERT = "triangle-alert";
         public const string CHEVRON_DOWN = "chevron-down";
         public const string CHEVRON_RIGHT = "chevron-right";
+        public const string SLIDERS_HORIZONTAL = "sliders-horizontal";
+        public const string GALLERY_VERTICAL = "gallery-vertical";
+        public const string SCROLL = "scroll";
+        public const string CHEVRONS_LEFT_RIGHT = "chevrons-left-right";
+        public const string WALLPAPER = "wallpaper";
+        public const string FRAME = "frame";
+        public const string COPY = "copy";
+        public const string RULER = "ruler";
+        public const string COLUMNS_3 = "columns-3";
+        public const string GRID_3X3 = "grid-3x3";
+        public const string MOVE_HORIZONTAL = "move-horizontal";
+        public const string TYPE = "type";
+        public const string CASE_SENSITIVE = "case-sensitive";
+        public const string SPACE = "space";
+        public const string BASELINE = "baseline";
+        public const string PILCROW = "pilcrow";
+        public const string TEXT_CURSOR = "text-cursor";
+        public const string PAINTBRUSH = "paintbrush";
+        public const string WHOLE_WORD = "whole-word";
+        public const string ACTIVITY = "activity";
+        public const string VIBRATE = "vibrate";
 
         private static readonly string[] s_names = {
             LAYERS, MOVE, PALETTE, IMAGE, LINK, UNLINK, PIPETTE, CHART_SPLINE,
             SCALING, ROTATE_CW, SCALE_3D, CROSSHAIR, ANCHOR, BLEND, PERCENT, MOUSE_POINTER_CLICK, SHIELD_CHECK,
             TRIANGLE_ALERT, CHEVRON_DOWN, CHEVRON_RIGHT,
+            SLIDERS_HORIZONTAL, GALLERY_VERTICAL, SCROLL, CHEVRONS_LEFT_RIGHT, WALLPAPER, FRAME, COPY, RULER,
+            COLUMNS_3, GRID_3X3, MOVE_HORIZONTAL, TYPE, CASE_SENSITIVE, SPACE, BASELINE, PILCROW, TEXT_CURSOR,
+            PAINTBRUSH, WHOLE_WORD, ACTIVITY, VIBRATE,
         };
 
         private static readonly Texture2D[] s_darkIcons = new Texture2D[s_names.Length];
@@ -110,6 +134,69 @@ namespace ApexionGame.UguiPlayable.Editor.Common
 
         /// <summary>Collapsed card.</summary>
         public static Texture2D ChevronRight => Get(19);
+
+        /// <summary>Slider track and clip.</summary>
+        public static Texture2D SlidersHorizontal => Get(20);
+
+        /// <summary>Scrollbar track and clip.</summary>
+        public static Texture2D GalleryVertical => Get(21);
+
+        /// <summary>ScrollRect track and clip.</summary>
+        public static Texture2D Scroll => Get(22);
+
+        /// <summary>Scroll position and value channels.</summary>
+        public static Texture2D ChevronsLeftRight => Get(23);
+
+        /// <summary>RawImage track and clip.</summary>
+        public static Texture2D Wallpaper => Get(24);
+
+        /// <summary>UV rect channel.</summary>
+        public static Texture2D Frame => Get(25);
+
+        /// <summary>Shadow/Outline track and clip.</summary>
+        public static Texture2D Copy => Get(26);
+
+        /// <summary>LayoutElement track and clip; size channels.</summary>
+        public static Texture2D Ruler => Get(27);
+
+        /// <summary>Horizontal/Vertical LayoutGroup track and clip.</summary>
+        public static Texture2D Columns3 => Get(28);
+
+        /// <summary>GridLayoutGroup track and clip.</summary>
+        public static Texture2D Grid3x3 => Get(29);
+
+        /// <summary>Spacing and padding channels.</summary>
+        public static Texture2D MoveHorizontal => Get(30);
+
+        /// <summary>TMP_Text track and clip.</summary>
+        public static Texture2D Type => Get(31);
+
+        /// <summary>Font size channel.</summary>
+        public static Texture2D CaseSensitive => Get(32);
+
+        /// <summary>Character and word spacing channels.</summary>
+        public static Texture2D Space => Get(33);
+
+        /// <summary>Line spacing channel.</summary>
+        public static Texture2D Baseline => Get(34);
+
+        /// <summary>Paragraph spacing channel.</summary>
+        public static Texture2D Pilcrow => Get(35);
+
+        /// <summary>Typewriter (visible ratio) channel.</summary>
+        public static Texture2D TextCursor => Get(36);
+
+        /// <summary>Vertex gradient channel.</summary>
+        public static Texture2D Paintbrush => Get(37);
+
+        /// <summary>Text (string tween) channel.</summary>
+        public static Texture2D WholeWord => Get(38);
+
+        /// <summary>Punch channel.</summary>
+        public static Texture2D Activity => Get(39);
+
+        /// <summary>Shake channel.</summary>
+        public static Texture2D Vibrate => Get(40);
 
         /// <summary>
         /// Returns the icon called <paramref name="name"/> (one of <see cref="Names"/>) for the current skin.
