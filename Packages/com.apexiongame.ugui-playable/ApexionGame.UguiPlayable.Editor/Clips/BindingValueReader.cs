@@ -52,6 +52,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.FILL_AMOUNT:
                     return TryReadFill(binding, out value);
 
+                case ChannelPresentation.IS_ON:
+                    return TryReadIsOn(binding, out value);
+
                 case ChannelPresentation.VALUE:
                     return TryReadValue(binding, out value);
 
@@ -271,6 +274,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             if (TryResolve(binding, out bar))
             {
                 value = new Vector4(bar.value, 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadIsOn(Object binding, out Vector4 value)
+        {
+            if (TryResolve<Toggle>(binding, out var toggle))
+            {
+                value = new Vector4(toggle.isOn ? 1f : 0f, 0f, 0f, 0f);
                 return true;
             }
 

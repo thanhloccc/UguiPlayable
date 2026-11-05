@@ -12,6 +12,7 @@ and the package uses [Semantic Versioning](https://semver.org/).
 - Editor icons use the `@2x` images on high-DPI displays.
 - RectTransform clips: Rotation mode Shortest path (quaternion); Euler stays the default.
 - The sample adds its UI input module at runtime, so it works with the Input System or the Input Manager.
+- Toggle track (`UGUI Playable/Controls/Toggle`): animates `isOn` with an Is On step channel (the value applies when the clip passes its threshold). Send callbacks (off by default, Play Mode only) works as on Slider and Scrollbar. Previewing a toggle in a `ToggleGroup` leaves the group as it was, and the checkmark matches the restored state. In Edit Mode, Unity itself calls `onValueChanged` once per toggle of the group when the preview ends. With `allowSwitchOff` off, the group turns the last toggle back on.
 
 ### Changed
 

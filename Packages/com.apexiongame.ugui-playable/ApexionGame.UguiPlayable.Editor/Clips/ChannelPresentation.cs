@@ -53,6 +53,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string PUNCH = "_punch";
         public const string SHAKE = "_shake";
         public const string ROTATION_MODE = "_rotationMode";
+        public const string IS_ON = "_isOn";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -92,6 +93,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [TEXT] = new("Text", static () => EditorIcons.WholeWord),
             [PUNCH] = new("Punch", static () => EditorIcons.Activity),
             [SHAKE] = new("Shake", static () => EditorIcons.Vibrate),
+            [IS_ON] = new("Is On", static () => EditorIcons.ToggleRight),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
