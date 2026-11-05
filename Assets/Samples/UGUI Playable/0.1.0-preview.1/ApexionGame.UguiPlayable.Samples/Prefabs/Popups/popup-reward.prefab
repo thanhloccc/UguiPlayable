@@ -145,6 +145,7 @@ GameObject:
   - component: {fileID: 7186347179143576305}
   - component: {fileID: 4799847122787133252}
   - component: {fileID: 3615801879040192544}
+  - component: {fileID: 2882520677105676397}
   m_Layer: 0
   m_Name: label-title
   m_TagString: Untagged
@@ -271,6 +272,21 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2882520677105676397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066139060617016251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 1, g: 0.8, b: 0.25, a: 0}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &2153161376440078449
 GameObject:
   m_ObjectHideFlags: 0
@@ -813,7 +829,7 @@ PlayableDirector:
   m_GameObject: {fileID: 7677949923001557259}
   m_Enabled: 1
   serializedVersion: 3
-  m_PlayableAsset: {fileID: 11400000, guid: 49d4f7f4c6541fc44a319dc27701cde1, type: 2}
+  m_PlayableAsset: {fileID: 11400000, guid: 93182e45947616c448abb36f893491c6, type: 2}
   m_InitialState: 0
   m_WrapMode: 2
   m_DirectorUpdateMode: 1
@@ -825,6 +841,20 @@ PlayableDirector:
     value: {fileID: 1420667171140528535}
   - key: {fileID: -579276657557173980, guid: 49d4f7f4c6541fc44a319dc27701cde1, type: 2}
     value: {fileID: 4612342866702222024}
+  - key: {fileID: 2172502829343824733, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 5500043109066310660}
+  - key: {fileID: -5519355376766419092, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 1420667171140528535}
+  - key: {fileID: -579276657557173980, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 4612342866702222024}
+  - key: {fileID: 4675189114162697319, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 3615801879040192544}
+  - key: {fileID: 2125390770043082301, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 2882520677105676397}
+  - key: {fileID: -2997157802206281393, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 8058316867843207594}
+  - key: {fileID: -1852970189222962646, guid: 93182e45947616c448abb36f893491c6, type: 2}
+    value: {fileID: 1666561416963732795}
   m_ExposedReferences:
     m_References: []
 --- !u!1 &8012621873152727672
