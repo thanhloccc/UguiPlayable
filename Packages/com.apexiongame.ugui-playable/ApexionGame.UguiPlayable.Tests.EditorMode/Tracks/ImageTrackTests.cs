@@ -183,7 +183,7 @@ public sealed class ImageTrackTests
     private void StopMixer()
     {
         var mixer = (ScriptPlayable<ImageMixer>)_director.playableGraph.GetRootPlayable(0).GetInput(0);
-        mixer.GetBehaviour().OnGraphStop(mixer);
+        mixer.GetBehaviour().OnPlayableDestroy(mixer);
     }
 
     private void EvaluateAt(double time)

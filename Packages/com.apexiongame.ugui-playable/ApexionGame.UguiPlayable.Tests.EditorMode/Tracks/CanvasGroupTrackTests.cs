@@ -172,9 +172,9 @@ public sealed class CanvasGroupTrackTests
         Assert.That(_group.interactable, Is.False);
     }
 
-    // Unity runs OnGraphStop/OnPlayableDestroy deferred, on a later player-loop update, which EditMode tests do not
-    // get (Timeline's own ActivationTrack revert behaves the same). These tests call the callback; the deferred
-    // Play Mode path was verified by hand (step 02 Result).
+    // Unity runs OnPlayableDestroy deferred, on a later player-loop update, which EditMode tests do not get
+    // (Timeline's own ActivationTrack revert behaves the same). These tests call the callback; the deferred Play Mode
+    // path was verified by hand (step 02 Result).
     [Test]
     public void Revert_RestoresBaseValue_WhenGraphStops()
     {
@@ -202,6 +202,20 @@ public sealed class CanvasGroupTrackTests
         StopMixer();
 
         Assert.That(_group.alpha, Is.EqualTo(0.5f).Within(TOLERANCE));
+    }
+
+    [Test]
+    public void PauseAndResume_KeepsBaseValue()
+    {
+        _group.alpha = 0.4f;
+        var channel = new TweenChannel<float>(0f, 0.2f, ValueMode.Relative);
+        AddClip(0d, 1d, new CanvasGroupBehaviour { Alpha = channel });
+
+        EvaluateAt(0.75d);
+        var mixer = (ScriptPlayable<CanvasGroupMixer>)_director.playableGraph.GetRootPlayable(0).GetInput(0);
+        mixer.GetBehaviour().OnGraphStop(mixer);
+
+        Assert.That(EvaluateAt(0.5d), Is.EqualTo(0.5f).Within(TOLERANCE), "Relative still adds to the original 0.4");
     }
 
     [Test]
@@ -274,7 +288,7 @@ public sealed class CanvasGroupTrackTests
     private void StopMixer()
     {
         var mixer = (ScriptPlayable<CanvasGroupMixer>)_director.playableGraph.GetRootPlayable(0).GetInput(0);
-        mixer.GetBehaviour().OnGraphStop(mixer);
+        mixer.GetBehaviour().OnPlayableDestroy(mixer);
     }
 
     private float EvaluateAt(double time)

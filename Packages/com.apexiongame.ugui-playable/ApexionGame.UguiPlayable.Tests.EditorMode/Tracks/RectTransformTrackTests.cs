@@ -359,7 +359,7 @@ public sealed class RectTransformTrackTests
     private void StopMixer()
     {
         var mixer = (ScriptPlayable<RectTransformMixer>)_director.playableGraph.GetRootPlayable(0).GetInput(0);
-        mixer.GetBehaviour().OnGraphStop(mixer);
+        mixer.GetBehaviour().OnPlayableDestroy(mixer);
     }
 
     private void EvaluateAt(double time)
