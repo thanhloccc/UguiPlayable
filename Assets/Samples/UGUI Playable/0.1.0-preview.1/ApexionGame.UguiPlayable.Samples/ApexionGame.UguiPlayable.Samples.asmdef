@@ -5,7 +5,8 @@
         "ApexionGame.UguiPlayable",
         "Unity.Timeline",
         "UnityEngine.UI",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -14,6 +15,12 @@
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "UGP_SAMPLE_INPUT_SYSTEM"
+        }
+    ],
     "noEngineReferences": false
 }
