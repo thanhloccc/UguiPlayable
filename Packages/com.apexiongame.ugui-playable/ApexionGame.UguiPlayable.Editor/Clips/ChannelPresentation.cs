@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Editor.Common;
+using ApexionGame.UguiPlayable.Tracks.Controls;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
 {
@@ -24,6 +25,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string FILL_AMOUNT = "_fillAmount";
         public const string INTERACTABLE = "_interactable";
         public const string BLOCKS_RAYCASTS = "_blocksRaycasts";
+        public const string VALUE = "_value";
+        public const string SIZE = "_size";
+        public const string NORMALIZED_POSITION = "_normalizedPosition";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -38,6 +42,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [FILL_AMOUNT] = new("Fill Amount", static () => EditorIcons.Percent),
             [INTERACTABLE] = new("Interactable", static () => EditorIcons.MousePointerClick),
             [BLOCKS_RAYCASTS] = new("Blocks Raycasts", static () => EditorIcons.ShieldCheck),
+            [VALUE] = new("Value", static () => EditorIcons.ChevronsLeftRight),
+            [SIZE] = new("Size", static () => EditorIcons.Ruler),
+            [NORMALIZED_POSITION] = new("Normalized Position", static () => EditorIcons.ChevronsLeftRight),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
@@ -59,10 +66,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             => s_entries.TryGetValue(name, out var entry) ? entry.Icon() : null;
 
         /// <summary>
-        /// Whether the channel is a 0..1 value drawn as a slider.
+        /// Whether the channel is a 0..1 value drawn as a slider. The clip type decides for a name two clips share:
+        /// <c>_value</c> is 0..1 on a scrollbar but spans the slider's own range on a slider.
         /// </summary>
-        public static bool IsNormalized(string name)
-            => name == ALPHA || name == FILL_AMOUNT;
+        public static bool IsNormalized(Type clipType, string name)
+            => name switch {
+                ALPHA or FILL_AMOUNT or SIZE => true,
+                VALUE => clipType == typeof(ScrollbarClip),
+                _ => false,
+            };
 
         private readonly record struct Entry(string DisplayName, Func<Texture2D> Icon);
     }

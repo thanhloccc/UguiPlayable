@@ -6,6 +6,7 @@ using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Timeline;
 using ApexionGame.UguiPlayable.Editor.Tracks;
+using ApexionGame.UguiPlayable.Tracks.Controls;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
@@ -233,6 +234,46 @@ public sealed class TweenTrackEditorTests
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<CanvasGroupTrack>(null, "a"), new CanvasGroupTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<GraphicTrack>(null, "b"), new GraphicTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ImageTrack>(null, "c"), new ImageTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<SliderTrack>(null, "d"), new SliderTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ScrollbarTrack>(null, "e"), new ScrollbarTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ScrollRectTrack>(null, "f"), new ScrollRectTrackEditor()));
+    }
+
+    [Test]
+    public void ScrollRectTrackEditor_ReportsAnErrorWithoutAContent()
+    {
+        var track = _timeline.CreateTrack<ScrollRectTrack>(null, "Scroll");
+        _parent = new GameObject("Scroll", typeof(RectTransform), typeof(ScrollRect));
+
+        var scrollRect = _parent.GetComponent<ScrollRect>();
+        var editor = new ScrollRectTrackEditor();
+
+        Assert.AreEqual(TweenClipTexts.SCROLL_RECT_NO_CONTENT, editor.GetTrackOptions(track, scrollRect).errorText);
+
+        _child = new GameObject("Content", typeof(RectTransform));
+        scrollRect.content = (RectTransform)_child.transform;
+
+        Assert.IsTrue(string.IsNullOrEmpty(editor.GetTrackOptions(track, scrollRect).errorText));
+    }
+
+    [Test]
+    public void ControlClipEditors_NameANewClipAfterTheControl()
+    {
+        var slider = _timeline.CreateTrack<SliderTrack>(null, "S");
+        var sliderClip = slider.CreateClip<SliderClip>();
+        new SliderClipEditor().OnCreate(sliderClip, slider, null);
+
+        var bar = _timeline.CreateTrack<ScrollbarTrack>(null, "B");
+        var barClip = bar.CreateClip<ScrollbarClip>();
+        new ScrollbarClipEditor().OnCreate(barClip, bar, null);
+
+        var scroll = _timeline.CreateTrack<ScrollRectTrack>(null, "R");
+        var scrollClip = scroll.CreateClip<ScrollRectClip>();
+        new ScrollRectClipEditor().OnCreate(scrollClip, scroll, null);
+
+        Assert.AreEqual("Slider", sliderClip.displayName);
+        Assert.AreEqual("Scrollbar", barClip.displayName);
+        Assert.AreEqual("Scroll Rect", scrollClip.displayName);
     }
 
     private static Texture2D GetIcon(TrackAsset track, UnityEditor.Timeline.TrackEditor editor)

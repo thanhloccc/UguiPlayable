@@ -251,7 +251,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             switch (_info.ValueKind)
             {
-                case ChannelValueKind.Float when ChannelPresentation.IsNormalized(_info.Name):
+                case ChannelValueKind.Float when IsNormalized():
                 {
                     var slider = new Slider(0f, 1f) { showInputField = true };
                     slider.BindProperty(value);
@@ -306,6 +306,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             field.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
             return field;
         }
+
+        // The clip type decides for channel names that two clips share (_value is 0..1 only on a scrollbar).
+        private bool IsNormalized()
+            => ChannelPresentation.IsNormalized(_serializedObject.targetObject.GetType(), _info.Name);
 
         private void ApplyCaptions(VisualElement vectorField)
         {

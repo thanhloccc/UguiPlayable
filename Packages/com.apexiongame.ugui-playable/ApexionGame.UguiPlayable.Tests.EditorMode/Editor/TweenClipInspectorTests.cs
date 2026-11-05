@@ -11,12 +11,14 @@ using UnityEngine.UIElements;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Common;
+using ApexionGame.UguiPlayable.Tracks.Controls;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
 using Button = UnityEngine.UIElements.Button;
 using Image = UnityEngine.UI.Image;
 using Object = UnityEngine.Object;
+using Slider = UnityEngine.UI.Slider;
 using Toggle = UnityEngine.UIElements.Toggle;
 
 namespace ApexionGame.UguiPlayable.Tests.EditorMode.Editor;
@@ -62,6 +64,9 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(RectTransformClip))]
     [TestCase(typeof(GraphicClip))]
     [TestCase(typeof(ImageClip))]
+    [TestCase(typeof(SliderClip))]
+    [TestCase(typeof(ScrollbarClip))]
+    [TestCase(typeof(ScrollRectClip))]
     public void Inspector_BuildsWithoutABinding(Type clipType)
     {
         Create(clipType);
@@ -85,6 +90,9 @@ public sealed class TweenClipInspectorTests
     )]
     [TestCase(typeof(GraphicClip), "_color,_alpha")]
     [TestCase(typeof(ImageClip), "_color,_alpha,_fillAmount")]
+    [TestCase(typeof(SliderClip), "_value")]
+    [TestCase(typeof(ScrollbarClip), "_value,_size")]
+    [TestCase(typeof(ScrollRectClip), "_normalizedPosition")]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
         Create(clipType);
@@ -373,6 +381,99 @@ public sealed class TweenClipInspectorTests
 
         Assert.IsFalse(BindingValueReader.TryRead("_unknown", rect, out _));
         Assert.IsFalse(BindingValueReader.TryRead("_scale", null, out _));
+    }
+
+    [Test]
+    public void IsNormalized_DependsOnTheClipForASharedChannelName()
+    {
+        Assert.IsTrue(ChannelPresentation.IsNormalized(typeof(ImageClip), "_alpha"));
+        Assert.IsTrue(ChannelPresentation.IsNormalized(typeof(ImageClip), "_fillAmount"));
+        Assert.IsTrue(ChannelPresentation.IsNormalized(typeof(ScrollbarClip), "_value"));
+        Assert.IsTrue(ChannelPresentation.IsNormalized(typeof(ScrollbarClip), "_size"));
+        Assert.IsFalse(ChannelPresentation.IsNormalized(typeof(SliderClip), "_value"));
+        Assert.IsFalse(ChannelPresentation.IsNormalized(typeof(ScrollRectClip), "_normalizedPosition"));
+        Assert.IsFalse(ChannelPresentation.IsNormalized(typeof(RectTransformClip), "_scale"));
+    }
+
+    [Test]
+    public void Inspector_DrawsASliderForAScrollbarValueAndAFloatFieldForASliderValue()
+    {
+        Create(typeof(ScrollbarClip));
+
+        var scrollbarRoot = _editor.CreateInspectorGUI();
+
+        var scrollbarSliders = scrollbarRoot.Query<UnityEngine.UIElements.Slider>().ToList();
+
+        Assert.AreEqual(4, scrollbarSliders.Count, "value and size, from and to");
+
+        Object.DestroyImmediate(_editor);
+        Object.DestroyImmediate(_clip);
+
+        Create(typeof(SliderClip));
+
+        var sliderRoot = _editor.CreateInspectorGUI();
+
+        Assert.AreEqual(0, sliderRoot.Query<UnityEngine.UIElements.Slider>().ToList().Count);
+        Assert.AreEqual(2, sliderRoot.Query<FloatField>().ToList().Count, "from and to");
+    }
+
+    [Test]
+    public void ScrollRectInspector_HasTheXAndYAxes()
+    {
+        Create(typeof(ScrollRectClip));
+
+        var root = _editor.CreateInspectorGUI();
+        var axes = root.Query<Button>(className: TweenClipSections.AXIS_BUTTON_USS_CLASS_NAME).ToList();
+
+        Assert.AreEqual(2, axes.Count);
+
+        var channels = TweenClipModel.Create(_editor.serializedObject).Channels;
+
+        Assert.AreEqual(ChannelValueKind.Vector2, Find(channels, "_normalizedPosition").ValueKind);
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsTheControls()
+    {
+        // Both are Selectables, which allow one per object: the bound object is the control itself.
+        _gameObject = new GameObject("Slider", typeof(RectTransform), typeof(Slider));
+
+        var barObject = new GameObject("Scrollbar", typeof(RectTransform), typeof(Scrollbar));
+        barObject.transform.SetParent(_gameObject.transform, false);
+
+        var slider = _gameObject.GetComponent<Slider>();
+        slider.minValue = 0f;
+        slider.maxValue = 10f;
+        slider.value = 4f;
+
+        var bar = barObject.GetComponent<Scrollbar>();
+        bar.value = 0.3f;
+        bar.size = 0.6f;
+
+        Assert.IsTrue(BindingValueReader.TryRead("_value", slider, out var sliderValue));
+        Assert.AreEqual(4f, sliderValue.x, 0.0001f, "a Slider binding reads the Slider");
+
+        Assert.IsTrue(BindingValueReader.TryRead("_value", bar, out var barValue));
+        Assert.AreEqual(0.3f, barValue.x, 0.0001f, "a Scrollbar binding reads the Scrollbar");
+
+        Assert.IsTrue(BindingValueReader.TryRead("_size", bar, out var size));
+        Assert.AreEqual(0.6f, size.x, 0.0001f);
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsTheScrollPositionOnlyWithAContent()
+    {
+        _gameObject = new GameObject("Scroll", typeof(RectTransform), typeof(ScrollRect));
+
+        var scrollRect = _gameObject.GetComponent<ScrollRect>();
+
+        Assert.IsFalse(BindingValueReader.TryRead("_normalizedPosition", scrollRect, out _), "no content");
+
+        var content = new GameObject("Content", typeof(RectTransform));
+        content.transform.SetParent(_gameObject.transform, false);
+        scrollRect.content = (RectTransform)content.transform;
+
+        Assert.IsTrue(BindingValueReader.TryRead("_normalizedPosition", scrollRect, out _));
     }
 
     private static ChannelInfo Find(System.Collections.Generic.IReadOnlyList<ChannelInfo> channels, string name)

@@ -36,6 +36,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             "This RectTransform's size is driven by a ContentSizeFitter or AspectRatioFitter; animated size is "
             + "overwritten on layout rebuild.";
 
+        public const string SCROLL_RECT_NO_CONTENT =
+            "This ScrollRect has no Content, so there is nothing to scroll. Assign its Content.";
+
         public static string FormatChannelCount(int enabled, int total)
             => $"{enabled} of {total} channels on";
     }

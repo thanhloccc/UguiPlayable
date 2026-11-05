@@ -51,6 +51,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.FILL_AMOUNT:
                     return TryReadFill(binding, out value);
 
+                case ChannelPresentation.VALUE:
+                    return TryReadValue(binding, out value);
+
+                case ChannelPresentation.SIZE:
+                    return TryReadSize(binding, out value);
+
+                case ChannelPresentation.NORMALIZED_POSITION:
+                    return TryReadScrollPosition(binding, out value);
+
                 default:
                     return false;
             }
@@ -122,6 +131,57 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             if (TryResolve<Image>(binding, out var image))
             {
                 value = new Vector4(image.fillAmount, 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        // Slider and Scrollbar both have a value channel named _value. The binding type decides first, then a
+        // component on the bound object.
+        private static bool TryReadValue(Object binding, out Vector4 value)
+        {
+            if (binding is Scrollbar bar)
+            {
+                value = new Vector4(bar.value, 0f, 0f, 0f);
+                return true;
+            }
+
+            if (binding is Slider slider || TryResolve(binding, out slider))
+            {
+                value = new Vector4(slider.value, 0f, 0f, 0f);
+                return true;
+            }
+
+            if (TryResolve(binding, out bar))
+            {
+                value = new Vector4(bar.value, 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadSize(Object binding, out Vector4 value)
+        {
+            if (TryResolve<Scrollbar>(binding, out var bar))
+            {
+                value = new Vector4(bar.size, 0f, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadScrollPosition(Object binding, out Vector4 value)
+        {
+            if (TryResolve<ScrollRect>(binding, out var scrollRect) && scrollRect.content.IsValid())
+            {
+                var position = scrollRect.normalizedPosition;
+                value = new Vector4(position.x, position.y, 0f, 0f);
                 return true;
             }
 
