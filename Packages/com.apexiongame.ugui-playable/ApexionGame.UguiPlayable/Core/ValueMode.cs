@@ -12,6 +12,11 @@ namespace ApexionGame.UguiPlayable.Core
         Absolute = 0,
 
         /// <summary>From and to are offsets added to the value the property had when the track bound it.</summary>
+        /// <remarks>
+        /// The base is captured again whenever the director's graph is rebuilt, for example after
+        /// <c>PlayableDirector.Stop()</c>. A timeline that does not return to its start drifts each time it is
+        /// replayed, so for show/hide transitions prefer Absolute targets or <see cref="FromCurrent"/>.
+        /// </remarks>
         Relative = 1,
 
         /// <summary>The tween starts from the value the property has when the clip becomes active.</summary>
