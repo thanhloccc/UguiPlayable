@@ -148,6 +148,23 @@ public sealed class EaseSettingDrawerTests
         }
     }
 
+    [Test]
+    public void EditorIcons_EveryIconLoadsAtBothScalesForBothSkins()
+    {
+        foreach (var name in EditorIcons.Names)
+        {
+            foreach (var dark in new[] { true, false })
+            {
+                foreach (var highDpi in new[] { false, true })
+                {
+                    var path = EditorIcons.GetPath(name, dark, highDpi);
+
+                    Assert.IsNotNull(AssetDatabase.LoadAssetAtPath<Texture2D>(path), path);
+                }
+            }
+        }
+    }
+
     private void Create(EaseSetting setting)
     {
         _holder = ScriptableObject.CreateInstance<EaseSettingHolder>();
