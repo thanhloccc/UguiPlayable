@@ -3,7 +3,7 @@
 UGUI Playable adds Timeline tracks and clips that animate uGUI. You build the animation in the Timeline window. You do
 not write tween code.
 
-This manual belongs to version `0.1.0-preview.1`. For install steps and requirements, see the package
+This manual belongs to version `0.1.0-preview.2`. For install steps and requirements, see the package
 [README](../README.md).
 
 ## How it works

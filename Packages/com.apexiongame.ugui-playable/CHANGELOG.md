@@ -6,6 +6,13 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.0-preview.2] - 2026-11-05
+
+### Fixed
+
+- Clip inspector: long row labels (Strength, Frequency, Elasticity, Amplitude, Stagger…) no longer overlap their
+  fields; labels that still do not fit end with an ellipsis.
+
 ## [0.1.0-preview.1] - 2026-11-05
 
 ### Added
