@@ -118,25 +118,30 @@ Packages/com.apexiongame.ugui-playable/
 
 ## 4. Samples
 
-Samples follow the EncosyTower layout.
+The package ships **one sample** (Owner decision 2026-11-05), laid out like EncosyTower's samples.
 
-- **Canonical source:** `Assets/Samples/UGUI Playable/<version>/ApexionGame.UguiPlayable.Samples.<Name>/`. This is
-  the path where the Package Manager imports a sample, so the development project sees samples exactly as users do.
-  It is tracked by Git.
-- **One sample = one folder** named like its assembly: `ApexionGame.UguiPlayable.Samples.<Name>.asmdef`
-  (`autoReferenced: false`) plus `csc.rsp`. The folder also holds the sample scene
-  `ugui-playable-sample-<name>.unity`, its timelines `ugui-playable-sample-<name>-<timeline>.playable` and any
-  scripts, in namespace `ApexionGame.UguiPlayable.Samples.<Name>`.
-- **Release output:** `Packages/com.apexiongame.ugui-playable/Samples~/ApexionGame.UguiPlayable.Samples.<Name>/`,
-  listed in `package.json` `samples` as `{ displayName, description, path }`.
+- **Canonical source:** `Assets/Samples/UGUI Playable/<version>/ApexionGame.UguiPlayable.Samples/`. This is the path
+  where the Package Manager imports a sample, so the development project sees the sample exactly as users do. It is
+  tracked by Git.
+- **Contents:**
+  - asmdef `ApexionGame.UguiPlayable.Samples` (`autoReferenced: false`) and `csc.rsp`;
+  - scene `ugui-playable-sample.unity`;
+  - `Prefabs/Screens|Popups|Overlays/`: page prefabs in the hierarchy standard (memory `ui-hierarchy-standard`);
+  - `Timelines/`: shared transition timelines, with tracks named by role;
+  - `Scripts/`, `Art/`.
+  - Namespace `ApexionGame.UguiPlayable.Samples`.
+- **Release output:** `Packages/com.apexiongame.ugui-playable/Samples~/ApexionGame.UguiPlayable.Samples/`, listed in
+  `package.json` `samples` as `{ displayName, description, path }`.
 - **Where to edit:** make sample changes in `Assets/Samples`, never in `Samples~`. At release:
-  - copy the canonical folders into `Samples~`, replacing the previous content;
+  - copy the canonical folder into `Samples~`, replacing the previous content;
   - move the `<version>` folder to the new version;
   - review the complete `Samples~` diff.
 - **Building:** build sample scenes and UI with unity CLI commands, not with builder scripts, so later hand edits
   survive. Timeline tracks and clips, which the CLI can't create, are set up by one-off `eval` calls.
-- **Dependencies:** samples depend only on the package and the Unity packages it declares. TextMeshPro text needs
-  TMP Essential Resources, which Unity offers to import.
+- **Position channels:** in shared show/hide timelines, use Absolute targets or From current, not Relative.
+  Relative re-bases each time a director's graph is rebuilt, so a hide that doesn't return to its start drifts.
+- **Dependencies:** the sample depends only on the package and the Unity packages it declares, plus the Input
+  System UI module used by the scene's EventSystem. TextMeshPro text needs TMP Essential Resources.
 
 ## 5. EncosyTower: Reference, Not Dependency
 
