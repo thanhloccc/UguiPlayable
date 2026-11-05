@@ -10,8 +10,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Controls
     /// The channels of a <see cref="ScrollbarClip"/>: value and handle size, both 0 to 1.
     /// </summary>
     /// <remarks>
-    /// <see cref="Scrollbar.onValueChanged"/> fires whenever the value changes, also while the Timeline window scrubs
-    /// in Edit Mode. The size channel is disabled by default.
+    /// <see cref="Scrollbar.onValueChanged"/> follows the track's <see cref="ScrollbarTrack.SendCallbacks"/> switch:
+    /// off by default, so scrubbing, playing and Revert write the value silently; on, the track notifies in Play Mode
+    /// only. In Edit Mode, Unity itself calls onValueChanged once when the preview ends. A linked
+    /// <see cref="ScrollRect"/> scrolls only through that callback: to scroll content, animate the ScrollRect track,
+    /// which updates its scrollbars, or turn on Send callbacks. The size channel is disabled by default and never
+    /// notifies.
     /// </remarks>
     [Serializable]
     public sealed class ScrollbarBehaviour : TweenBehaviour

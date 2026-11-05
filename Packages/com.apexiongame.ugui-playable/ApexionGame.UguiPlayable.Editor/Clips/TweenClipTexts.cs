@@ -30,6 +30,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string NAME = "Name";
         public const string TRACK_LOCKED = "The track is locked in the Timeline window.";
         public const string RESTORE_MODE = "Restore Mode";
+        public const string SEND_CALLBACKS = "Send callbacks";
+        public const string SEND_CALLBACKS_NOTE =
+            "Play Mode only. Scrubbing and Revert never call onValueChanged. In Edit Mode, Unity itself calls "
+            + "onValueChanged once when the preview ends.";
+        public const string SEND_CALLBACKS_SCROLLBAR_NOTE =
+            SEND_CALLBACKS_NOTE + " A linked ScrollRect scrolls only through callbacks: animate the ScrollRect track, "
+            + "which updates its scrollbars, or turn this on.";
         public const string RESTORE_KEEP_NOTE = "Keep: the last animated value stays when the timeline stops.";
         public const string RESTORE_REVERT_NOTE = "Revert: the bound object returns to its earlier value when stopped.";
         public const string LAYOUT_WARNING =

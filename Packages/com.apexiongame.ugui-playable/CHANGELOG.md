@@ -10,3 +10,7 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 - Package skeleton: runtime, Editor and EditMode test assemblies.
 - Editor icons use the `@2x` images on high-DPI displays.
+
+### Changed
+
+- Slider and Scrollbar tracks no longer raise `onValueChanged` by default; turn on Send callbacks on the track for Play Mode callbacks. A Scrollbar track no longer scrolls a linked ScrollRect: to scroll content, animate the ScrollRect track, which updates its scrollbars; or turn on Send callbacks.

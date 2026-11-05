@@ -13,8 +13,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Controls
     /// Absolute values are in the slider's own range (<see cref="Slider.minValue"/> to
     /// <see cref="Slider.maxValue"/>). The <see cref="Slider.value"/> setter clamps to that range and rounds when
     /// <see cref="Slider.wholeNumbers"/> is on; the clip does not work around either.
-    /// <see cref="Slider.onValueChanged"/> fires whenever the value changes, also while the Timeline window scrubs in
-    /// Edit Mode.
+    /// <see cref="Slider.onValueChanged"/> follows the track's <see cref="SliderTrack.SendCallbacks"/> switch: off by
+    /// default, so scrubbing, playing and Revert write the value silently; on, the track notifies in Play Mode only.
+    /// In Edit Mode, Unity itself calls onValueChanged once when the preview ends.
     /// </remarks>
     [Serializable]
     public sealed class SliderBehaviour : TweenBehaviour

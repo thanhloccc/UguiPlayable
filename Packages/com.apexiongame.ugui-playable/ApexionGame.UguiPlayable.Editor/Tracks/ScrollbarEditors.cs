@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
+using UnityEngine.UIElements;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Common;
@@ -23,6 +24,9 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
         protected override string Title => "Scrollbar Track";
 
         protected override Texture2D Icon => EditorIcons.GalleryVertical;
+
+        protected override void AddTrackRows(VisualElement root)
+            => AddSendCallbacksRows(root, TweenClipTexts.SEND_CALLBACKS_SCROLLBAR_NOTE);
     }
 
     [CustomTimelineEditor(typeof(ScrollbarClip))]

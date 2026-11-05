@@ -25,6 +25,9 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
         // data and cannot change without [FormerlySerializedAs].
         public const string RESTORE_MODE = "_restoreMode";
 
+        // Same reason as RESTORE_MODE: SliderTrack and ScrollbarTrack keep the field private.
+        public const string SEND_CALLBACKS = "_sendCallbacks";
+
         public const string RESTORE_LABEL_USS_CLASS_NAME = TweenClipSections.CARD_USS_CLASS_NAME + "__row-label--wide";
 
         private const long BINDING_POLL_MILLISECONDS = 500;
@@ -61,6 +64,8 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
             });
             RefreshNote(note, restoreMode);
 
+            AddTrackRows(root);
+
             var warning = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
             root.Add(warning);
             RefreshWarning(warning);
@@ -70,6 +75,32 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
                 RefreshLocked(root);
             }).Every(BINDING_POLL_MILLISECONDS);
             return root;
+        }
+
+        /// <summary>
+        /// Adds rows after the restore note and before the binding warning. The default adds nothing.
+        /// </summary>
+        protected virtual void AddTrackRows(VisualElement root)
+        {
+        }
+
+        /// <summary>
+        /// Adds the "Send callbacks" switch bound to <see cref="SEND_CALLBACKS"/>, and its note.
+        /// </summary>
+        protected void AddSendCallbacksRows(VisualElement root, string noteText)
+        {
+            var sendCallbacks = serializedObject.FindProperty(SEND_CALLBACKS);
+            var toggle = new Toggle().WithSwitchStyle();
+            toggle.BindProperty(sendCallbacks);
+
+            var row = TweenClipSections.CreateRow(TweenClipTexts.SEND_CALLBACKS);
+            row[0].AddToClassList(RESTORE_LABEL_USS_CLASS_NAME);
+            row.Add(toggle);
+            root.Add(row);
+            root.Add(TweenClipSections.CreateNote(noteText));
+
+            // Timeline caches the graph: rebuild it so the new flag reaches the open mixer.
+            root.TrackPropertyValue(sendCallbacks, _ => TimelineEditor.Refresh(RefreshReason.ContentsModified));
         }
 
         /// <summary>

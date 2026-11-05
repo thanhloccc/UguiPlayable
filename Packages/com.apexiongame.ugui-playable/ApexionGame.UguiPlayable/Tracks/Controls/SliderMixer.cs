@@ -11,6 +11,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Controls
     /// </remarks>
     public sealed class SliderMixer : TweenMixer<Slider, SliderBehaviour>
     {
+        /// <summary>
+        /// Whether a write raises <c>onValueChanged</c>. Set by the track; effective in Play Mode only.
+        /// </summary>
+        internal bool SendCallbacks { get; set; }
+
         private float _baseValue;
         private FloatAccumulator _value;
         private bool _wroteValue;
@@ -27,7 +32,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Controls
         {
             if (_wroteValue)
             {
-                binding.value = _baseValue;
+                binding.SetValueWithoutNotify(_baseValue);
             }
         }
 
@@ -64,8 +69,20 @@ namespace ApexionGame.UguiPlayable.Tracks.Controls
         {
             if (_value.HasContribution)
             {
-                binding.value = _value.Resolve(_baseValue);
+                Write(binding, _value.Resolve(_baseValue));
                 _wroteValue = true;
+            }
+        }
+
+        private void Write(Slider binding, float value)
+        {
+            if (SendCallbacks && PlayModeSeam.IsPlaying)
+            {
+                binding.value = value;
+            }
+            else
+            {
+                binding.SetValueWithoutNotify(value);
             }
         }
     }
