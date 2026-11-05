@@ -214,13 +214,13 @@ MonoBehaviour:
           m_RotationOrder: 4
       _ignoredAxes: 0
     _interactable:
-      _enabled: 0
-      _value: 1
-      _threshold: 0.5
+      _enabled: 1
+      _value: 0
+      _threshold: 0
     _blocksRaycasts:
-      _enabled: 0
-      _value: 1
-      _threshold: 0.5
+      _enabled: 1
+      _value: 0
+      _threshold: 0
 --- !u!114 &7445866527522483230
 MonoBehaviour:
   m_ObjectHideFlags: 1

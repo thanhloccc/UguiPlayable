@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: toast-drop-in
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: dba9f7b03acd8ae41996b00901226fa0, type: 2}
+  _category: toast
+  _description: 'Drops the toast in: alpha 0 to 1 (Absolute, 0.25 s, Out Quad) and
+    the anchored position from 120 units above to its rest position (Relative offset
+    to 0, 0.35 s, Out Back). Binds body/toast.'
+  _icon: move
+  _bindings:
+  - _trackName: toast-alpha
+    _path: body/toast
+  - _trackName: toast-slide
+    _path: body/toast

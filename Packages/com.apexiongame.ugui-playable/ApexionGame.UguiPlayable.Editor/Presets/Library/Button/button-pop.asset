@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: button-pop
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: aac89b059929f8b47aac33eb756edac6, type: 2}
+  _category: button
+  _description: 'A springy pop: a scale punch of +0.15 on x and y (0.3 s, frequency
+    3, elasticity 0.8); the scale returns exactly to its start value. Binds the button
+    itself.'
+  _icon: mouse-pointer-click
+  _bindings:
+  - _trackName: button-scale
+    _path: 

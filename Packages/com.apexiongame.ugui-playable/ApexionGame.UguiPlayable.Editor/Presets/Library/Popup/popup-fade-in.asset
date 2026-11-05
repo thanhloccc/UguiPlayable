@@ -15,7 +15,8 @@ MonoBehaviour:
   _timeline: {fileID: 11400000, guid: 0b05cd6a654c0704c96c9784b999ec55, type: 2}
   _category: popup
   _description: 'Fades the backdrop and the popup in: CanvasGroup alpha 0 to 1 (Absolute),
-    0.25 s, Out Quad. Binds backdrop and body/popup.'
+    0.25 s, Out Quad; the popup becomes interactable and blocks raycasts at the half-way
+    point. Binds backdrop and body/popup.'
   _icon: blend
   _bindings:
   - _trackName: backdrop

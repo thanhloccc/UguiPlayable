@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: popup-slide-up-in
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: c3332fe3f0655ac4388d86e54ced0494, type: 2}
+  _category: popup
+  _description: 'Slides the popup up into place: the backdrop fades 0 to 1 (0.25
+    s, Out Quad); the popup fades 0 to 1 (0.3 s, Out Quad) and its anchored position
+    moves from 300 units below to its rest position (Relative offset to 0, 0.3 s,
+    Out Cubic). It becomes interactable half-way. Binds backdrop and body/popup.'
+  _icon: move
+  _bindings:
+  - _trackName: backdrop
+    _path: backdrop
+  - _trackName: popup-alpha
+    _path: body/popup
+  - _trackName: popup-slide
+    _path: body/popup

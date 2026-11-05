@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: toast-rise-out
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: 4e237a2de6876da498f6172fb029bc34, type: 2}
+  _category: toast
+  _description: 'Lifts the toast away: alpha from its current value to 0 (From current,
+    0.25 s, In Quad) and the anchored position from rest to 120 units above (Relative
+    0 to offset, 0.3 s, In Cubic). The slide track is Revert, so the toast returns
+    to rest when the graph stops (Play Mode); in Edit Mode preview, scrubbing back
+    restores it. Binds body/toast.'
+  _icon: move
+  _bindings:
+  - _trackName: toast-alpha
+    _path: body/toast
+  - _trackName: toast-slide
+    _path: body/toast

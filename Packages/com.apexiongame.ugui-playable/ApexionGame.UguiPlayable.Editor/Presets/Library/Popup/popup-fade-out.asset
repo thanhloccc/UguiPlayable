@@ -15,7 +15,8 @@ MonoBehaviour:
   _timeline: {fileID: 11400000, guid: 3345d0f1e5f87404c91af470436ca16c, type: 2}
   _category: popup
   _description: Fades the backdrop and the popup out from their current alpha to
-    0 (From current), 0.2 s, In Quad. Binds backdrop and body/popup.
+    0 (From current), 0.2 s, In Quad; the popup stops being interactable and blocking
+    raycasts as the clip starts. Binds backdrop and body/popup.
   _icon: blend
   _bindings:
   - _trackName: backdrop

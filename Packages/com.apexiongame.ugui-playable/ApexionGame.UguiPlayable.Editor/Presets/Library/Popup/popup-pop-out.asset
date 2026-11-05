@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: popup-pop-out
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: 686492b8c69943345a91ef84403ec2a1, type: 2}
+  _category: popup
+  _description: 'Pops the popup out: the backdrop and the popup fade from their current
+    alpha to 0 (From current, 0.2 s, In Quad) and the popup scales from its current
+    scale to 0.8 (In Back); the popup stops being interactable and blocking raycasts
+    as the clip starts. Binds backdrop and body/popup.'
+  _icon: scaling
+  _bindings:
+  - _trackName: backdrop
+    _path: backdrop
+  - _trackName: popup-alpha
+    _path: body/popup
+  - _trackName: popup-scale
+    _path: body/popup

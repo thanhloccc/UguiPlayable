@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: attention-pulse
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: 4e2e981e29630aa4fb4e0c3c109141e3, type: 2}
+  _category: attention
+  _description: 'A looping pulse: a scale punch of 0.1 on x and y (0.8 s, frequency
+    2) with Loop extrapolation, so it keeps pulsing for as long as the clip lasts.
+    Lengthen the clip to pulse longer. Binds the element itself.'
+  _icon: activity
+  _bindings:
+  - _trackName: pulse
+    _path: 

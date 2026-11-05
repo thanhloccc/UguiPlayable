@@ -1,0 +1,182 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7053885158665469951
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cbef15b0a27f2145aa355d84490d908, type: 3}
+  m_Name: TmpCharacterClip
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable::ApexionGame.UguiPlayable.Tracks.Text.TmpCharacterClip
+  _template:
+    _rangeStart: 0
+    _rangeLength: 0
+    _stagger: 0.5
+    _order: 0
+    _orderSeed: 0
+    _ease:
+      _ease: 8
+      _curve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    _pivot: 0
+    _offset:
+      _enabled: 1
+      _from: {x: 0, y: -12}
+      _to: {x: 0, y: 0}
+    _rotation:
+      _enabled: 0
+      _from: 90
+      _to: 0
+    _scale:
+      _enabled: 0
+      _from: {x: 0, y: 0}
+      _to: {x: 1, y: 1}
+    _scaleConstrainFrom: 0
+    _scaleConstrainTo: 0
+    _alpha:
+      _enabled: 1
+      _from: 0
+      _to: 1
+    _color:
+      _enabled: 0
+      _from: {r: 1, g: 1, b: 1, a: 1}
+      _to: {r: 1, g: 1, b: 1, a: 1}
+    _wave:
+      _enabled: 0
+      _target: 0
+      _shape: 0
+      _amplitude: {x: 0, y: 10, z: 0}
+      _cycles: 2
+      _phasePerCharacter: 0.1
+    _shake:
+      _enabled: 0
+      _target: 0
+      _strength: {x: 3, y: 3, z: 0}
+      _frequency: 10
+      _elasticity: 0.5
+      _randomness: 0.5
+      _fadeOut: 1
+      _seed: 0
+      _ignoredAxes: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: text-char-fade-in
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 1662952410499452377}
+  m_FixedDuration: 0
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 0
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &1662952410499452377
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb3c5d22ed2e57740924558a0715b5d9, type: 3}
+  m_Name: characters
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable::ApexionGame.UguiPlayable.Tracks.Text.TmpCharacterTrack
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 0
+    m_ClipIn: 0
+    m_Asset: {fileID: -7053885158665469951}
+    m_Duration: 0.800000011920929
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 1662952410499452377}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: -1
+    m_BlendOutDuration: -1
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 1
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: characters
+  m_Markers:
+    m_Objects: []
+  _restoreMode: 0

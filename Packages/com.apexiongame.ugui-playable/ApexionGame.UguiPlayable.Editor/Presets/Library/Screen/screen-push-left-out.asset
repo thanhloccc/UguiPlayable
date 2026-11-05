@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: screen-push-left-out
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: d2bc4f2ef8365ec4089e012ebb2f9f83, type: 2}
+  _category: screen
+  _description: 'Pushes the screen out to the left: the body''s anchors move from
+    their current value to x -1..0 (From current, 0.35 s, In Cubic). Binds body.'
+  _icon: chevrons-left-right
+  _bindings:
+  - _trackName: body
+    _path: body

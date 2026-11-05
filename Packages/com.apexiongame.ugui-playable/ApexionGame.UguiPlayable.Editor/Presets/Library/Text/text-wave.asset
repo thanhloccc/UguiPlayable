@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73253eaa24e4c8549a2a4b522df9799d, type: 3}
+  m_Name: text-wave
+  m_EditorClassIdentifier: ApexionGame.UguiPlayable.Editor::ApexionGame.UguiPlayable.Editor.Presets.TweenPreset
+  _timeline: {fileID: 11400000, guid: 80a56c8b07a047f45bafdca5044301a2, type: 2}
+  _category: text
+  _description: 'Waves the text: every character moves up and down along a sine of
+    10 units (2 s, 2 cycles, 0.1 phase per character) and the text rests afterwards.
+    Binds the TMP text itself.'
+  _icon: chart-spline
+  _bindings:
+  - _trackName: characters
+    _path: 
