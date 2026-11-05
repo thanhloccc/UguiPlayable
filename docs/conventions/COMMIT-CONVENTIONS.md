@@ -17,8 +17,8 @@ see [PROJECT-CONVENTIONS.md](PROJECT-CONVENTIONS.md)).
   explain, or use.
 - A feature commit must compile on its own: include its code, any new asmdef and
   `csc.rsp`, and the assets it needs.
-- Keep agent-only guidance (`.claude/`) separate from runtime code, packages,
-  assets, project settings, and build configuration.
+- Agent-only files (`.claude/`, `CLAUDE.md`, `AGENTS.md`, `.agents/`, `Works/`) are never committed to this
+  repository; they live in a separate private repository.
 - Keep changes to vendored EncosyTower code (`Packages/com.laicasaane.encosy-tower`,
   `Plugins/`) separate from package code, even when made for the same feature.
 - Porting EncosyTower or TweenPlayables code into the package is a package
@@ -75,7 +75,6 @@ UguiPlayable.Editor: add ease curve preview to clip inspector
 Tests: cover RectTransform track blending
 Samples: add popup open/close timeline sample
 Project: remove Entities and Latios packages
-Agents: add commit skill
 EncosyTower.PubSub: fix handler order for equal priority
 Version 0.1.0
 ```
@@ -87,7 +86,7 @@ Choose topics by ownership and behavior, not only by directory.
 | Topic | Use |
 |---|---|
 | `Project` | Repository-wide configuration, `Packages/manifest.json` and lock file, `ProjectSettings/`, CI, root `README.md` / `LICENSE`, and `docs/` |
-| `Agents` | `.claude/` (skills, subagents, memory, agent settings), `AGENTS.md`, `CLAUDE.md`, `Works/`, and other agent-only files |
+| `Agents` | Only in the private agent-files repository: `.claude/`, `AGENTS.md`, `CLAUDE.md`, `.agents/`, `Works/`. Never used in this repository |
 | `UguiPlayable` | The runtime assembly `ApexionGame.UguiPlayable`, plus package metadata (`package.json`, package README, `THIRD-PARTY-NOTICES.md`) when not part of a release |
 | `UguiPlayable.Editor` | Changes confined to `ApexionGame.UguiPlayable.Editor` |
 | `UguiPlayable.<Feature>` | A future feature assembly `ApexionGame.UguiPlayable.<Feature>`, and `UguiPlayable.<Feature>.Editor` for its editor assembly |
@@ -112,7 +111,7 @@ Apply these rules when choosing between related topics:
 - Use `Tests` for changes to the test assemblies, including tests that
   accompany one assembly's change.
 - Use `Project` for root documentation (including these conventions) unless a
-  narrower feature or `Agents` topic clearly owns it.
+  narrower feature topic clearly owns it.
 - For a new feature, derive the topic from its new assembly name.
 
 ## 4. Commit Body

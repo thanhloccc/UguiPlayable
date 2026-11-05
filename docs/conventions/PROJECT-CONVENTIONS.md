@@ -14,8 +14,8 @@ Minimum Unity version: **6000.3**.
 - For C# code, follow [CODING-CONVENTIONS.md](CODING-CONVENTIONS.md).
 - Before staging or creating commits, follow
   [COMMIT-CONVENTIONS.md](COMMIT-CONVENTIONS.md).
-- Large work (a new track family, an editor tool, a migration) goes through
-  [WORK-FAMILY-CONVENTIONS.md](WORK-FAMILY-CONVENTIONS.md).
+- Large work (a new track family, an editor tool, a migration) is planned in work families, described in
+  [WORK-FAMILY-CONVENTIONS.md](WORK-FAMILY-CONVENTIONS.md). The family files live in a private repository.
 - Prior art: [AnnulusGames/TweenPlayables](https://github.com/AnnulusGames/TweenPlayables)
   (MIT, no longer maintained, IMGUI editors). It is a reference for scope and
   gaps, not a source to copy from without attribution (§5).
@@ -37,7 +37,6 @@ UguiPlayable/
 │   ├── ApexionGame/                            development-only content (sandbox scenes, probes)
 │   └── Samples/UGUI Playable/                  canonical sample sources (§4)
 ├── docs/conventions/                           these conventions
-├── Works/                                      work families (WORK-FAMILY-CONVENTIONS)
 ├── README.md, LICENSE                          repository-level docs (the changelog lives in the package)
 └── ProjectSettings/, Packages/manifest.json    Unity project setup
 ```
@@ -187,10 +186,9 @@ The package ships **one sample** (Owner decision 2026-11-05), laid out like Enco
   permission. Use Unity-owned compilation and test workflows instead.
 - This restriction does not prohibit commands against tracked, standalone .NET
   workspaces that never touch Unity-generated projects, such as
-  `Plugins/SourceGenerator/EncosyTower.SourceGen.slnx` and the agent harness
-  `.claude/skills/encosy-tower-advisor/scripts/run_generators/` (which builds
-  into the system temp directory). Task-specific validation restrictions still
-  apply.
+  `Plugins/SourceGenerator/EncosyTower.SourceGen.slnx` and agent harnesses kept
+  outside the repository (which build into the system temp directory).
+  Task-specific validation restrictions still apply.
 - Assets created outside the Editor get their `.meta` only after Unity imports
   them. Never hand-write `.meta` files. Files inside the embedded package need
   `.meta` files too.
@@ -232,8 +230,8 @@ The package ships **one sample** (Owner decision 2026-11-05), laid out like Enco
 
 - Treat these as separate evidence:
   - static searches;
-  - Roslyn semantic analysis, including the agent's offline generator harness
-    `run_generators.py`;
+  - Roslyn semantic analysis, including offline generator harnesses kept outside
+    the repository;
   - Unity compilation and domain reload;
   - Unity Test Runner results (EditMode, PlayMode);
   - Timeline behaviour checked in the Editor (scrubbing, preview, Play Mode);

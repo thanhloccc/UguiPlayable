@@ -13,7 +13,8 @@ Small, one-session tasks don't need a family: keep using a single dated file in 
 
 ## 1. Layout
 
-Families live in `Works/` at the repo root, split by stage. `<family>` is short kebab-case (`save-system`,
+Families live in `Works/` at the root of the private agent-files repository (checked out over this project), never
+in this public repository. They are split by stage. `<family>` is short kebab-case (`save-system`,
 `level-editor`) and is the same name in both folders:
 
 - `Works/Research/<family>/` holds the research, the design, the review record and `handoff.md`.
