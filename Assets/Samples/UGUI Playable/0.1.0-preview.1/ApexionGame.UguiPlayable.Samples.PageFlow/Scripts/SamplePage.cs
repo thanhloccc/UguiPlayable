@@ -1,16 +1,17 @@
-using System;
 using UnityEngine;
 using UnityEngine.Playables;
 
 namespace ApexionGame.UguiPlayable.Samples.PageFlow
 {
     /// <summary>
-    /// A screen, popup or overlay whose transitions are two UGUI Playable timelines: Show and Hide.
+    /// Plays a page's Show and Hide timelines. It sits on the page root (screen, popup or overlay prefab) next to
+    /// the two <see cref="PlayableDirector"/>s that play the shared transition timelines on this page's nodes.
     /// </summary>
     /// <remarks>
     /// The page is activated before Show plays and deactivated when Hide ends. Starting one timeline stops the other,
-    /// so a page can be hidden while it is still showing; From current channels then continue from where it is.
-    /// The directors live outside the page, so they keep running while the page is inactive.
+    /// so a page hidden while it is still showing continues from where it is (From current channels).
+    /// <see cref="Show"/> and <see cref="Hide"/> take no arguments, so buttons can call them from their
+    /// <c>onClick</c> event in the Inspector. This is a sample helper, not a page-flow framework.
     /// </remarks>
     public sealed class SamplePage : MonoBehaviour
     {
@@ -20,99 +21,75 @@ namespace ApexionGame.UguiPlayable.Samples.PageFlow
         [SerializeField]
         private PlayableDirector _hide;
 
-        private PlayableDirector _running;
-        private Action _onDone;
-        private bool _deactivateWhenDone;
+        private bool _hiding;
 
-        /// <summary>Whether the page was last asked to show.</summary>
-        public bool IsVisible { get; private set; }
-
-        private void Awake()
+        private void OnEnable()
         {
-            Subscribe(_show);
-            Subscribe(_hide);
+            if (_hide != null)
+            {
+                _hide.stopped += OnHideStopped;
+            }
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
-            Unsubscribe(_show);
-            Unsubscribe(_hide);
+            if (_hide != null)
+            {
+                _hide.stopped -= OnHideStopped;
+            }
         }
 
-        /// <summary>Activates the page and plays its Show timeline; <paramref name="onDone"/> runs when it ends.</summary>
-        public void Show(Action onDone = null)
+        /// <summary>Activates the page and plays its Show timeline.</summary>
+        public void Show()
         {
+            _hiding = false;
             gameObject.SetActive(true);
-            IsVisible = true;
-            Play(_show, _hide, onDone, deactivateWhenDone: false);
-        }
 
-        /// <summary>Plays the Hide timeline, then deactivates the page and runs <paramref name="onDone"/>.</summary>
-        public void Hide(Action onDone = null)
-        {
-            IsVisible = false;
-            Play(_hide, _show, onDone, deactivateWhenDone: true);
-        }
-
-        private void Play(PlayableDirector director, PlayableDirector other, Action onDone, bool deactivateWhenDone)
-        {
-            // Clear the running director first, so the stopped events raised below are ignored.
-            _running = null;
-
-            if (other != null)
+            if (_hide != null)
             {
-                other.Stop();
+                _hide.Stop();
             }
 
-            if (director == null)
+            if (_show != null)
             {
-                Finish(onDone, deactivateWhenDone);
-                return;
+                _show.Stop();
+                _show.Play();
             }
-
-            director.Stop();
-            _onDone = onDone;
-            _deactivateWhenDone = deactivateWhenDone;
-            _running = director;
-            director.Play();
         }
 
-        private void OnStopped(PlayableDirector director)
+        /// <summary>Plays the Hide timeline; the page deactivates when it ends.</summary>
+        public void Hide()
         {
-            if (director != _running)
+            if (gameObject.activeInHierarchy == false)
             {
                 return;
             }
 
-            _running = null;
-            var onDone = _onDone;
-            _onDone = null;
-            Finish(onDone, _deactivateWhenDone);
-        }
+            // Stop() raises PlayableDirector.stopped, so the flag is set only after stopping.
+            _hiding = false;
 
-        private void Finish(Action onDone, bool deactivate)
-        {
-            if (deactivate)
+            if (_show != null)
+            {
+                _show.Stop();
+            }
+
+            if (_hide == null)
             {
                 gameObject.SetActive(false);
+                return;
             }
 
-            onDone?.Invoke();
+            _hide.Stop();
+            _hiding = true;
+            _hide.Play();
         }
 
-        private void Subscribe(PlayableDirector director)
+        private void OnHideStopped(PlayableDirector director)
         {
-            if (director != null)
+            if (_hiding)
             {
-                director.stopped += OnStopped;
-            }
-        }
-
-        private void Unsubscribe(PlayableDirector director)
-        {
-            if (director != null)
-            {
-                director.stopped -= OnStopped;
+                _hiding = false;
+                gameObject.SetActive(false);
             }
         }
     }
