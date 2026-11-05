@@ -38,6 +38,9 @@ Icons used (rendered to PNG in dark and light colours at 16 px and 32 px, under
 `ApexionGame.UguiPlayable.Editor/Common/Icons/`): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
 `pipette`, `chart-spline`. `move` and `link` are Feather-derived.
 
+The PageFlow sample (`Samples~/ApexionGame.UguiPlayable.Samples.PageFlow/Art/Icons/`) uses `x` and `arrow-left`,
+rendered white at 64 px.
+
 ```text
 ISC License
 
