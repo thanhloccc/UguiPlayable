@@ -1,0 +1,142 @@
+.ugp-tween-clip {
+    padding: 4px 0;
+}
+
+.ugp-tween-clip__header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 24px;
+    margin-bottom: 4px;
+}
+
+.ugp-tween-clip__header-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+}
+
+.ugp-tween-clip__title {
+    flex-grow: 1;
+    -unity-font-style: bold;
+}
+
+.ugp-tween-clip__count {
+    color: var(--ugp-tween-clip-secondary);
+}
+
+.ugp-tween-clip__note {
+    margin: 2px 0 4px 0;
+    white-space: normal;
+    color: var(--ugp-tween-clip-secondary);
+}
+
+.ugp-tween-card {
+    margin-top: 4px;
+    padding: 4px 6px;
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: var(--ugp-tween-card-border);
+    background-color: var(--ugp-tween-card-background);
+}
+
+.ugp-tween-card__header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 22px;
+}
+
+.ugp-tween-card__icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+}
+
+.ugp-tween-card__name {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+    -unity-font-style: bold;
+}
+
+.ugp-tween-card__header > .ugp-switch {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+.ugp-tween-card--disabled .ugp-tween-card__header > .ugp-tween-card__icon,
+.ugp-tween-card--disabled .ugp-tween-card__name {
+    opacity: 0.5;
+}
+
+/* An off channel shows only its switch, icon and name; the mode control returns when it is turned on. */
+.ugp-tween-card--disabled .ugp-segmented {
+    display: none;
+}
+
+.ugp-tween-card__body {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top-width: 1px;
+    border-top-color: var(--ugp-tween-card-border);
+}
+
+.ugp-tween-card__row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 22px;
+    margin: 1px 0;
+}
+
+.ugp-tween-card__row-label {
+    width: 44px;
+    flex-shrink: 0;
+    color: var(--ugp-tween-clip-secondary);
+}
+
+.ugp-tween-card__field {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+.ugp-tween-card__icon-button {
+    flex-shrink: 0;
+    width: 22px;
+    height: 20px;
+    margin: 0 0 0 4px;
+    padding: 2px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ugp-tween-card__icon-button > .ugp-tween-card__icon {
+    margin-right: 0;
+}
+
+.ugp-tween-card__icon-button--on {
+    background-color: var(--ugp-tween-card-toggle-on);
+}
+
+.ugp-tween-card__axis-button {
+    min-width: 28px;
+    margin: 0 4px 0 0;
+    padding: 0 6px;
+}
+
+.ugp-tween-card__axis-button--on {
+    background-color: var(--ugp-tween-card-toggle-on);
+    color: var(--ugp-tween-card-toggle-on-text);
+}
+
+.ugp-tween-card__percent {
+    width: 36px;
+    flex-shrink: 0;
+    margin-left: 4px;
+    -unity-text-align: middle-right;
+    color: var(--ugp-tween-clip-secondary);
+}
+
+.ugp-tween-card__row-label--wide {
+    width: 96px;
+}

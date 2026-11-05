@@ -26,9 +26,23 @@ namespace ApexionGame.UguiPlayable.Editor.Common
         public const string UNLINK = "unlink";
         public const string PIPETTE = "pipette";
         public const string CHART_SPLINE = "chart-spline";
+        public const string SCALING = "scaling";
+        public const string ROTATE_CW = "rotate-cw";
+        public const string SCALE_3D = "scale-3d";
+        public const string CROSSHAIR = "crosshair";
+        public const string ANCHOR = "anchor";
+        public const string BLEND = "blend";
+        public const string PERCENT = "percent";
+        public const string MOUSE_POINTER_CLICK = "mouse-pointer-click";
+        public const string SHIELD_CHECK = "shield-check";
+        public const string TRIANGLE_ALERT = "triangle-alert";
+        public const string CHEVRON_DOWN = "chevron-down";
+        public const string CHEVRON_RIGHT = "chevron-right";
 
         private static readonly string[] s_names = {
             LAYERS, MOVE, PALETTE, IMAGE, LINK, UNLINK, PIPETTE, CHART_SPLINE,
+            SCALING, ROTATE_CW, SCALE_3D, CROSSHAIR, ANCHOR, BLEND, PERCENT, MOUSE_POINTER_CLICK, SHIELD_CHECK,
+            TRIANGLE_ALERT, CHEVRON_DOWN, CHEVRON_RIGHT,
         };
 
         private static readonly Texture2D[] s_darkIcons = new Texture2D[s_names.Length];
@@ -60,6 +74,42 @@ namespace ApexionGame.UguiPlayable.Editor.Common
 
         /// <summary>Ease preview.</summary>
         public static Texture2D ChartSpline => Get(7);
+
+        /// <summary>Size delta channel.</summary>
+        public static Texture2D Scaling => Get(8);
+
+        /// <summary>Rotation channel.</summary>
+        public static Texture2D RotateCw => Get(9);
+
+        /// <summary>Scale channel.</summary>
+        public static Texture2D Scale3d => Get(10);
+
+        /// <summary>Pivot channel.</summary>
+        public static Texture2D Crosshair => Get(11);
+
+        /// <summary>Anchor min and max channels.</summary>
+        public static Texture2D Anchor => Get(12);
+
+        /// <summary>Alpha channel.</summary>
+        public static Texture2D Blend => Get(13);
+
+        /// <summary>Fill amount channel.</summary>
+        public static Texture2D Percent => Get(14);
+
+        /// <summary>Interactable channel.</summary>
+        public static Texture2D MousePointerClick => Get(15);
+
+        /// <summary>Blocks raycasts channel.</summary>
+        public static Texture2D ShieldCheck => Get(16);
+
+        /// <summary>Warnings.</summary>
+        public static Texture2D TriangleAlert => Get(17);
+
+        /// <summary>Expanded card.</summary>
+        public static Texture2D ChevronDown => Get(18);
+
+        /// <summary>Collapsed card.</summary>
+        public static Texture2D ChevronRight => Get(19);
 
         /// <summary>
         /// Returns the icon called <paramref name="name"/> (one of <see cref="Names"/>) for the current skin.

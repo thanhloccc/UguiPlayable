@@ -68,3 +68,16 @@
 .ugp-switch:disabled {
     opacity: 0.5;
 }
+
+/* Segmented control: compact ToggleButtonGroup. */
+.ugp-segmented {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.ugp-segmented > .unity-button {
+    min-width: 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    -unity-font-style: normal;
+}

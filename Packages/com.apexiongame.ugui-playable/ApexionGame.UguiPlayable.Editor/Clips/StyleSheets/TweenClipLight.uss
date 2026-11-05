@@ -1,0 +1,7 @@
+.ugp-tween-clip {
+    --ugp-tween-clip-secondary: #535353;
+    --ugp-tween-card-background: #e2e2e2;
+    --ugp-tween-card-border: #b4b4b4;
+    --ugp-tween-card-toggle-on: #7db3e8;
+    --ugp-tween-card-toggle-on-text: #000000;
+}
