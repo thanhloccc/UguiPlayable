@@ -6,6 +6,10 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `package.json` links the documentation, changelog and licence, so the Package Manager window shows them.
+
 ## [0.1.0-preview.2] - 2026-11-05
 
 ### Fixed

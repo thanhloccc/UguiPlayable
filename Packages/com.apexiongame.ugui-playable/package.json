@@ -13,6 +13,9 @@
     "ui"
   ],
   "license": "MIT",
+  "documentationUrl": "https://github.com/thanhloccc/UguiPlayable/blob/main/Packages/com.apexiongame.ugui-playable/Documentation~/index.md",
+  "changelogUrl": "https://github.com/thanhloccc/UguiPlayable/blob/main/Packages/com.apexiongame.ugui-playable/CHANGELOG.md",
+  "licensesUrl": "https://github.com/thanhloccc/UguiPlayable/blob/main/Packages/com.apexiongame.ugui-playable/LICENSE.md",
   "author": {
     "name": "ApexionGame"
   },

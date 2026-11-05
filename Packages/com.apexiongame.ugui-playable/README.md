@@ -1,5 +1,9 @@
 # UGUI Playable
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+[![Unity 6000.3+](https://img.shields.io/badge/Unity-6000.3%2B-black?logo=unity)](https://unity.com/releases/editor/archive)
+[![Version](https://img.shields.io/github/v/tag/thanhloccc/UguiPlayable?include_prereleases&sort=semver&label=version)](https://github.com/thanhloccc/UguiPlayable/tags)
+
 Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI in Unity. Move, fade, scale, recolor and fill
 UI elements on a Timeline instead of writing tween code.
 
@@ -31,7 +35,7 @@ Open **Window > Package Manager**, choose **+ > Install package from git URL…*
 https://github.com/thanhloccc/UguiPlayable.git?path=/Packages/com.apexiongame.ugui-playable
 ```
 
-To pin a release, append `#` and a tag name, for example `#v0.1.0-preview.2`.
+To pin a release, append `#` and a tag name, for example `#0.1.0-preview.2`.
 
 OpenUPM: planned. There is no OpenUPM install line yet.
 
