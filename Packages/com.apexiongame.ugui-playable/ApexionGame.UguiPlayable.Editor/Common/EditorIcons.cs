@@ -10,9 +10,10 @@ namespace ApexionGame.UguiPlayable.Editor.Common
     /// editor skin.
     /// </summary>
     /// <remarks>
-    /// The <c>@2x</c> (32 px) files sit next to them for later use. They are not loaded here: the AssetDatabase has
-    /// no API that picks the @2x variant automatically, so a caller that needs a high-DPI image loads the
-    /// <c>@2x</c> path itself.
+    /// <c>name-dark.png</c> or <c>name-light.png</c> (16 px) is loaded when
+    /// <see cref="UnityEditor.EditorGUIUtility.pixelsPerPoint"/> is 1 or less. <c>name-dark@2x.png</c> or
+    /// <c>name-light@2x.png</c> (32 px) is loaded when it is above 1. Unverified: whether <c>pixelsPerPoint</c>
+    /// reports the display scale outside <c>OnGUI</c> (when a UI Toolkit inspector is built) at scales above 100 %.
     /// </remarks>
     internal static class EditorIcons
     {
@@ -72,6 +73,8 @@ namespace ApexionGame.UguiPlayable.Editor.Common
 
         private static readonly Texture2D[] s_darkIcons = new Texture2D[s_names.Length];
         private static readonly Texture2D[] s_lightIcons = new Texture2D[s_names.Length];
+        private static readonly Texture2D[] s_darkIcons2x = new Texture2D[s_names.Length];
+        private static readonly Texture2D[] s_lightIcons2x = new Texture2D[s_names.Length];
 
         /// <summary>Every icon name.</summary>
         public static IReadOnlyList<string> Names => s_names;
@@ -218,16 +221,22 @@ namespace ApexionGame.UguiPlayable.Editor.Common
         }
 
         public static string GetPath(string name, bool dark)
-            => $"{ROOT}/{name}-{(dark ? "dark" : "light")}.png";
+            => GetPath(name, dark, false);
+
+        public static string GetPath(string name, bool dark, bool highDpi)
+            => $"{ROOT}/{name}-{(dark ? "dark" : "light")}{(highDpi ? "@2x" : "")}.png";
 
         private static Texture2D Get(int index)
         {
             var dark = EditorAssets.IsDark;
-            var cache = dark ? s_darkIcons : s_lightIcons;
+            var highDpi = UnityEditor.EditorGUIUtility.pixelsPerPoint > 1f;
+            var cache = highDpi
+                ? (dark ? s_darkIcons2x : s_lightIcons2x)
+                : (dark ? s_darkIcons : s_lightIcons);
 
             if (cache[index].IsInvalid())
             {
-                cache[index] = EditorAssets.LoadAsset<Texture2D>(GetPath(s_names[index], dark));
+                cache[index] = EditorAssets.LoadAsset<Texture2D>(GetPath(s_names[index], dark, highDpi));
             }
 
             return cache[index];

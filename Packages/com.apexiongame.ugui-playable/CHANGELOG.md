@@ -9,3 +9,4 @@ and the package uses [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Package skeleton: runtime, Editor and EditMode test assemblies.
+- Editor icons use the `@2x` images on high-DPI displays.
