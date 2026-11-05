@@ -62,6 +62,7 @@ namespace ApexionGame.UguiPlayable.Editor.Common
         public const string VIBRATE = "vibrate";
         public const string DICES = "dices";
         public const string TOGGLE_RIGHT = "toggle-right";
+        public const string TEXT_SELECT = "text-select";
 
         private static readonly string[] s_names = {
             LAYERS, MOVE, PALETTE, IMAGE, LINK, UNLINK, PIPETTE, CHART_SPLINE,
@@ -70,7 +71,7 @@ namespace ApexionGame.UguiPlayable.Editor.Common
             SLIDERS_HORIZONTAL, GALLERY_VERTICAL, SCROLL, CHEVRONS_LEFT_RIGHT, WALLPAPER, FRAME, COPY, RULER,
             COLUMNS_3, GRID_3X3, MOVE_HORIZONTAL, TYPE, CASE_SENSITIVE, SPACE, BASELINE, PILCROW, TEXT_CURSOR,
             PAINTBRUSH, WHOLE_WORD, ACTIVITY, VIBRATE, DICES,
-            TOGGLE_RIGHT,
+            TOGGLE_RIGHT, TEXT_SELECT,
         };
 
         private static readonly Texture2D[] s_darkIcons = new Texture2D[s_names.Length];
@@ -209,6 +210,9 @@ namespace ApexionGame.UguiPlayable.Editor.Common
 
         /// <summary>Toggle track and clip; Is On channel.</summary>
         public static Texture2D ToggleRight => Get(42);
+
+        /// <summary>TMP Characters track and clip.</summary>
+        public static Texture2D TextSelect => Get(43);
 
         /// <summary>
         /// Returns the icon called <paramref name="name"/> (one of <see cref="Names"/>) for the current skin.

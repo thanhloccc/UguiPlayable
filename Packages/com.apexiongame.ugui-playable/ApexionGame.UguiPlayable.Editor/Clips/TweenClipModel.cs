@@ -25,6 +25,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string TARGET = "_target";
         public const string STRENGTH = "_strength";
         public const string FREQUENCY = "_frequency";
+        public const string SHAPE = "_shape";
+        public const string AMPLITUDE = "_amplitude";
+        public const string CYCLES = "_cycles";
+        public const string PHASE_PER_CHARACTER = "_phasePerCharacter";
 
         private static readonly string[] s_gradientCorners = { "topLeft", "topRight", "bottomLeft", "bottomRight" };
 
@@ -126,6 +130,16 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return true;
             }
 
+            if (from != null && to != null && mode == null && TryGetValueKind(from, out var characterKind))
+            {
+                var hasConstrain = template.FindPropertyRelative(GetConstrainName(child.name, true)) != null
+                    && template.FindPropertyRelative(GetConstrainName(child.name, false)) != null;
+
+                info = new ChannelInfo(child.name, ChannelShape.Character, characterKind, hasConstrain);
+                enabled = enabledProperty.boolValue;
+                return true;
+            }
+
             if (from != null
                 && to != null
                 && mode != null
@@ -143,6 +157,16 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 && child.FindPropertyRelative(FREQUENCY) != null)
             {
                 info = new ChannelInfo(child.name, ChannelShape.Oscillation, ChannelValueKind.Vector3, false);
+                enabled = enabledProperty.boolValue;
+                return true;
+            }
+
+            if (child.FindPropertyRelative(TARGET) != null
+                && child.FindPropertyRelative(AMPLITUDE) != null
+                && child.FindPropertyRelative(CYCLES) != null
+            )
+            {
+                info = new ChannelInfo(child.name, ChannelShape.Wave, ChannelValueKind.Vector3, false);
                 enabled = enabledProperty.boolValue;
                 return true;
             }

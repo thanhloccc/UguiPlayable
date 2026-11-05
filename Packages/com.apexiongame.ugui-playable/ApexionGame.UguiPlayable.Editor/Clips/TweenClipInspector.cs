@@ -39,6 +39,8 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             root.Add(CreateHeader(count));
             root.Add(warning);
 
+            AddSections(root);
+
             var channels = model.Channels;
 
             for (var i = 0; i < channels.Count; i++)
@@ -55,6 +57,14 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             source.Refresh();
             root.schedule.Execute(source.Refresh).Every(BINDING_POLL_MILLISECONDS);
             return root;
+        }
+
+        /// <summary>
+        /// Adds sections between the header and the channel cards, for clip settings that are not channels. The
+        /// default adds nothing.
+        /// </summary>
+        protected virtual void AddSections(VisualElement root)
+        {
         }
 
         private VisualElement CreateHeader(Label count)
@@ -87,6 +97,16 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             if (info.Shape == ChannelShape.Text)
             {
                 return TextChannelCardSection.Create(serializedObject, info, source);
+            }
+
+            if (info.Shape == ChannelShape.Character)
+            {
+                return CharacterChannelCardSection.Create(serializedObject, info);
+            }
+
+            if (info.Shape == ChannelShape.Wave)
+            {
+                return WaveChannelCardSection.Create(serializedObject, info);
             }
 
             return ChannelCardSection.Create(serializedObject, info, source);

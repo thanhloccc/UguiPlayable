@@ -19,6 +19,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         /// seed, ignored axes.
         /// </summary>
         Oscillation,
+
+        /// <summary>A <c>CharacterChannel&lt;T&gt;</c>: enabled, from, to (no mode, no ease).</summary>
+        Character,
+
+        /// <summary>A <c>WaveChannel</c>: enabled, target, shape, amplitude, cycles, phase per character.</summary>
+        Wave,
     }
 
     /// <summary>
@@ -40,7 +46,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     /// One channel found under a clip's <c>_template</c>.
     /// </summary>
     /// <param name="Name">The serialized field name of the channel, for example <c>_anchoredPosition</c>.</param>
-    /// <param name="Shape">Whether the channel is a tween, a step or a text channel.</param>
+    /// <param name="Shape">The channel's layout: tween, step, text, oscillation, character or wave.</param>
     /// <param name="ValueKind">The from/to value type. Unused for a step channel.</param>
     /// <param name="HasConstrain">Whether the template has <c>&lt;Name&gt;ConstrainFrom/To</c> sibling bools.</param>
     internal readonly record struct ChannelInfo(

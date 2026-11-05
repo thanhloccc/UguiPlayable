@@ -127,7 +127,7 @@ SOFTWARE.
 Icons used (rendered to PNG in dark and light colours at 16 px and 32 px (`@2x`), under
 `ApexionGame.UguiPlayable.Editor/Common/Icons/`; the 32 px files are used on high-DPI screens): `layers`, `move`, `palette`, `image`, `link`, `unlink`,
 `pipette`, `chart-spline`, `scaling`, `rotate-cw`, `scale-3d`, `crosshair`, `anchor`, `blend`, `percent`,
-`mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`, `sliders-horizontal`, `gallery-vertical`, `scroll`, `chevrons-left-right`, `wallpaper`, `frame`, `copy`, `ruler`, `columns-3`, `grid-3x3`, `move-horizontal`, `type`, `case-sensitive`, `space`, `baseline`, `pilcrow`, `text-cursor`, `paintbrush`, `whole-word`, `activity`, `vibrate`, `dices`, `toggle-right`. `move`, `link`,
+`mouse-pointer-click`, `shield-check`, `triangle-alert`, `chevron-down`, `chevron-right`, `sliders-horizontal`, `gallery-vertical`, `scroll`, `chevrons-left-right`, `wallpaper`, `frame`, `copy`, `ruler`, `columns-3`, `grid-3x3`, `move-horizontal`, `type`, `case-sensitive`, `space`, `baseline`, `pilcrow`, `text-cursor`, `paintbrush`, `whole-word`, `activity`, `vibrate`, `dices`, `toggle-right`, `text-select`. `move`, `link`,
 `crosshair`, `percent`, `chevron-down`, `chevron-right` and `type` are Feather-derived.
 
 The sample uses `x` and `arrow-left`, rendered white at 64 px. In this repository they live in

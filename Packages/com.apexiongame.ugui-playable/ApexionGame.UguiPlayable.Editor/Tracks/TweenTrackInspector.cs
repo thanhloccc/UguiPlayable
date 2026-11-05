@@ -12,8 +12,9 @@ using Object = UnityEngine.Object;
 namespace ApexionGame.UguiPlayable.Editor.Tracks
 {
     /// <summary>
-    /// The shared track inspector: a header, the Restore Mode segmented control with a one-line explanation, and the
-    /// binding warning of the open Timeline as a HelpBox. A concrete inspector only names itself.
+    /// The shared track inspector: a header, the Restore Mode segmented control with a one-line explanation (unless
+    /// <see cref="ShowRestoreMode"/> is false), and the binding warning of the open Timeline as a HelpBox. A concrete
+    /// inspector only names itself.
     /// </summary>
     /// <remarks>
     /// This replaces Timeline's IMGUI fallback inspector for the track type.
@@ -43,26 +44,14 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
         public override VisualElement CreateInspectorGUI()
         {
             var root = TweenClipSections.CreateRoot();
-            var restoreMode = serializedObject.FindProperty(RESTORE_MODE);
 
             root.Add(CreateHeader());
             root.Add(CreateNameRow());
 
-            var control = SegmentedControl.Create(s_restoreLabels).BindEnum(restoreMode, s_restoreLabels.Length);
-            var row = TweenClipSections.CreateRow(TweenClipTexts.RESTORE_MODE);
-            row[0].AddToClassList(RESTORE_LABEL_USS_CLASS_NAME);
-            row.Add(control);
-            root.Add(row);
-
-            var note = TweenClipSections.CreateNote(string.Empty);
-            root.Add(note);
-            root.TrackPropertyValue(restoreMode, p => {
-                RefreshNote(note, p);
-
-                // Timeline caches the graph: rebuild it so the new mode applies to the open preview.
-                TimelineEditor.Refresh(RefreshReason.ContentsModified);
-            });
-            RefreshNote(note, restoreMode);
+            if (ShowRestoreMode)
+            {
+                AddRestoreModeRows(root);
+            }
 
             AddTrackRows(root);
 
@@ -76,6 +65,12 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
             }).Every(BINDING_POLL_MILLISECONDS);
             return root;
         }
+
+        /// <summary>
+        /// Whether the inspector shows the Restore Mode control and its note. A track that always restores (or never
+        /// writes anything to restore) hides it and explains why in <see cref="AddTrackRows"/>.
+        /// </summary>
+        protected virtual bool ShowRestoreMode => true;
 
         /// <summary>
         /// Adds rows after the restore note and before the binding warning. The default adds nothing.
@@ -108,6 +103,27 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
         /// </summary>
         protected virtual string GetBindingWarning(Object binding)
             => string.Empty;
+
+        private void AddRestoreModeRows(VisualElement root)
+        {
+            var restoreMode = serializedObject.FindProperty(RESTORE_MODE);
+
+            var control = SegmentedControl.Create(s_restoreLabels).BindEnum(restoreMode, s_restoreLabels.Length);
+            var row = TweenClipSections.CreateRow(TweenClipTexts.RESTORE_MODE);
+            row[0].AddToClassList(RESTORE_LABEL_USS_CLASS_NAME);
+            row.Add(control);
+            root.Add(row);
+
+            var note = TweenClipSections.CreateNote(string.Empty);
+            root.Add(note);
+            root.TrackPropertyValue(restoreMode, p => {
+                RefreshNote(note, p);
+
+                // Timeline caches the graph: rebuild it so the new mode applies to the open preview.
+                TimelineEditor.Refresh(RefreshReason.ContentsModified);
+            });
+            RefreshNote(note, restoreMode);
+        }
 
         private VisualElement CreateHeader()
         {
