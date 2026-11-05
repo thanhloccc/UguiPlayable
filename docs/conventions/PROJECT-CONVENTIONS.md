@@ -140,8 +140,9 @@ The package ships **one sample** (Owner decision 2026-11-05), laid out like Enco
   survive. Timeline tracks and clips, which the CLI can't create, are set up by one-off `eval` calls.
 - **Position channels:** in shared show/hide timelines, use Absolute targets or From current, not Relative.
   Relative re-bases each time a director's graph is rebuilt, so a hide that doesn't return to its start drifts.
-- **Dependencies:** the sample depends only on the package and the Unity packages it declares, plus the Input
-  System UI module used by the scene's EventSystem. TextMeshPro text needs TMP Essential Resources.
+- **Dependencies:** the sample depends only on the package and the Unity packages it declares; its EventSystem
+  gets its input module at runtime (Input System or Input Manager), and no module is serialized. TextMeshPro text
+  needs TMP Essential Resources.
 
 ## 5. EncosyTower: Reference, Not Dependency
 
