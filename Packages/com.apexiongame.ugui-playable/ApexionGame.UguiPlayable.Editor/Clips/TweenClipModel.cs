@@ -145,6 +145,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     kind = ChannelValueKind.Vector3;
                     return true;
 
+                case SerializedPropertyType.Vector4:
+                    kind = ChannelValueKind.Vector4;
+                    return true;
+
                 case SerializedPropertyType.Color:
                     kind = ChannelValueKind.Color;
                     return true;

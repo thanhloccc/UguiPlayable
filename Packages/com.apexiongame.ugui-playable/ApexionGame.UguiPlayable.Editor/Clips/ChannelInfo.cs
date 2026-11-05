@@ -20,6 +20,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         Float,
         Vector2,
         Vector3,
+        Vector4,
         Color,
     }
 

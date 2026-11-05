@@ -11,4 +11,5 @@
     --ugp-tween-card-axis-x: #c8392b;
     --ugp-tween-card-axis-y: #4e8f1f;
     --ugp-tween-card-axis-z: #2f6bc4;
+    --ugp-tween-card-axis-w: #a8740c;
 }

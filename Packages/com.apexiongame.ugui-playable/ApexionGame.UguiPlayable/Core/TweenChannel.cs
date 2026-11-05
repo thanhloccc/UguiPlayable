@@ -90,8 +90,8 @@ namespace ApexionGame.UguiPlayable.Core
         public EaseSetting Ease => _ease;
 
         /// <summary>
-        /// The axes this channel leaves alone, so another clip can animate them. Used by <see cref="Vector2"/> and
-        /// <see cref="Vector3"/> channels, ignored by float and color channels.
+        /// The axes this channel leaves alone, so another clip can animate them. Used by <see cref="Vector2"/>,
+        /// <see cref="Vector3"/> and <see cref="Vector4"/> channels, ignored by float and color channels.
         /// </summary>
         public AxisMask IgnoredAxes => _ignoredAxes;
 

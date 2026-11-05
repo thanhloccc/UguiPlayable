@@ -65,6 +65,24 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <inheritdoc cref="Evaluate(in TweenChannel{float}, float, float)"/>
+        public static Vector4 Evaluate(in TweenChannel<Vector4> channel, float progress, Vector4 baseValue)
+        {
+            var eased = channel.Ease.Evaluate(progress);
+
+            switch (channel.Mode)
+            {
+                case ValueMode.Relative:
+                    return baseValue + Vector4.LerpUnclamped(channel.From, channel.To, eased);
+
+                case ValueMode.FromCurrent:
+                    return Vector4.LerpUnclamped(channel.HasCaptured ? channel.Captured : baseValue, channel.To, eased);
+
+                default:
+                    return Vector4.LerpUnclamped(channel.From, channel.To, eased);
+            }
+        }
+
+        /// <inheritdoc cref="Evaluate(in TweenChannel{float}, float, float)"/>
         /// <remarks>
         /// In <see cref="ValueMode.Relative"/> the offset is added per component and the alpha is clamped to [0, 1].
         /// </remarks>

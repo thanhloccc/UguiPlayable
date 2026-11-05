@@ -72,8 +72,23 @@ namespace ApexionGame.UguiPlayable.Core
 
             foreach (var name in names)
             {
-                driver.AddFromName(binding, name);
+                GatherProperty(binding, name, driver);
             }
+        }
+
+        /// <summary>
+        /// Registers one name from <see cref="TweenBehaviour.CollectPropertyNames"/> for Timeline's edit-mode preview.
+        /// The default registers the serialized property <paramref name="name"/> on the bound component.
+        /// </summary>
+        /// <remarks>
+        /// Preview API: this hook may change before 1.0. Override it when a channel animates something that is not
+        /// serialized on the binding itself: the behaviour reports a name of its own choosing, and the track maps it
+        /// to the real objects and properties (for example a ScrollRect's content position and scrollbars). The
+        /// name is only reported while a clip enables the channel.
+        /// </remarks>
+        protected virtual void GatherProperty(TBinding binding, string name, IPropertyCollector driver)
+        {
+            driver.AddFromName(binding, name);
         }
     }
 }

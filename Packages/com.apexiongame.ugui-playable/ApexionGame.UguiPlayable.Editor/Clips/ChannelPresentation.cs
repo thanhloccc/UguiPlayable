@@ -40,6 +40,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [BLOCKS_RAYCASTS] = new("Blocks Raycasts", static () => EditorIcons.ShieldCheck),
         };
 
+        private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
+
+        // Channels whose components are not plain X/Y/Z/W. Phase-2 tracks add their entries here (for example a UV
+        // rect as X/Y/W/H, a padding as L/R/T/B).
+        private static readonly Dictionary<string, string[]> s_axisCaptions = new();
+
+        /// <summary>
+        /// The caption of each vector component of a channel, used by the axes row and the from/to fields.
+        /// </summary>
+        public static string[] GetAxisCaptions(string name)
+            => s_axisCaptions.TryGetValue(name, out var captions) ? captions : s_defaultAxisCaptions;
+
         public static string GetDisplayName(string name)
             => s_entries.TryGetValue(name, out var entry) ? entry.DisplayName : ObjectNames.NicifyVariableName(name);
 

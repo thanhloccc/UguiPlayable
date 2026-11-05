@@ -143,6 +143,11 @@
     border-bottom-color: var(--ugp-tween-card-axis-z);
 }
 
+.ugp-tween-card__axis-button--w.ugp-tween-card__axis-button--on {
+    color: var(--ugp-tween-card-axis-w);
+    border-bottom-color: var(--ugp-tween-card-axis-w);
+}
+
 .ugp-tween-card__percent {
     width: 36px;
     flex-shrink: 0;

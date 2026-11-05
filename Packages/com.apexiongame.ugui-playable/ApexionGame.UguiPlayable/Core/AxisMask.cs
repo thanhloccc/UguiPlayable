@@ -22,5 +22,11 @@ namespace ApexionGame.UguiPlayable.Core
 
         /// <summary>The Z axis. Ignored by <see cref="UnityEngine.Vector2"/> channels.</summary>
         Z = 4,
+
+        /// <summary>
+        /// The W axis, the fourth component of a <see cref="UnityEngine.Vector4"/> channel (for example the height of
+        /// a UV rect or the bottom padding). Ignored by two- and three-component channels.
+        /// </summary>
+        W = 8,
     }
 }

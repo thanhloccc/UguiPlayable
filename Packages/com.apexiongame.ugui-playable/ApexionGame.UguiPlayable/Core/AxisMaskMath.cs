@@ -30,6 +30,32 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <inheritdoc cref="Merge(Vector3, Vector3, AxisMask)"/>
+        public static Vector4 Merge(Vector4 current, Vector4 replacement, AxisMask axes)
+        {
+            if ((axes & AxisMask.X) != 0)
+            {
+                current.x = replacement.x;
+            }
+
+            if ((axes & AxisMask.Y) != 0)
+            {
+                current.y = replacement.y;
+            }
+
+            if ((axes & AxisMask.Z) != 0)
+            {
+                current.z = replacement.z;
+            }
+
+            if ((axes & AxisMask.W) != 0)
+            {
+                current.w = replacement.w;
+            }
+
+            return current;
+        }
+
+        /// <inheritdoc cref="Merge(Vector3, Vector3, AxisMask)"/>
         public static Vector2 Merge(Vector2 current, Vector2 replacement, AxisMask axes)
         {
             if ((axes & AxisMask.X) != 0)

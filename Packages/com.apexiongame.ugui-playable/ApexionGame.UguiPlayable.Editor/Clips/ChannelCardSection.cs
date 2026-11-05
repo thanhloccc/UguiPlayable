@@ -14,12 +14,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     internal sealed class ChannelCardSection
     {
         private static readonly string[] s_modeLabels = { "Absolute", "Relative", "From current" };
-        private static readonly string[] s_axisNames = { "X", "Y", "Z" };
-
         private static readonly string[] s_axisClasses = {
               TweenClipSections.AXIS_BUTTON_X_USS_CLASS_NAME
             , TweenClipSections.AXIS_BUTTON_Y_USS_CLASS_NAME
             , TweenClipSections.AXIS_BUTTON_Z_USS_CLASS_NAME
+            , TweenClipSections.AXIS_BUTTON_W_USS_CLASS_NAME
         };
 
         private readonly SerializedObject _serializedObject;
@@ -69,7 +68,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.Add(CreateHeader());
             _card.Add(_body);
 
-            var hasAxes = info.ValueKind == ChannelValueKind.Vector2 || info.ValueKind == ChannelValueKind.Vector3;
+            var hasAxes = GetDimension(info.ValueKind) > 1;
 
             if (hasAxes)
             {
@@ -160,13 +159,14 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         private Button[] CreateAxisButtons()
         {
-            var count = _info.ValueKind == ChannelValueKind.Vector3 ? 3 : 2;
+            var count = GetDimension(_info.ValueKind);
+            var captions = ChannelPresentation.GetAxisCaptions(_info.Name);
             var buttons = new Button[count];
 
             for (var i = 0; i < count; i++)
             {
                 var button = new Button {
-                    text = s_axisNames[i],
+                    text = captions[i],
                     tooltip = TweenClipTexts.AXIS_TOOLTIP,
                 };
 
@@ -202,6 +202,14 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             row.Add(_axisGroup);
             return row;
         }
+
+        private static int GetDimension(ChannelValueKind kind)
+            => kind switch {
+                ChannelValueKind.Vector2 => 2,
+                ChannelValueKind.Vector3 => 3,
+                ChannelValueKind.Vector4 => 4,
+                _ => 1,
+            };
 
         private SerializedProperty FindConstrain(SerializedProperty template, bool isFrom)
             => template.FindPropertyRelative(TweenClipModel.GetConstrainName(_info.Name, isFrom));
@@ -275,6 +283,17 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     break;
                 }
 
+                case ChannelValueKind.Vector4:
+                {
+                    // No constrain rule for four components, so the field binds directly. The component labels
+                    // follow the channel's captions (for example X/Y/W/H for a UV rect).
+                    var vector4Field = new Vector4Field();
+                    vector4Field.BindProperty(value);
+                    ApplyCaptions(vector4Field);
+                    field = vector4Field;
+                    break;
+                }
+
                 default:
                 {
                     var vector3Field = new Vector3Field();
@@ -286,6 +305,21 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             field.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
             return field;
+        }
+
+        private void ApplyCaptions(VisualElement vectorField)
+        {
+            var captions = ChannelPresentation.GetAxisCaptions(_info.Name);
+            var index = 0;
+
+            vectorField.Query<FloatField>().ForEach(component => {
+                if (index < captions.Length)
+                {
+                    component.label = captions[index];
+                }
+
+                index++;
+            });
         }
 
         // Vector fields are not bound directly: the constrain rule rewrites the other axes in the same write, so the
@@ -409,6 +443,10 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
                 case ChannelValueKind.Vector3:
                     target.vector3Value = new Vector3(sample.x, sample.y, sample.z);
+                    break;
+
+                case ChannelValueKind.Vector4:
+                    target.vector4Value = sample;
                     break;
 
                 case ChannelValueKind.Color:

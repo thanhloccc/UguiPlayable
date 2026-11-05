@@ -378,6 +378,26 @@ public sealed class TweenClipInspectorTests
     private static ChannelInfo Find(System.Collections.Generic.IReadOnlyList<ChannelInfo> channels, string name)
         => channels.First(channel => channel.Name == name);
 
+    [Test]
+    public void Vector4Channel_DrawsFourAxesAndVector4Fields()
+    {
+        _clip = ScriptableObject.CreateInstance<Vector4TestClip>();
+
+        var serializedObject = new SerializedObject(_clip);
+        var model = TweenClipModel.Create(serializedObject);
+
+        Assert.AreEqual(1, model.Channels.Count);
+        Assert.AreEqual(ChannelValueKind.Vector4, model.Channels[0].ValueKind);
+
+        var card = ChannelCardSection.Create(serializedObject, model.Channels[0], new ClipBindingSource(_clip));
+        var axes = card.Query<Button>(className: TweenClipSections.AXIS_BUTTON_USS_CLASS_NAME).ToList();
+
+        Assert.AreEqual(2, card.Query<Vector4Field>().ToList().Count);
+        Assert.AreEqual(4, axes.Count);
+        Assert.IsTrue(axes[3].ClassListContains(TweenClipSections.AXIS_BUTTON_W_USS_CLASS_NAME));
+        Assert.AreEqual("W", axes[3].text);
+    }
+
     private void Create(Type clipType)
     {
         _clip = ScriptableObject.CreateInstance(clipType);
