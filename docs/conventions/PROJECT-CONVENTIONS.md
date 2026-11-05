@@ -118,14 +118,25 @@ Packages/com.apexiongame.ugui-playable/
 
 ## 4. Samples
 
-- `Assets/Samples/UGUI Playable/` is the canonical authoring source for samples
-  and is tracked by Git. One folder per sample.
-- `Packages/com.apexiongame.ugui-playable/Samples~/` is the release deployment
-  output, listed in `package.json` `samples`.
-- Make sample changes in `Assets/Samples`, never in `Samples~`. At release,
-  copy the canonical folders into `Samples~` (replacing the previous content)
-  and review the complete `Samples~` diff.
-- Samples depend only on the package and the Unity packages it declares.
+Samples follow the EncosyTower layout.
+
+- **Canonical source:** `Assets/Samples/UGUI Playable/<version>/ApexionGame.UguiPlayable.Samples.<Name>/`. This is
+  the path where the Package Manager imports a sample, so the development project sees samples exactly as users do.
+  It is tracked by Git.
+- **One sample = one folder** named like its assembly: `ApexionGame.UguiPlayable.Samples.<Name>.asmdef`
+  (`autoReferenced: false`) plus `csc.rsp`. The folder also holds the sample scene
+  `ugui-playable-sample-<name>.unity`, its timelines `ugui-playable-sample-<name>-<timeline>.playable` and any
+  scripts, in namespace `ApexionGame.UguiPlayable.Samples.<Name>`.
+- **Release output:** `Packages/com.apexiongame.ugui-playable/Samples~/ApexionGame.UguiPlayable.Samples.<Name>/`,
+  listed in `package.json` `samples` as `{ displayName, description, path }`.
+- **Where to edit:** make sample changes in `Assets/Samples`, never in `Samples~`. At release:
+  - copy the canonical folders into `Samples~`, replacing the previous content;
+  - move the `<version>` folder to the new version;
+  - review the complete `Samples~` diff.
+- **Building:** build sample scenes and UI with unity CLI commands, not with builder scripts, so later hand edits
+  survive. Timeline tracks and clips, which the CLI can't create, are set up by one-off `eval` calls.
+- **Dependencies:** samples depend only on the package and the Unity packages it declares. TextMeshPro text needs
+  TMP Essential Resources, which Unity offers to import.
 
 ## 5. EncosyTower: Reference, Not Dependency
 
