@@ -12,6 +12,7 @@ using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Common;
 using ApexionGame.UguiPlayable.Tracks.Controls;
+using ApexionGame.UguiPlayable.Tracks.Effects;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
@@ -67,6 +68,8 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(SliderClip))]
     [TestCase(typeof(ScrollbarClip))]
     [TestCase(typeof(ScrollRectClip))]
+    [TestCase(typeof(RawImageClip))]
+    [TestCase(typeof(ShadowClip))]
     public void Inspector_BuildsWithoutABinding(Type clipType)
     {
         Create(clipType);
@@ -93,6 +96,8 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(SliderClip), "_value")]
     [TestCase(typeof(ScrollbarClip), "_value,_size")]
     [TestCase(typeof(ScrollRectClip), "_normalizedPosition")]
+    [TestCase(typeof(RawImageClip), "_color,_alpha,_uvRect")]
+    [TestCase(typeof(ShadowClip), "_effectColor,_effectDistance")]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
         Create(clipType);
@@ -461,6 +466,45 @@ public sealed class TweenClipInspectorTests
     }
 
     [Test]
+    public void RawImageInspector_CaptionsTheUvRectAxesAsXYWH()
+    {
+        Create(typeof(RawImageClip));
+
+        var root = _editor.CreateInspectorGUI();
+        var axes = root.Query<Button>(className: TweenClipSections.AXIS_BUTTON_USS_CLASS_NAME).ToList();
+
+        Assert.AreEqual(4, axes.Count);
+        Assert.AreEqual("X,Y,W,H", string.Join(",", axes.Select(axis => axis.text)));
+
+        var channels = TweenClipModel.Create(_editor.serializedObject).Channels;
+
+        Assert.AreEqual(ChannelValueKind.Vector4, Find(channels, "_uvRect").ValueKind);
+    }
+
+    [Test]
+    public void BindingValueReader_ReadsTheUvRectAndTheShadow()
+    {
+        _gameObject = new GameObject("Raw", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+
+        var rawImage = _gameObject.GetComponent<RawImage>();
+        rawImage.uvRect = new Rect(0.1f, 0.2f, 0.3f, 0.4f);
+
+        Assert.IsTrue(BindingValueReader.TryRead("_uvRect", rawImage, out var uv));
+        Assert.AreEqual(new Vector4(0.1f, 0.2f, 0.3f, 0.4f), uv);
+
+        var shadow = _gameObject.AddComponent<Shadow>();
+        shadow.effectColor = new Color(0.1f, 0.2f, 0.3f, 0.4f);
+        shadow.effectDistance = new Vector2(3f, -5f);
+
+        Assert.IsTrue(BindingValueReader.TryRead("_effectColor", shadow, out var color));
+        Assert.AreEqual(0.4f, color.w, 0.0001f);
+
+        Assert.IsTrue(BindingValueReader.TryRead("_effectDistance", shadow, out var distance));
+        Assert.AreEqual(3f, distance.x, 0.0001f);
+        Assert.AreEqual(-5f, distance.y, 0.0001f);
+    }
+
+    [Test]
     public void BindingValueReader_ReadsTheScrollPositionOnlyWithAContent()
     {
         _gameObject = new GameObject("Scroll", typeof(RectTransform), typeof(ScrollRect));
@@ -496,7 +540,8 @@ public sealed class TweenClipInspectorTests
         Assert.AreEqual(2, card.Query<Vector4Field>().ToList().Count);
         Assert.AreEqual(4, axes.Count);
         Assert.IsTrue(axes[3].ClassListContains(TweenClipSections.AXIS_BUTTON_W_USS_CLASS_NAME));
-        Assert.AreEqual("W", axes[3].text);
+        // The test channel is named _uvRect, so its components are captioned X/Y/W/H.
+        Assert.AreEqual("H", axes[3].text);
     }
 
     private void Create(Type clipType)

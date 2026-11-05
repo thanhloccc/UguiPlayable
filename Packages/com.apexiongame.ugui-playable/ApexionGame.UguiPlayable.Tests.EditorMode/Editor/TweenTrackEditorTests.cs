@@ -7,6 +7,7 @@ using ApexionGame.UguiPlayable.Editor.Clips;
 using ApexionGame.UguiPlayable.Editor.Timeline;
 using ApexionGame.UguiPlayable.Editor.Tracks;
 using ApexionGame.UguiPlayable.Tracks.Controls;
+using ApexionGame.UguiPlayable.Tracks.Effects;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 using ApexionGame.UguiPlayable.Tracks.Groups;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
@@ -237,6 +238,8 @@ public sealed class TweenTrackEditorTests
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<SliderTrack>(null, "d"), new SliderTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ScrollbarTrack>(null, "e"), new ScrollbarTrackEditor()));
         Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ScrollRectTrack>(null, "f"), new ScrollRectTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<RawImageTrack>(null, "g"), new RawImageTrackEditor()));
+        Assert.IsNotNull(GetIcon(_timeline.CreateTrack<ShadowTrack>(null, "h"), new ShadowTrackEditor()));
     }
 
     [Test]
@@ -271,6 +274,16 @@ public sealed class TweenTrackEditorTests
         var scrollClip = scroll.CreateClip<ScrollRectClip>();
         new ScrollRectClipEditor().OnCreate(scrollClip, scroll, null);
 
+        var raw = _timeline.CreateTrack<RawImageTrack>(null, "I");
+        var rawClip = raw.CreateClip<RawImageClip>();
+        new RawImageClipEditor().OnCreate(rawClip, raw, null);
+
+        var shadow = _timeline.CreateTrack<ShadowTrack>(null, "J");
+        var shadowClip = shadow.CreateClip<ShadowClip>();
+        new ShadowClipEditor().OnCreate(shadowClip, shadow, null);
+
+        Assert.AreEqual("Raw Image", rawClip.displayName);
+        Assert.AreEqual("Shadow", shadowClip.displayName);
         Assert.AreEqual("Slider", sliderClip.displayName);
         Assert.AreEqual("Scrollbar", barClip.displayName);
         Assert.AreEqual("Scroll Rect", scrollClip.displayName);

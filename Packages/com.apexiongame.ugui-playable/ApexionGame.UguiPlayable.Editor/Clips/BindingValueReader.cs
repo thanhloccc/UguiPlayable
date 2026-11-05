@@ -60,6 +60,15 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 case ChannelPresentation.NORMALIZED_POSITION:
                     return TryReadScrollPosition(binding, out value);
 
+                case ChannelPresentation.UV_RECT:
+                    return TryReadUvRect(binding, out value);
+
+                case ChannelPresentation.EFFECT_COLOR:
+                    return TryReadShadow(binding, shadow => shadow.effectColor, out value);
+
+                case ChannelPresentation.EFFECT_DISTANCE:
+                    return TryReadShadow(binding, shadow => shadow.effectDistance, out value);
+
                 default:
                     return false;
             }
@@ -182,6 +191,31 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             {
                 var position = scrollRect.normalizedPosition;
                 value = new Vector4(position.x, position.y, 0f, 0f);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadUvRect(Object binding, out Vector4 value)
+        {
+            if (TryResolve<RawImage>(binding, out var rawImage))
+            {
+                var rect = rawImage.uvRect;
+                value = new Vector4(rect.x, rect.y, rect.width, rect.height);
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static bool TryReadShadow(Object binding, System.Func<Shadow, Vector4> read, out Vector4 value)
+        {
+            if (TryResolve<Shadow>(binding, out var shadow))
+            {
+                value = read(shadow);
                 return true;
             }
 

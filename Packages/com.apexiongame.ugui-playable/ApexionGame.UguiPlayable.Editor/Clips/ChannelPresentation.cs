@@ -28,6 +28,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string VALUE = "_value";
         public const string SIZE = "_size";
         public const string NORMALIZED_POSITION = "_normalizedPosition";
+        public const string UV_RECT = "_uvRect";
+        public const string EFFECT_COLOR = "_effectColor";
+        public const string EFFECT_DISTANCE = "_effectDistance";
 
         private static readonly Dictionary<string, Entry> s_entries = new() {
             [ANCHORED_POSITION] = new("Anchored Position", static () => EditorIcons.Move),
@@ -45,13 +48,18 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [VALUE] = new("Value", static () => EditorIcons.ChevronsLeftRight),
             [SIZE] = new("Size", static () => EditorIcons.Ruler),
             [NORMALIZED_POSITION] = new("Normalized Position", static () => EditorIcons.ChevronsLeftRight),
+            [UV_RECT] = new("UV Rect", static () => EditorIcons.Frame),
+            [EFFECT_COLOR] = new("Effect Color", static () => EditorIcons.Palette),
+            [EFFECT_DISTANCE] = new("Effect Distance", static () => EditorIcons.Move),
         };
 
         private static readonly string[] s_defaultAxisCaptions = { "X", "Y", "Z", "W" };
 
-        // Channels whose components are not plain X/Y/Z/W. Phase-2 tracks add their entries here (for example a UV
-        // rect as X/Y/W/H, a padding as L/R/T/B).
-        private static readonly Dictionary<string, string[]> s_axisCaptions = new();
+        // Channels whose components are not plain X/Y/Z/W. Phase-2 tracks add their entries here (a padding as
+        // L/R/T/B, for example).
+        private static readonly Dictionary<string, string[]> s_axisCaptions = new() {
+            [UV_RECT] = new[] { "X", "Y", "W", "H" },
+        };
 
         /// <summary>
         /// The caption of each vector component of a channel, used by the axes row and the from/to fields.
