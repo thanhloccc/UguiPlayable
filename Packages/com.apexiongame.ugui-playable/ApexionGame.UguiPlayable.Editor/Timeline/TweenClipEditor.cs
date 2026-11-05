@@ -8,10 +8,10 @@ using ApexionGame.UguiPlayable.Editor.Clips;
 namespace ApexionGame.UguiPlayable.Editor.Timeline
 {
     /// <summary>
-    /// The shared Timeline clip hooks: a default display name, the track icon, an error when no channel is on, and the
-    /// ease curve in the clip background. A concrete editor reads its clip's template through typed accessors, because
-    /// <see cref="GetClipOptions"/> and <see cref="DrawBackground"/> run on every clip draw: no
-    /// <c>SerializedObject</c>, no allocation per call.
+    /// The shared Timeline clip hooks: a default display name, the track icon and an error when no channel is on. A
+    /// concrete editor reads its clip's template through typed accessors, because <see cref="GetClipOptions"/> runs
+    /// on every clip draw: no <c>SerializedObject</c>, no allocation per call. The clip background is left to
+    /// Timeline (Owner 2026-11-05: no curve in the clip).
     /// </summary>
     /// <typeparam name="TClip">The clip asset type this editor draws.</typeparam>
     internal abstract class TweenClipEditor<TClip> : ClipEditor
@@ -57,16 +57,6 @@ namespace ApexionGame.UguiPlayable.Editor.Timeline
             var template = GetTemplate(clip);
 
             return template != null && template.HasEnabledChannel();
-        }
-
-        public override void DrawBackground(TimelineClip clip, ClipBackgroundRegion region)
-        {
-            if (clip.asset is TClip asset
-                && GetTemplate(asset) is { } template
-                && template.TryGetFirstEnabledEase(out var ease))
-            {
-                ClipCurveBackground.Draw(clip, region, ease);
-            }
         }
 
         // One cached array, rebuilt only when the editor skin changes or the texture was destroyed.

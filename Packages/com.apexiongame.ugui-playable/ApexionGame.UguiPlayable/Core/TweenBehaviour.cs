@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
-using ApexionGame.UguiPlayable.Easing;
 
 namespace ApexionGame.UguiPlayable.Core
 {
@@ -25,18 +24,11 @@ namespace ApexionGame.UguiPlayable.Core
         /// </remarks>
         public abstract void CollectPropertyNames(ICollection<string> names);
 
-        // Editor tooling hooks. Virtual, not abstract, so user tracks outside this assembly can still derive from the
-        // public base (D7); their clips simply get no "animates nothing" check and no background curve.
+        // Editor tooling hook. Virtual, not abstract, so user tracks outside this assembly can still derive from the
+        // public base (D7); their clips simply get no "animates nothing" check.
 
         /// <summary>Whether any channel of this behaviour is enabled. Allocation-free.</summary>
         internal virtual bool HasEnabledChannel() => true;
-
-        /// <summary>The ease of the first enabled tween channel, if there is one.</summary>
-        internal virtual bool TryGetFirstEnabledEase(out EaseSetting ease)
-        {
-            ease = default;
-            return false;
-        }
 
         /// <summary>
         /// Called on the first frame the clip gets weight. Capture values for <see cref="ValueMode.FromCurrent"/>.
