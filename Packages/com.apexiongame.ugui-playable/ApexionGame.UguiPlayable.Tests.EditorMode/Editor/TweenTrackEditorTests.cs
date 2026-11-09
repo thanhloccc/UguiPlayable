@@ -48,6 +48,11 @@ public sealed class TweenTrackEditorTests
             Object.DestroyImmediate(_timeline);
         }
 
+        if (_child.IsValid())
+        {
+            Object.DestroyImmediate(_child);
+        }
+
         if (_parent.IsValid())
         {
             Object.DestroyImmediate(_parent);
