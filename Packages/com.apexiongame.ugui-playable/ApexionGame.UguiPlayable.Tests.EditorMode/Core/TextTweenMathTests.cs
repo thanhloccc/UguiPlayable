@@ -594,6 +594,23 @@ public sealed class TextTweenMathTests
         Assert.AreNotEqual(byReveal, FillWithStep(4));
     }
 
+    [Test]
+    public void Fill_ScrambleChangesWithTheStep_AtTheSameReveal()
+    {
+        var first = FillWithStep(10);
+        var second = FillWithStep(11);
+
+        // The revealed part is the same, the scrambled tail is not.
+        Assert.AreEqual(first.Substring(0, 3), second.Substring(0, 3));
+        Assert.AreNotEqual(first, second);
+    }
+
+    [Test]
+    public void Fill_TheSameStepGivesTheSameText()
+    {
+        Assert.AreEqual(FillWithStep(37), FillWithStep(37));
+    }
+
     private static string FillWithStep(int scrambleStep)
     {
         var buffer = new char[64];

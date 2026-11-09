@@ -14,6 +14,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string MODE = "Mode";
         public const string SCRAMBLE = "Scramble";
         public const string CHARACTERS = "Chars";
+        public const string RATE = "Rate";
         public const string AXIS_TOOLTIP = "Animate this axis. Turn it off to leave the axis unchanged.";
         public const string FROM_CURRENT_NOTE = "Starts from the value the property has when the clip becomes active.";
         public const string RELATIVE_NOTE = "Offsets added to the value the property had when the track bound it.";
@@ -91,6 +92,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         public const string TEXT_SCRAMBLE_TOOLTIP =
             "The characters shown at positions that are not revealed yet and differ from the target.";
+
+        public const string TEXT_RATE_TOOLTIP =
+            "How many times per second the scramble characters change. 0 changes them only when the reveal advances.";
 
         public const string TEXT_CUSTOM_TOOLTIP = "The characters used when Scramble is Custom. Empty means no scramble.";
 

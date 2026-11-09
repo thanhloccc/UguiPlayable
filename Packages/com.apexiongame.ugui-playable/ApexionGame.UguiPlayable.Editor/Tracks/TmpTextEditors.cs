@@ -39,6 +39,32 @@ namespace ApexionGame.UguiPlayable.Editor.Tracks
 
         protected override TweenBehaviour GetTemplate(TmpTextClip clip)
             => clip.Template;
+
+        /// <summary>Gives a new clip a scramble rate of 20; clips made by code and older clips keep 0.</summary>
+        public override void OnCreate(TimelineClip clip, TrackAsset track, TimelineClip clonedFrom)
+        {
+            base.OnCreate(clip, track, clonedFrom);
+
+            if (clonedFrom != null || clip.asset == null)
+            {
+                return;
+            }
+
+            var serializedObject = new SerializedObject(clip.asset);
+            var rate = serializedObject.FindProperty(
+                $"{TweenClipModel.TEMPLATE}.{ChannelPresentation.TEXT}.{TweenClipModel.SCRAMBLE_RATE}"
+            );
+
+            if (rate == null)
+            {
+                return;
+            }
+
+            rate.floatValue = NEW_CLIP_SCRAMBLE_RATE;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        internal const float NEW_CLIP_SCRAMBLE_RATE = 20f;
     }
 
     [CustomTimelineEditor(typeof(TmpTextTrack))]

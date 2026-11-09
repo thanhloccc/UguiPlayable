@@ -23,6 +23,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string THRESHOLD = "_threshold";
         public const string SCRAMBLE = "_scramble";
         public const string CUSTOM_SCRAMBLE_CHARS = "_customScrambleChars";
+        public const string SCRAMBLE_RATE = "_scrambleRate";
         public const string TARGET = "_target";
         public const string STRENGTH = "_strength";
         public const string FREQUENCY = "_frequency";

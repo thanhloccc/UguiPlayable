@@ -66,6 +66,7 @@ The channel reveals a string from From to To.
 | From, To | empty | The start and end strings |
 | Scramble | None | None, All, Uppercase, Lowercase, Numerals or Custom |
 | Custom characters | empty | The characters used when Scramble is Custom. Empty means no scramble |
+| Rate | 20 for new clips, 0 in older clips | Scramble changes per second; 0 changes them only when the reveal advances. Shown when Scramble is not None |
 | Ease | Linear | Shapes the reveal |
 
 How it works:

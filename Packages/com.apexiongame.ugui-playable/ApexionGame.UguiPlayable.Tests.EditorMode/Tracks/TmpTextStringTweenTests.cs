@@ -8,6 +8,7 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Tracks.Text;
+using TmpTextClipEditor = ApexionGame.UguiPlayable.Editor.Tracks.TmpTextClipEditor;
 using Object = UnityEngine.Object;
 
 namespace ApexionGame.UguiPlayable.Tests.EditorMode.Tracks;
@@ -383,6 +384,74 @@ public sealed class TmpTextStringTweenTests
         // The new text shows 4 characters (11 with its tags; TMP's text info still counts the 11 of the old one).
         Assert.AreEqual("<b>yyyy</b>", _text.text);
         Assert.AreEqual(2, _text.maxVisibleCharacters);
+    }
+
+    [Test]
+    public void ScrambleRate_ChangesGlyphsInsideOneRevealStep()
+    {
+        AddClip(
+              0d
+            , 5d
+            , new TextChannel("----------", "ABCDEFGHIJ", ScrambleMode.All, scrambleRate: 20f)
+        );
+
+        // Reveal count is 1 at both times (0.10 and 0.112 of the clip); the scramble step is 10 then 11.
+        EvaluateAt(0.50d);
+        var first = _text.text;
+        EvaluateAt(0.56d);
+        var second = _text.text;
+
+        Assert.AreEqual(first[0], second[0]);
+        Assert.AreNotEqual(first, second);
+    }
+
+    [Test]
+    public void ScrambleRate_Zero_IsThePerStepBehaviour()
+    {
+        AddClip(0d, 5d, new TextChannel("----------", "ABCDEFGHIJ", ScrambleMode.All));
+
+        EvaluateAt(0.50d);
+        var first = _text.text;
+        EvaluateAt(0.56d);
+
+        Assert.AreEqual(first, _text.text);
+    }
+
+    [Test]
+    public void ScrambleRate_ScrubbingIsStable()
+    {
+        AddClip(
+              0d
+            , 5d
+            , new TextChannel("----------", "ABCDEFGHIJ", ScrambleMode.All, scrambleRate: 20f)
+        );
+
+        EvaluateAt(0.56d);
+        var first = _text.text;
+        EvaluateAt(3.21d);
+        EvaluateAt(1.07d);
+        EvaluateAt(0.56d);
+
+        Assert.AreEqual(first, _text.text);
+    }
+
+    [Test]
+    public void NewClip_HasScrambleRateTwenty()
+    {
+        var clip = _track.CreateClip<TmpTextClip>();
+        var editor = new TmpTextClipEditor();
+
+        Assert.AreEqual(0f, ((TmpTextClip)clip.asset).Template.Text.ScrambleRate);
+
+        editor.OnCreate(clip, _track, null);
+
+        Assert.AreEqual(20f, ((TmpTextClip)clip.asset).Template.Text.ScrambleRate);
+
+        var copy = _track.CreateClip<TmpTextClip>();
+
+        editor.OnCreate(copy, _track, clip);
+
+        Assert.AreEqual(0f, ((TmpTextClip)copy.asset).Template.Text.ScrambleRate);
     }
 
     private TimelineClip AddClip(double start, double duration, TextChannel channel)

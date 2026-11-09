@@ -35,6 +35,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         private readonly VisualElement _fromRow;
         private readonly VisualElement _toRow;
         private readonly VisualElement _customRow;
+        private readonly VisualElement _rateRow;
         private readonly Button _fromPipette;
         private readonly Button _toPipette;
 
@@ -84,6 +85,20 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _customRow = CreateRow(TweenClipTexts.CHARACTERS);
             _customRow.Add(customField);
             _body.Add(_customRow);
+
+            var rateField = new FloatField { tooltip = TweenClipTexts.TEXT_RATE_TOOLTIP };
+            rateField.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
+            rateField.BindProperty(channel.FindPropertyRelative(TweenClipModel.SCRAMBLE_RATE));
+            rateField.RegisterValueChangedCallback(static evt => {
+                if (evt.newValue < 0f && evt.target is FloatField field)
+                {
+                    field.value = 0f;
+                }
+            });
+
+            _rateRow = CreateRow(TweenClipTexts.RATE);
+            _rateRow.Add(rateField);
+            _body.Add(_rateRow);
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_mode, _ => RefreshState());
@@ -215,6 +230,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _fromRow.style.display = fromCurrent ? DisplayStyle.None : DisplayStyle.Flex;
             _customRow.style.display = _scramble.hasMultipleDifferentValues
                 || _scramble.enumValueIndex == (int)ScrambleMode.Custom
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+
+            _rateRow.style.display = _scramble.hasMultipleDifferentValues
+                || _scramble.enumValueIndex != (int)ScrambleMode.None
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
 

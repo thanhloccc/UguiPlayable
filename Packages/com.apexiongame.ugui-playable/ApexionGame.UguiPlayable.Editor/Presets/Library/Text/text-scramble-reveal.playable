@@ -456,3 +456,4 @@ MonoBehaviour:
           m_RotationOrder: 4
       _scramble: 1
       _customScrambleChars: 
+      _scrambleRate: 20

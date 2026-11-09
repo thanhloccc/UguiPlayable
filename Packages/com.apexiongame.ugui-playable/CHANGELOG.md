@@ -8,6 +8,11 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- TMP Text track: a scramble **Rate** (`TextChannel.ScrambleRate`, changes per second) makes the scramble characters
+  change in time, not only when the reveal steps, so a long clip on a short text keeps flickering; the step is a
+  function of the clip-local time, so scrubbing is stable. New clips created in the editor and the `text-scramble-reveal`
+  preset use 20; 0 (clips made by code and clips saved before this field) keeps the per-step behaviour. The scramble
+  `TextChannel` constructor gets an optional last parameter `float scrambleRate = 0f`.
 - TMP Text track: the Font Size card notes that the channel has no effect while the bound text has Auto Size on, and
   the track row and track inspector warn while any clip enables Font Size.
 - TMP Text track: the string tween is rich-text aware when the bound text has Rich Text on. Tags take no position

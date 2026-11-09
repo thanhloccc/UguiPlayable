@@ -37,6 +37,9 @@ namespace ApexionGame.UguiPlayable.Core
         [SerializeField]
         private string _customScrambleChars;
 
+        [SerializeField]
+        private float _scrambleRate;
+
         [NonSerialized]
         private string _captured;
 
@@ -55,6 +58,7 @@ namespace ApexionGame.UguiPlayable.Core
             _ease = EaseSetting.Default;
             _scramble = ScrambleMode.None;
             _customScrambleChars = string.Empty;
+            _scrambleRate = 0f;
             _captured = null;
             _hasCaptured = false;
         }
@@ -69,11 +73,13 @@ namespace ApexionGame.UguiPlayable.Core
             , string customScrambleChars = ""
             , ValueMode mode = ValueMode.Absolute
             , bool enabled = true
+            , float scrambleRate = 0f
         )
             : this(from, to, mode, enabled)
         {
             _scramble = scramble;
             _customScrambleChars = customScrambleChars ?? string.Empty;
+            _scrambleRate = Mathf.Max(0f, scrambleRate);
         }
 
         /// <summary>Whether the channel drives the text.</summary>
@@ -98,6 +104,15 @@ namespace ApexionGame.UguiPlayable.Core
         /// The scramble characters, used only when <see cref="Scramble"/> is <see cref="ScrambleMode.Custom"/>.
         /// </summary>
         public readonly string CustomScrambleChars => _customScrambleChars;
+
+        /// <summary>
+        /// How many times per second the scramble characters change; 0 changes them only when the reveal advances.
+        /// </summary>
+        /// <remarks>
+        /// The step is a function of the clip-local time, so scrubbing gives the same characters. Clips created in
+        /// the editor start at 20; clips made by code and clips saved before this field existed have 0.
+        /// </remarks>
+        public readonly float ScrambleRate => _scrambleRate;
 
         /// <summary>Whether <see cref="Captured"/> holds the text read when the clip became active.</summary>
         public readonly bool HasCaptured => _hasCaptured;

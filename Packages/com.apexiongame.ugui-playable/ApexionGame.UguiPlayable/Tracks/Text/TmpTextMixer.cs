@@ -61,6 +61,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private TextChannel _textChannel;
         private TmpTextBehaviour _textBehaviour;
         private float _textProgress;
+        private double _textSeconds;
         private float _textWeight;
         private bool _hasActiveText;
         private TextChannel _holdChannel;
@@ -265,6 +266,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             {
                 _textChannel = behaviour.Text;
                 _textProgress = progress;
+                _textSeconds = CurrentLocalSeconds;
                 _textWeight = weight;
                 _hasActiveText = true;
             }
@@ -369,6 +371,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
                 EnsureCapacity(TextTweenMath.RequiredLength(from, channel.To, richText));
 
+                // A rate above 0 makes the scramble step a function of the clip-local time; 0 keeps the reveal count.
+                var rate = channel.ScrambleRate;
+                var step = rate > 0f
+                    ? (int)Math.Min(Math.Floor(_textSeconds * rate), int.MaxValue)
+                    : TextTweenMath.SCRAMBLE_STEP_FROM_REVEAL;
+
                 length = TextTweenMath.Fill(
                       _buffer
                     , from
@@ -378,6 +386,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     , channel.CustomScrambleChars
                     , richText
                     , parseEscapes
+                    , step
                     , out slotCount
                 );
             }

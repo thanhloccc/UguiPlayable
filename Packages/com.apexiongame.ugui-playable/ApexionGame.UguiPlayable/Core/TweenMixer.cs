@@ -38,6 +38,12 @@ namespace ApexionGame.UguiPlayable.Core
         /// <summary>The mixer playable being processed; valid only inside <see cref="OnInputActivated"/>.</summary>
         internal Playable CurrentPlayable { get; private set; }
 
+        /// <summary>
+        /// The clip-local seconds of the input being accumulated, clamped to the clip's length; valid only inside
+        /// <see cref="Accumulate"/>.
+        /// </summary>
+        internal double CurrentLocalSeconds { get; private set; }
+
         /// <summary>The number of clip windows the mixer was initialised with.</summary>
         internal int WindowCount => _windows.Length;
 
@@ -103,7 +109,10 @@ namespace ApexionGame.UguiPlayable.Core
                         OnInputActivated(behaviour, binding);
                     }
 
-                    Accumulate(behaviour, weight, window.ToProgress(input.GetTime()));
+                    var localTime = input.GetTime();
+
+                    CurrentLocalSeconds = Math.Clamp(localTime - window.ClipIn, 0d, Math.Max(0d, window.LocalLength));
+                    Accumulate(behaviour, weight, window.ToProgress(localTime));
                     continue;
                 }
 
