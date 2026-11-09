@@ -7,7 +7,7 @@
 Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI in Unity. Move, fade, scale, recolor and fill
 UI elements on a Timeline instead of writing tween code.
 
-> Status: preview (`0.1.0-preview.2`). The tracks and the editor tools work. The base classes for custom tracks are
+> Status: preview (`0.2.0-preview.1`). The tracks and the editor tools work. The base classes for custom tracks are
 > marked "Preview API" and may change before 1.0. See [CHANGELOG.md](CHANGELOG.md).
 
 ## What you get

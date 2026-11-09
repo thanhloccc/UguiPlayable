@@ -1,7 +1,7 @@
 {
   "name": "com.apexiongame.ugui-playable",
   "displayName": "UGUI Playable",
-  "version": "0.1.0-preview.2",
+  "version": "0.2.0-preview.1",
   "unity": "6000.3",
   "description": "Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI (RectTransform, Graphic, Image, text, CanvasGroup and more) without writing tween code.",
   "keywords": [
@@ -28,6 +28,11 @@
       "displayName": "UGUI Playable Sample",
       "description": "Screens, popups and a toast driven by Timeline: show/hide transitions, controls, toggle, shortest-path rotation, TMP per-character text and preset-built clips. Needs TMP Essential Resources.",
       "path": "Samples~/ApexionGame.UguiPlayable.Samples"
+    },
+    {
+      "displayName": "ApexionGame.UguiPlayable.Samples.Showcase",
+      "description": "A self-running 42-second trailer that uses every UGUI Playable track, with a replay button. Needs TMP Essential Resources.",
+      "path": "Samples~/ApexionGame.UguiPlayable.Samples.Showcase"
     }
   ]
 }

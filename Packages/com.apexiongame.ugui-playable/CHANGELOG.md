@@ -6,6 +6,8 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0-preview.1] - 2026-11-09
+
 ### Added
 
 - TMP Text track: a number counter channel, with its own inspector card (mode, From, To, ease, decimals, grouping
@@ -42,6 +44,9 @@ and the package uses [Semantic Versioning](https://semver.org/).
   characters. New overloads `TextTweenMath.Fill(…, bool richText, bool parseEscapes, out int slotCount)` and
   `TextTweenMath.RequiredLength(string, string, bool richText)`.
 
+- Showcase sample (`ApexionGame.UguiPlayable.Samples.Showcase`): a self-running 42-second trailer that uses every
+  track, with a replay button. Import it from the Package Manager; it needs TMP Essential Resources.
+
 ### Changed
 
 - `package.json` links the documentation, changelog and licence, so the Package Manager window shows them.
@@ -53,6 +58,9 @@ and the package uses [Semantic Versioning](https://semver.org/).
 - TMP Text track: rich-text tags are no longer revealed letter by letter, and the style tags of `from` are dropped
   while the tween runs. A custom scramble set never shows `<`, `>` or `\` on a rich text. The clip card's rich-text
   note shows only when the bound text has Rich Text off.
+- Binary compatibility: the scramble `TextChannel` constructor gained the optional last parameter `float scrambleRate = 0f`,
+  so its binary signature changed. Source that calls it recompiles unchanged; assemblies compiled against 0.1.0 must be
+  rebuilt.
 
 ### Fixed
 

@@ -7,7 +7,7 @@
 Timeline tracks, clips and UI Toolkit editor tooling for animating uGUI in Unity: move, fade, scale, recolor and fill
 UI elements on a Timeline instead of writing tween code.
 
-> Status: preview (`0.1.0-preview.2`). 15 tracks, a UI Toolkit clip inspector, multi-clip editing and 27 starter
+> Status: preview (`0.2.0-preview.1`). 15 tracks, a UI Toolkit clip inspector, multi-clip editing and 27 starter
 > presets are in. The base classes for custom tracks are marked "Preview API" and may change before 1.0.
 
 It is a maintained successor in spirit to
