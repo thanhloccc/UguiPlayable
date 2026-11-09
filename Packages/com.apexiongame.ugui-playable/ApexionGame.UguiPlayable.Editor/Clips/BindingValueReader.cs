@@ -167,6 +167,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public static bool IsVertexGradientOff(Object binding)
             => TryResolve<TMP_Text>(binding, out var text) && text.enableVertexGradient == false;
 
+        /// <summary>
+        /// Whether the binding is a text with Auto Size on, which discards writes to its font size.
+        /// </summary>
+        public static bool IsAutoSizing(Object binding)
+            => TryResolve<TMP_Text>(binding, out var text) && text.enableAutoSizing;
+
         private static float GetVisibleRatio(TMP_Text text)
         {
             var count = text.textInfo.characterCount;

@@ -591,6 +591,14 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                     : _note.text + "\n" + TweenClipTexts.GRADIENT_OFF_NOTE;
             }
 
+            // TMP discards a font size write while Auto Size is on.
+            if (_info.Name == ChannelPresentation.FONT_SIZE && BindingValueReader.IsAutoSizing(_source.Binding))
+            {
+                _note.text = _note.text.Length == 0
+                    ? TweenClipTexts.AUTO_SIZE_NOTE
+                    : _note.text + "\n" + TweenClipTexts.AUTO_SIZE_NOTE;
+            }
+
             _note.style.display = _note.text.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;
 
             RefreshAxes();

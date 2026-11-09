@@ -7,6 +7,7 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Easing;
+using ApexionGame.UguiPlayable.Editor.Tracks;
 using ApexionGame.UguiPlayable.Tracks.Text;
 using Object = UnityEngine.Object;
 
@@ -82,6 +83,27 @@ public sealed class TmpTextTrackTests
         Assert.IsFalse(behaviour.LineSpacing.Enabled);
         Assert.IsFalse(behaviour.ParagraphSpacing.Enabled);
         Assert.IsFalse(behaviour.ColorGradient.Enabled);
+    }
+
+    [Test]
+    public void TrackCheck_WarnsWhenFontSizeIsAnimatedUnderAutoSize()
+    {
+        var clip = AddClip(0d, 1d, new TmpTextBehaviour());
+        var template = ((TmpTextClip)clip.asset).Template;
+
+        _text.enableAutoSizing = true;
+        template.FontSize = Off();
+
+        Assert.IsEmpty(TmpTextTrackCheck.GetWarning(_track, _text), "Font Size is off");
+
+        template.FontSize = new TweenChannel<float>(10f, 20f);
+
+        Assert.IsNotEmpty(TmpTextTrackCheck.GetWarning(_track, _text));
+
+        _text.enableAutoSizing = false;
+
+        Assert.IsEmpty(TmpTextTrackCheck.GetWarning(_track, _text), "Auto Size is off");
+        Assert.IsEmpty(TmpTextTrackCheck.GetWarning(_track, null));
     }
 
     [Test]

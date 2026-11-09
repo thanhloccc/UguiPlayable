@@ -818,6 +818,22 @@ public sealed class TweenClipInspectorTests
         Assert.IsFalse(BindingValueReader.TryReadGradient(null, out _));
     }
 
+    [Test]
+    public void BindingValueReader_NotesAutoSizeOnlyWhileItIsOn()
+    {
+        _gameObject = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer));
+
+        var text = _gameObject.AddComponent<TMPro.TextMeshProUGUI>();
+
+        Assert.IsFalse(BindingValueReader.IsAutoSizing(text));
+
+        text.enableAutoSizing = true;
+
+        Assert.IsTrue(BindingValueReader.IsAutoSizing(text));
+        Assert.IsTrue(BindingValueReader.IsAutoSizing(_gameObject));
+        Assert.IsFalse(BindingValueReader.IsAutoSizing(null));
+    }
+
     private static ChannelInfo Find(System.Collections.Generic.IReadOnlyList<ChannelInfo> channels, string name)
         => channels.First(channel => channel.Name == name);
 

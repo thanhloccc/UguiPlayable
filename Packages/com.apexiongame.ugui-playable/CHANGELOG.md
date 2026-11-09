@@ -6,6 +6,11 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- TMP Text track: the Font Size card notes that the channel has no effect while the bound text has Auto Size on, and
+  the track row and track inspector warn while any clip enables Font Size.
+
 ### Changed
 
 - `package.json` links the documentation, changelog and licence, so the Package Manager window shows them.

@@ -56,6 +56,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             "Color Gradient is off on the bound text, so the gradient is not shown. Turn it on in the text's "
             + "Extra Settings.";
 
+        public const string AUTO_SIZE_NOTE =
+            "Auto Size is on for the bound text, so TMP sets the font size itself and this channel has no effect. "
+            + "Animate Min/Max or turn Auto Size off.";
+
+        public const string AUTO_SIZE_WARNING =
+            "Auto Size is on for the bound text, so the Font Size channel has no effect.";
+
         public const string SCROLL_RECT_NO_CONTENT =
             "This ScrollRect has no Content, so there is nothing to scroll. Assign its Content.";
 

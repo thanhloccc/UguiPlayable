@@ -28,6 +28,12 @@ All tweened channels default to **Absolute** mode and a **Linear** ease. See
 
 Only the typewriter channel is on in a new clip.
 
+### Font Size
+
+While the bound text has **Auto Size** on, TMP sets the font size itself and discards what this channel writes. The
+Font Size card shows a note, and the track row and the track inspector show a warning while any clip turns Font Size
+on. Turn Auto Size off to animate the size.
+
 ### Color and alpha
 
 Both write the text colour. If both are on, Alpha decides the A and Color decides RGB, as on the graphic tracks.
