@@ -117,29 +117,43 @@ Packages/com.apexiongame.ugui-playable/
 
 ## 4. Samples
 
-The package ships **one sample** (Owner decision 2026-11-05), laid out like EncosyTower's samples.
+The package ships **two samples**, each laid out like EncosyTower's samples: `ApexionGame.UguiPlayable.Samples` (the
+screens-and-popups sample, Owner decision 2026-11-05) and `ApexionGame.UguiPlayable.Samples.Showcase` (the 42-second
+trailer that uses every track, Owner decision D16, 2026-11-09).
 
-- **Canonical source:** `Assets/Samples/UGUI Playable/<version>/ApexionGame.UguiPlayable.Samples/`. This is the path
-  where the Package Manager imports a sample, so the development project sees the sample exactly as users do. It is
-  tracked by Git.
-- **Contents:**
+- **Canonical source:** `Assets/Samples/UGUI Playable/<version>/<Sample>/`, with `<Sample>` the folder name of each
+  sample. The Package Manager imports a sample under `Assets/Samples/<package display name>/<version>/<sample display
+  name>/`, so the display name in `package.json` must equal the folder name for the development project to see the
+  sample exactly as users do (step 00 measured that today sample 1's display name, `UGUI Playable Sample`, differs
+  from its folder; it is renamed at release). The canonical source is tracked by Git.
+- **Contents of `ApexionGame.UguiPlayable.Samples`:**
   - asmdef `ApexionGame.UguiPlayable.Samples` (`autoReferenced: false`) and `csc.rsp`;
   - scene `ugui-playable-sample.unity`;
   - `Prefabs/Screens|Popups|Overlays/`: page prefabs in the hierarchy standard (memory `ui-hierarchy-standard`);
   - `Timelines/`: shared transition timelines, with tracks named by role;
   - `Scripts/`, `Art/`.
   - Namespace `ApexionGame.UguiPlayable.Samples`.
-- **Release output:** `Packages/com.apexiongame.ugui-playable/Samples~/ApexionGame.UguiPlayable.Samples/`, listed in
+- **Contents of `ApexionGame.UguiPlayable.Samples.Showcase`:**
+  - asmdef `ApexionGame.UguiPlayable.Samples.Showcase` (`autoReferenced: false`) and `csc.rsp`;
+  - scene `ugui-playable-showcase.unity`;
+  - `Prefabs/Screens/screen-showcase.prefab`: one screen prefab in the hierarchy standard;
+  - `Timelines/showcase-trailer.playable`: the master timeline, one GroupTrack per chapter;
+  - `Scripts/` (input module, Replay), `Art/Icons|Shapes|Patterns|Fonts/`.
+  - Namespace `ApexionGame.UguiPlayable.Samples.Showcase`. Third-party art (the font, the Lucide icons) has a
+    THIRD-PARTY-NOTICES entry; art the Owner drew does not.
+- **Release output:** `Packages/com.apexiongame.ugui-playable/Samples~/<Sample>/` for each sample, both listed in
   `package.json` `samples` as `{ displayName, description, path }`.
 - **Where to edit:** make sample changes in `Assets/Samples`, never in `Samples~`. At release:
-  - copy the canonical folder into `Samples~`, replacing the previous content;
+  - copy each sample folder into `Samples~` separately, replacing that sample's previous content;
   - move the `<version>` folder to the new version;
   - review the complete `Samples~` diff.
+- **New samples (D25):** author a new sample under the next version's folder (`Assets/Samples/UGUI Playable/<next
+  version>/<Sample>/`), not under the released one, so a released sample folder is moved as a whole at release.
 - **Building:** build sample scenes and UI with unity CLI commands, not with builder scripts, so later hand edits
   survive. Timeline tracks and clips, which the CLI can't create, are set up by one-off `eval` calls.
 - **Position channels:** in shared show/hide timelines, use Absolute targets or From current, not Relative.
   Relative re-bases each time a director's graph is rebuilt, so a hide that doesn't return to its start drifts.
-- **Dependencies:** the sample depends only on the package and the Unity packages it declares; its EventSystem
+- **Dependencies:** each sample depends only on the package and the Unity packages it declares; its EventSystem
   gets its input module at runtime (Input System or Input Manager), and no module is serialized. TextMeshPro text
   needs TMP Essential Resources.
 
