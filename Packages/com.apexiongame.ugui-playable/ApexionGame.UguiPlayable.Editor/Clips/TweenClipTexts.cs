@@ -86,7 +86,8 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string SHORTEST_PATH_NOTE =
             "Turns the short way. Axis toggles are ignored; a full turn becomes no turn.";
 
-        public const string TEXT_RICH_TAGS_NOTE = "Rich text tags are revealed as plain characters.";
+        public const string TEXT_RICH_TAGS_NOTE =
+            "Rich Text is off on the bound text, so tags show and are revealed as plain characters.";
 
         public const string TEXT_SCRAMBLE_TOOLTIP =
             "The characters shown at positions that are not revealed yet and differ from the target.";

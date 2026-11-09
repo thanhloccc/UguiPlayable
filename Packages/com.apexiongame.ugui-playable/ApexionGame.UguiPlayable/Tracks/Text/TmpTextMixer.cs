@@ -56,6 +56,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private char[] _buffer = Array.Empty<char>();
         private char[] _previous = Array.Empty<char>();
         private int _previousLength;
+        private int _previousSlotCount;
         private bool _wroteText;
         private TextChannel _textChannel;
         private TmpTextBehaviour _textBehaviour;
@@ -87,6 +88,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             _baseText = binding.text;
             _previousLength = 0;
+            _previousSlotCount = 0;
             _wroteText = false;
         }
 
@@ -141,6 +143,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 binding.text = _baseText;
                 _wroteText = false;
                 _previousLength = 0;
+                _previousSlotCount = 0;
             }
 
             if (_wroteRatio)
@@ -172,7 +175,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         {
             if (_wroteText)
             {
-                behaviour.CaptureVisibleRatio(binding, _previousLength);
+                behaviour.CaptureVisibleRatio(binding, _previousSlotCount);
             }
 
             var text = behaviour.Text;
@@ -352,7 +355,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
         private void ApplyText(TMP_Text binding)
         {
+            var richText = binding.richText;
+            var parseEscapes = binding.parseCtrlCharacters;
             int length;
+            int slotCount;
 
             if (_hasActiveText)
             {
@@ -361,7 +367,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     ? (channel.HasCaptured ? channel.Captured : _baseText)
                     : channel.From;
 
-                EnsureCapacity(TextTweenMath.RequiredLength(from, channel.To));
+                EnsureCapacity(TextTweenMath.RequiredLength(from, channel.To, richText));
 
                 length = TextTweenMath.Fill(
                       _buffer
@@ -370,6 +376,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     , channel.Ease.Evaluate(_textProgress)
                     , channel.Scramble
                     , channel.CustomScrambleChars
+                    , richText
+                    , parseEscapes
+                    , out slotCount
                 );
             }
             else if (_hasHoldText)
@@ -377,14 +386,25 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 var to = _holdChannel.To ?? string.Empty;
 
                 EnsureCapacity(to.Length);
-                length = TextTweenMath.Fill(_buffer, string.Empty, to, 1f, ScrambleMode.None, string.Empty);
+
+                length = TextTweenMath.Fill(
+                      buffer: _buffer
+                    , from: string.Empty
+                    , to: to
+                    , progress: 1f
+                    , mode: ScrambleMode.None
+                    , custom: string.Empty
+                    , richText: richText
+                    , parseEscapes: parseEscapes
+                    , slotCount: out slotCount
+                );
             }
             else
             {
                 return;
             }
 
-            _producedCount = length;
+            _producedCount = slotCount;
             _hasProducedText = true;
 
             if (_wroteText && IsSameAsPrevious(length))
@@ -399,6 +419,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             Array.Copy(_buffer, _previous, length);
             _previousLength = length;
+            _previousSlotCount = slotCount;
             _wroteText = true;
             binding.SetCharArray(_buffer, 0, length);
         }

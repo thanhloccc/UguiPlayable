@@ -78,7 +78,18 @@ How it works:
   scrubbing is stable.
 - A newline in either string is kept as its own character (`\r` stays `\r`); a revealed position shows To even where
   From has a newline.
-- Rich-text tags are revealed as plain characters. Avoid tags in the From and To strings, or the tags show for a moment.
+- With **Rich Text** on (the default), tags are markup: they take no position, so the count runs over the characters
+  you see. The tags of To come with the revealed part, and right after it come only the closing tags of To that close
+  what the revealed part opened, so a style never spills onto the unrevealed part (`Hello <color=red>World</color>`:
+  "World" turns red as it is revealed). Tags still ahead, such as `<pos>`, `<space>` or `<page>`, wait until they are
+  revealed. `<br>`, `<sprite…>`, `<nbsp>`, `<zwsp>`, `<zwj>`, `<shy>` and `<cr>` count as one character, text inside
+  `<noparse>` counts letter by letter, and a surrogate pair (an emoji) or a parsed escape such as `\n` is one
+  character. The style tags of From are dropped while the tween runs, so a From current tween loses the base text's
+  styles in the unrevealed part. Where the revealed part, From and scramble characters meet, a lone `\` or `<` never
+  joins what follows into an escape or a tag (the tween writes `\\`, `\u005C` or `</noparse>` there, which TMP
+  shows as nothing extra). TMP prints a tag it does not know as text, while the tween treats any `<…>` as a tag, so
+  such text (for example `1 < 2 and 3 > 2`) appears whole when the reveal reaches it. With Rich Text off, tags are
+  plain characters and the clip card shows a note.
 - The channel is not blended. When clips overlap, the active clip with the highest weight decides. After a clip, the
   latest finished clip's To shows.
 - From current starts from the To of the previous text clip on the track (the one that started earlier and ends last),

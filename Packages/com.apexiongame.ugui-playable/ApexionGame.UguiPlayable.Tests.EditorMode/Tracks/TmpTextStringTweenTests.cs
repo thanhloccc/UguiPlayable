@@ -265,6 +265,126 @@ public sealed class TmpTextStringTweenTests
         Assert.That(GC.GetAllocatedBytesForCurrentThread() - before, Is.Zero);
     }
 
+    // Probe of TMP itself: the rules the slot scan relies on. A tag TMP does not know is printed as text, while the
+    // scan treats it as a tag (no slot); that difference is documented.
+    [TestCase("<b>x</b>", true, 1, 1)]
+    [TestCase("a<br>b", true, 3, 3)]
+    [TestCase("a<BR>b", true, 3, 3)]
+    [TestCase("a<nbsp>b", true, 3, 3)]
+    [TestCase("a<zwsp>b", true, 3, 3)]
+    [TestCase("a<zwj>b", true, 3, 3)]
+    [TestCase("a<shy>b", true, 3, 3)]
+    [TestCase("a<cr>b", true, 3, 3)]
+    [TestCase("<noparse><b></noparse>", true, 3, 3)]
+    [TestCase("<NoParse><br></NOPARSE>", true, 4, 4)]
+    [TestCase("a\\nb", true, 3, 3)]
+    [TestCase("a\\nb", false, 4, 4)]
+    [TestCase("a\\\\b", true, 3, 3)]
+    [TestCase("\\u0041", false, 1, 1)]
+    [TestCase("😀", true, 1, 1)]
+    [TestCase("a<>b", true, 4, 4)]
+    [TestCase("a < b", true, 5, 5)]
+    [TestCase("<foo>", true, 5, 0)]
+    public void TmpCountsTheCharactersTheSlotScanExpects(string text, bool parseEscapes, int tmpCount, int slotCount)
+    {
+        _text.parseCtrlCharacters = parseEscapes;
+        _text.text = text;
+        _text.ForceMeshUpdate();
+
+        var buffer = new char[TextTweenMath.RequiredLength(string.Empty, text, richText: true)];
+
+        TextTweenMath.Fill(
+              buffer: buffer
+            , from: string.Empty
+            , to: text
+            , progress: 1f
+            , mode: ScrambleMode.None
+            , custom: string.Empty
+            , richText: true
+            , parseEscapes: parseEscapes
+            , slotCount: out var scanned
+        );
+
+        Assert.AreEqual(tmpCount, _text.textInfo.characterCount, "TMP");
+        Assert.AreEqual(slotCount, scanned, "slot scan");
+    }
+
+    // Where text from different places meets, TMP must not see an escape or a tag the slot scan did not count.
+    [TestCase("abcnefgh", "C:\\Users", true)]
+    [TestCase("abcuefgh", "C:\\Users", false)]
+    [TestCase("a\\<b>n", "xyz", true)]
+    [TestCase("aab>yz", "x<<<<<", true)]
+    [TestCase("wxyz", "<b>a<b>b</b>c</b>d", true)]
+    [TestCase("1 2 3 4 5 6 7", "a<pos=50%>b<space=2em>c<page>d", true)]
+    public void TmpCountsTheSlotsOfEveryFrameAtTheSeams(string from, string to, bool parseEscapes)
+    {
+        _text.parseCtrlCharacters = parseEscapes;
+
+        var buffer = new char[TextTweenMath.RequiredLength(from, to, richText: true)];
+
+        foreach (var mode in new[] { ScrambleMode.None, ScrambleMode.All })
+        {
+            for (var i = 0; i <= 20; i++)
+            {
+                var length = TextTweenMath.Fill(
+                      buffer: buffer
+                    , from: from
+                    , to: to
+                    , progress: i / 20f
+                    , mode: mode
+                    , custom: string.Empty
+                    , richText: true
+                    , parseEscapes: parseEscapes
+                    , slotCount: out var slotCount
+                );
+
+                _text.text = new string(buffer, 0, length);
+                _text.ForceMeshUpdate();
+
+                Assert.AreEqual(slotCount, _text.textInfo.characterCount, $"'{_text.text}' ({mode}, step {i})");
+            }
+        }
+    }
+
+    [Test]
+    public void RichText_CharacterCountNeverCountsTagCharactersMidClip()
+    {
+        AddClip(0d, 1d, new TextChannel(string.Empty, "<b>Hello</b> <color=#F00>World</color>"));
+
+        for (var i = 0; i <= 20; i++)
+        {
+            EvaluateAt(i / 20d);
+            _text.ForceMeshUpdate();
+
+            var info = _text.textInfo;
+            var count = (int)(i / 20f * 11 + 1e-5f);
+
+            // From is empty: nothing at count 0, then 11 characters (the revealed part and spaces).
+            Assert.AreEqual(count == 0 ? 0 : 11, info.characterCount, $"step {i}");
+
+            for (var c = 0; c < info.characterCount; c++)
+            {
+                var character = info.characterInfo[c].character;
+
+                Assert.That(character != '<' && character != '>', $"'{_text.text}' shows a tag at step {i}");
+            }
+        }
+    }
+
+    [Test]
+    public void Typewriter_UsesTheSlotCountOfRichTextWrittenThisFrame()
+    {
+        var clip = AddClip(0d, 1d, new TextChannel("xxxx", "<b>yyyy</b>"));
+
+        ((TmpTextClip)clip.asset).Template.VisibleRatio = new TweenChannel<float>(0.5f, 0.5f);
+
+        EvaluateAt(1d);
+
+        // The new text shows 4 characters (11 with its tags; TMP's text info still counts the 11 of the old one).
+        Assert.AreEqual("<b>yyyy</b>", _text.text);
+        Assert.AreEqual(2, _text.maxVisibleCharacters);
+    }
+
     private TimelineClip AddClip(double start, double duration, TextChannel channel)
     {
         var clip = _track.CreateClip<TmpTextClip>();

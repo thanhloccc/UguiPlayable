@@ -20,9 +20,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// <para>
     /// The visible ratio is a 0 to 1 share of the text's character count. It is blended as a ratio and converted once
     /// to <see cref="TMP_Text.maxVisibleCharacters"/> as <c>floor(ratio * count)</c>: a ratio of 1 or more writes
-    /// 99999 (TMP's "all"), so text set later is not cut. The count is the length of the string this track writes in
-    /// the same frame; when the track writes no text, it comes from <see cref="TMP_Text.textInfo"/>, which can lag one
-    /// frame behind a text change. The mixer never forces a mesh update.
+    /// 99999 (TMP's "all"), so text set later is not cut. The count is the character count of the string this track
+    /// writes in the same frame (tags excluded when Rich Text is on); when the track writes no text, it comes from
+    /// <see cref="TMP_Text.textInfo"/>, which can lag one frame behind a text change. The mixer never forces a mesh
+    /// update.
     /// </para>
     /// <para>
     /// The gradient channel writes <see cref="TMP_Text.colorGradient"/> only. TMP shows it when
@@ -30,7 +31,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// </para>
     /// <para>
     /// The text channel is off by default. It is not blended and writes <see cref="TMP_Text.text"/> through the
-    /// mixer's character buffer; rich-text tags are revealed as plain characters.
+    /// mixer's character buffer. When the text has <see cref="TMP_Text.richText"/> on, tags are markup: they take no
+    /// character position and are never revealed letter by letter.
     /// </para>
     /// </remarks>
     [Serializable]

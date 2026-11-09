@@ -92,7 +92,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _card.TrackPropertyValue(_scramble, _ => RefreshState());
             MultiEdit.PollWhileMultiple(_card, serializedObject, RefreshState);
 
-            _source.Changed += UpdatePipettes;
+            _source.Changed += RefreshState;
 
             RefreshState();
         }
@@ -220,7 +220,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
             var note = fromCurrent ? TweenClipTexts.TEXT_FROM_CURRENT_NOTE : string.Empty;
 
-            if (HasTag(_to.stringValue) || (fromCurrent == false && HasTag(_from.stringValue)))
+            var hasTag = HasTag(_to.stringValue) || (fromCurrent == false && HasTag(_from.stringValue));
+
+            if (hasTag && BindingValueReader.IsRichTextOff(_source.Binding))
             {
                 note = note.Length == 0
                     ? TweenClipTexts.TEXT_RICH_TAGS_NOTE

@@ -173,6 +173,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public static bool IsAutoSizing(Object binding)
             => TryResolve<TMP_Text>(binding, out var text) && text.enableAutoSizing;
 
+        /// <summary>
+        /// Whether the binding is a text with Rich Text off, so tags in a string tween show as plain characters.
+        /// </summary>
+        public static bool IsRichTextOff(Object binding)
+            => TryResolve<TMP_Text>(binding, out var text) && text.richText == false;
+
         private static float GetVisibleRatio(TMP_Text text)
         {
             var count = text.textInfo.characterCount;

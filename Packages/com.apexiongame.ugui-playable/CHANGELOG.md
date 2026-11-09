@@ -10,6 +10,13 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 - TMP Text track: the Font Size card notes that the channel has no effect while the bound text has Auto Size on, and
   the track row and track inspector warn while any clip enables Font Size.
+- TMP Text track: the string tween is rich-text aware when the bound text has Rich Text on. Tags take no position
+  and are copied whole. Only the closing tags of `to` that close what the revealed part opened follow it, so styles
+  never spill onto the rest and tags ahead (`<pos>`, `<page>`, unknown tags) never show early. Glyph tags (`<br>`,
+  `<sprite…>`, `<nbsp>`…) are one character, `<noparse>` is honoured, surrogate pairs and parsed escapes (`\n`) are
+  one character, and text joined from different places never forms an escape or a tag. The typewriter counts the characters TMP will show, not the tag
+  characters. New overloads `TextTweenMath.Fill(…, bool richText, bool parseEscapes, out int slotCount)` and
+  `TextTweenMath.RequiredLength(string, string, bool richText)`.
 
 ### Changed
 
@@ -19,6 +26,9 @@ and the package uses [Semantic Versioning](https://semver.org/).
   of the ratio, not at 0.5/n. The `text-scramble-reveal` preset has Visible Ratio off, so its scramble shows.
 - TMP Text track: a From current string tween starts from the To of the previous text clip, or from the base text when
   there is none, not from the last frame shown, so scrubbing into a clip matches playing to it.
+- TMP Text track: rich-text tags are no longer revealed letter by letter, and the style tags of `from` are dropped
+  while the tween runs. A custom scramble set never shows `<`, `>` or `\` on a rich text. The clip card's rich-text
+  note shows only when the bound text has Rich Text off.
 
 ### Fixed
 
