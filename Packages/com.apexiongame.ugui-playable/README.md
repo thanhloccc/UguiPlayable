@@ -10,6 +10,10 @@ UI elements on a Timeline instead of writing tween code.
 > Status: preview (`0.2.0-preview.1`). The tracks and the editor tools work. The base classes for custom tracks are
 > marked "Preview API" and may change before 1.0. See [CHANGELOG.md](CHANGELOG.md).
 
+[![The Showcase sample: a 42-second trailer driven by one Timeline](https://raw.githubusercontent.com/thanhloccc/UguiPlayable/main/docs/media/showcase.gif)](https://github.com/thanhloccc/UguiPlayable/blob/main/docs/media/showcase.mp4)
+
+The Showcase sample above is one Timeline and no tween code. Import it from **Package Manager > Samples**.
+
 ## What you get
 
 - 15 Timeline tracks for uGUI: Rect Transform, Graphic, Image, Raw Image, Canvas Group, Shadow/Outline, Layout Element,
