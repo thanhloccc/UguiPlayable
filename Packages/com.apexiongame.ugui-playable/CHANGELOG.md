@@ -17,6 +17,8 @@ and the package uses [Semantic Versioning](https://semver.org/).
 - TMP Text track: the string tween shows `from` unchanged at progress 0 and reveals in even steps (the count is
   `floor(progress * length)`), and the typewriter floors instead of rounding, so the first character appears at 1/n
   of the ratio, not at 0.5/n. The `text-scramble-reveal` preset has Visible Ratio off, so its scramble shows.
+- TMP Text track: a From current string tween starts from the To of the previous text clip, or from the base text when
+  there is none, not from the last frame shown, so scrubbing into a clip matches playing to it.
 
 ### Fixed
 

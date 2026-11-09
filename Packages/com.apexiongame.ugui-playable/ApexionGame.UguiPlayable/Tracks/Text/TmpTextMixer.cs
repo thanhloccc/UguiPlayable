@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Tracks.Graphics;
 
@@ -27,9 +28,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// <c>SetCharArray</c> leaves TMP's input source on "text array" and only the setter re-renders reliably.
     /// </para>
     /// <para>
-    /// A From current text tween takes its start from the mixer's own knowledge: the captured base text when the
-    /// mixer has not written, otherwise the characters it wrote last (one string built per clip activation, never
-    /// per frame). Reading <see cref="TMP_Text.text"/> would allocate in TMP.
+    /// A From current text tween starts from the <c>to</c> of the previous text clip on the track (the one that
+    /// started earlier and ends last), or from the base text when there is none, so jumping to a time gives the same
+    /// text as playing to it. The base text is read once per bind (<see cref="TMP_Text.text"/> allocates once after
+    /// <c>SetCharArray</c> in the player) and never per frame.
     /// </para>
     /// </remarks>
     public sealed class TmpTextMixer : TweenMixer<TMP_Text, TmpTextBehaviour>
@@ -180,8 +182,56 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 return;
             }
 
-            // One string per clip activation, never per frame.
-            behaviour.CaptureText(_wroteText ? new string(_previous, 0, _previousLength) : _baseText);
+            // The previous clip's To (or the base text) is passed as is: no string is built.
+            behaviour.CaptureText(FindPreviousText());
+        }
+
+        // Among the other text clips that started earlier than the one being activated, the one that ends last (ties:
+        // the later input) gives its To; none gives the base text. It does not depend on what was scrubbed before.
+        private string FindPreviousText()
+        {
+            var playable = CurrentPlayable;
+            var index = CurrentInputIndex;
+            var start = GetWindow(index).Start;
+            var count = Math.Min(playable.GetInputCount(), WindowCount);
+            var found = false;
+            var bestEnd = 0d;
+            string result = null;
+
+            for (var j = 0; j < count; j++)
+            {
+                if (j == index)
+                {
+                    continue;
+                }
+
+                var window = GetWindow(j);
+
+                if (window.Start >= start || (found && window.End < bestEnd))
+                {
+                    continue;
+                }
+
+                var input = (ScriptPlayable<TmpTextBehaviour>)playable.GetInput(j);
+
+                if (input.IsValid() == false)
+                {
+                    continue;
+                }
+
+                var other = input.GetBehaviour();
+
+                if (other == null || other.Text.Enabled == false)
+                {
+                    continue;
+                }
+
+                found = true;
+                bestEnd = window.End;
+                result = other.Text.To ?? string.Empty;
+            }
+
+            return found ? result : _baseText;
         }
 
         /// <inheritdoc/>

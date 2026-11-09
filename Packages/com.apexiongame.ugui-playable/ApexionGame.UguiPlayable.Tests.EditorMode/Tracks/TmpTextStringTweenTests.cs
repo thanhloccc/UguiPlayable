@@ -141,7 +141,7 @@ public sealed class TmpTextStringTweenTests
     }
 
     [Test]
-    public void FromCurrent_StartsFromTheTextTheMixerLastWrote()
+    public void FromCurrent_StartsFromThePreviousClipsTo()
     {
         AddClip(0d, 1d, new TextChannel("aaaa", "bbbb"));
         AddClip(1d, 1d, new TextChannel(string.Empty, "cccc", ValueMode.FromCurrent));
@@ -149,9 +149,37 @@ public sealed class TmpTextStringTweenTests
         EvaluateAt(0.5d);
         Assert.AreEqual("bbaa", _text.text);
 
-        // The second clip starts from what the first one showed: "bbaa", count 2.
+        // The second clip starts from the first one's To: "bbbb", count 2.
         EvaluateAt(1.5d);
-        Assert.AreEqual("ccaa", _text.text);
+        Assert.AreEqual("ccbb", _text.text);
+    }
+
+    [Test]
+    public void FromCurrent_JumpingGivesTheSameTextAsPlaying()
+    {
+        AddClip(0d, 1d, new TextChannel("aaaa", "bbbb"));
+        AddClip(1d, 1d, new TextChannel(string.Empty, "cccc", ValueMode.FromCurrent));
+
+        EvaluateAt(0.5d);
+        EvaluateAt(1.5d);
+        var played = _text.text;
+
+        EvaluateAt(0.1d);
+        EvaluateAt(1.5d);
+        var jumpedBack = _text.text;
+
+        Assert.AreEqual("ccbb", played);
+        Assert.AreEqual(played, jumpedBack);
+    }
+
+    [Test]
+    public void FromCurrent_WithoutAPreviousClipStartsFromTheBaseText()
+    {
+        AddClip(1d, 1d, new TextChannel(string.Empty, "ZZZZ", ValueMode.FromCurrent));
+
+        EvaluateAt(1.5d);
+
+        Assert.AreEqual("ZZZZ  World", _text.text);
     }
 
     [Test]

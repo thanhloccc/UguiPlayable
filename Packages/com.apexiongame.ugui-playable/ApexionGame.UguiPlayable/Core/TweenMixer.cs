@@ -32,6 +32,18 @@ namespace ApexionGame.UguiPlayable.Core
         /// <summary>The track's restore option.</summary>
         public RestoreMode RestoreMode => _restoreMode;
 
+        /// <summary>The input being activated; valid only inside <see cref="OnInputActivated"/>.</summary>
+        internal int CurrentInputIndex { get; private set; }
+
+        /// <summary>The mixer playable being processed; valid only inside <see cref="OnInputActivated"/>.</summary>
+        internal Playable CurrentPlayable { get; private set; }
+
+        /// <summary>The number of clip windows the mixer was initialised with.</summary>
+        internal int WindowCount => _windows.Length;
+
+        /// <summary>The window of the clip connected to input <paramref name="index"/>.</summary>
+        internal ClipWindow GetWindow(int index) => _windows[index];
+
         internal void Initialize(ClipWindow[] windows, RestoreMode restoreMode)
         {
             _windows = windows ?? Array.Empty<ClipWindow>();
@@ -85,6 +97,8 @@ namespace ApexionGame.UguiPlayable.Core
                     if (_active[i] == false)
                     {
                         _active[i] = true;
+                        CurrentInputIndex = i;
+                        CurrentPlayable = playable;
                         behaviour.OnActivated(binding);
                         OnInputActivated(behaviour, binding);
                     }

@@ -81,7 +81,9 @@ How it works:
 - Rich-text tags are revealed as plain characters. Avoid tags in the From and To strings, or the tags show for a moment.
 - The channel is not blended. When clips overlap, the active clip with the highest weight decides. After a clip, the
   latest finished clip's To shows.
-- From current starts from the text shown when the clip becomes active.
+- From current starts from the To of the previous text clip on the track (the one that started earlier and ends last),
+  or from the text the label had when the track was bound when there is none. It does not depend on the last frame
+  shown, so scrubbing straight into the clip gives the same text as playing through.
 - Restoring uses TMP's text setter, which re-renders reliably.
 
 Allocation: the track writes the string through a character buffer that only grows when a longer pair of strings
