@@ -10,7 +10,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 {
     /// <summary>
     /// The channels of a <see cref="TmpTextClip"/>: color, alpha, font size, four spacings, the typewriter ratio, the
-    /// vertex gradient and the string tween.
+    /// vertex gradient, the string tween and the number counter.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -39,6 +39,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// The text channel is off by default. It is not blended and writes <see cref="TMP_Text.text"/> through the
     /// mixer's character buffer. When the text has <see cref="TMP_Text.richText"/> on, tags are markup: they take no
     /// character position and are never revealed letter by letter.
+    /// </para>
+    /// <para>
+    /// The counter channel is off by default. It counts a number and writes it as formatted text through the same
+    /// buffer, never parsing the text. When the string channel and the counter are both on, the string channel
+    /// decides the text; with no active clip, the hold that ends later wins, the string channel on a tie.
     /// </para>
     /// </remarks>
     [Serializable]
@@ -97,6 +102,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
         [SerializeField]
         private TextChannel _text = new(string.Empty, string.Empty, enabled: false);
+
+        [SerializeField]
+        private CounterChannel _counter = new(0d, 100d, enabled: false);
 
         /// <summary>The <see cref="Graphic.color"/> channel.</summary>
         public TweenChannel<Color> Color
@@ -196,6 +204,13 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             set => _text = value;
         }
 
+        /// <summary>The number counter channel: counts a number and writes it as formatted <see cref="TMP_Text.text"/>.</summary>
+        public CounterChannel Counter
+        {
+            get => _counter;
+            set => _counter = value;
+        }
+
         /// <inheritdoc/>
         internal override bool HasEnabledChannel()
             => _color.Enabled
@@ -207,7 +222,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 || _paragraphSpacing.Enabled
                 || _visibleRatio.Enabled
                 || _colorGradient.Enabled
-                || _text.Enabled;
+                || _text.Enabled
+                || _counter.Enabled;
 
         /// <inheritdoc/>
         /// <remarks>The visible ratio is not serialized by TMP, so it registers no property.</remarks>
@@ -250,7 +266,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 names.Add(COLOR_GRADIENT_PROPERTY);
             }
 
-            if (_text.Enabled)
+            if (_text.Enabled || _counter.Enabled)
             {
                 names.Add(TEXT_PROPERTY);
             }
@@ -296,6 +312,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _visibleRatio.ClearCapture();
             _colorGradient.ClearCapture();
             _text.ClearCapture();
+            _counter.ClearCapture();
         }
 
         /// <summary>
@@ -307,6 +324,18 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             if (_text.Enabled && _text.Mode == ValueMode.FromCurrent)
             {
                 _text.Capture(current);
+            }
+        }
+
+        /// <summary>
+        /// Stores the value a <see cref="ValueMode.FromCurrent"/> counter starts from: the last value the mixer
+        /// wrote, or <c>From</c> when it wrote none. The text is never parsed.
+        /// </summary>
+        internal void CaptureCounter(bool hasLast, double last)
+        {
+            if (_counter.Enabled && _counter.Mode == ValueMode.FromCurrent)
+            {
+                _counter.Capture(hasLast ? last : _counter.From);
             }
         }
 

@@ -73,6 +73,21 @@ public sealed class LegacyAssetLoadTests
     }
 
     [Test]
+    public void LegacyClip_CounterIsOff()
+    {
+        var clip = LoadLegacyClip();
+        var counter = clip.Template.Counter;
+
+        Assert.IsFalse(counter.Enabled);
+        Assert.AreEqual(0, counter.Decimals);
+        Assert.IsFalse(counter.Grouping);
+        Assert.AreEqual(",", counter.GroupSeparator);
+        Assert.AreEqual(".", counter.DecimalSeparator);
+        Assert.AreEqual(string.Empty, counter.Prefix);
+        Assert.AreEqual(string.Empty, counter.Suffix);
+    }
+
+    [Test]
     public void LegacyClip_TypewriterIsByCharacterWithoutPause()
     {
         var clip = LoadLegacyClip();

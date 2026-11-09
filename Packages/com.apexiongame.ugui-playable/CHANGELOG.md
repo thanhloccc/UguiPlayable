@@ -8,6 +8,12 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- TMP Text track: a number counter channel (runtime; the inspector card follows). `TmpTextBehaviour.Counter` is a new
+  public `CounterChannel` (From, To, Ease, Decimals 0 to 6, Grouping, separators, Prefix, Suffix) that counts a number
+  and writes it as formatted text, culture-free and with no allocation in the package, through the track's text
+  buffer. The string tween wins over the counter while any active clip has it on; with no active clip the hold that
+  ends later wins, the string tween on a tie. From current starts from the last value the track wrote, else From; the
+  text is never parsed. Off by default and in every existing clip.
 - TMP Text track: the typewriter can reveal by word or by line, and can pause after punctuation (`.,:;!?…`).
   `TmpTextBehaviour.VisibleUnit` (new enum `TypewriterUnit`: Character, Word, Line) and
   `TmpTextBehaviour.PunctuationPause` (in steps of the unit), shown as Unit and Pause in the Visible Ratio card.

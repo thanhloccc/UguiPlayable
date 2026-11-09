@@ -24,6 +24,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string SCRAMBLE = "_scramble";
         public const string CUSTOM_SCRAMBLE_CHARS = "_customScrambleChars";
         public const string SCRAMBLE_RATE = "_scrambleRate";
+        public const string DECIMALS = "_decimals";
         public const string TARGET = "_target";
         public const string STRENGTH = "_strength";
         public const string FREQUENCY = "_frequency";
@@ -153,6 +154,13 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             var enabledProperty = child.FindPropertyRelative(ENABLED);
 
             if (enabledProperty == null || enabledProperty.propertyType != SerializedPropertyType.Boolean)
+            {
+                return false;
+            }
+
+            // The number counter has double From/To like a float tween but its own card (step 10a); until it exists
+            // the inspector must not draw it as a float channel.
+            if (child.FindPropertyRelative(DECIMALS) != null)
             {
                 return false;
             }

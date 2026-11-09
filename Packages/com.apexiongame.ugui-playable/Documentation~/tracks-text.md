@@ -119,6 +119,42 @@ Allocation: the track writes the string through a character buffer that only gro
 appears. In the Editor, TextMeshPro's `SetCharArray` allocates; see
 [value-modes-and-restore.md](value-modes-and-restore.md).
 
+### Counter (number)
+
+The channel counts a number from From to To and writes it as formatted text. It is off by default; the inspector card
+follows in the next release, so for now set it from code (`TmpTextBehaviour.Counter`, a `CounterChannel`).
+
+| Setting | Default | Meaning |
+|---|---|---|
+| Mode | Absolute | Absolute or From current. Relative behaves like Absolute |
+| From, To | 0 and 100 | The start and end values (doubles, exact up to 2^53) |
+| Ease | Linear | Shapes the count |
+| Decimals | 0 | 0 to 6; values round half away from zero |
+| Grouping | off | Groups the integer digits by three |
+| Group separator, Decimal separator | `,` and `.` | Null or empty reads as the default |
+| Prefix, Suffix | empty | Text around the number; the sign comes before the prefix (`-$5`) |
+
+How it works:
+
+- The text is formatted without the culture, so every machine prints the same characters. A value beyond the `long`
+  range (after scaling by the decimals) is clamped; `-0` and NaN print `0`.
+- The counter writes through the same character buffer as the string tween and calls `SetCharArray` only when the
+  digits change. The typewriter counts the formatted text, prefix and suffix included (rich-text tags in a prefix or
+  suffix count as characters too).
+- The counter never reads or parses the label's text. From current starts from the last value the track wrote, or
+  from From when it wrote none, so a count that continues a previous clip is seamless. The start therefore depends
+  on what was played or scrubbed before (and, for clips that touch, on the frame rate): jumping straight into a From
+  current clip before the track wrote any value starts it from From.
+- Overlapping counter clips blend their values by weight (in double); the format comes from the clip with the highest
+  weight. After a clip, the latest finished counter clip's To shows.
+- The string tween wins over the counter: while any active clip has the Text channel on, the string decides the
+  text, even when a counter clip weighs more. With no active text or counter clip, the hold that ends later wins; on
+  a tie the string tween.
+- Restoring is the same as for the string tween: the base text returns whenever the text was written.
+
+Allocation: the counter allocates nothing in the package. In the Editor, TextMeshPro's `SetCharArray` allocates when
+the digits change; see [value-modes-and-restore.md](value-modes-and-restore.md).
+
 ## Restore
 
 Only the properties the mixer wrote are restored. With **Revert**, the colour, sizes, spacing and gradient return to

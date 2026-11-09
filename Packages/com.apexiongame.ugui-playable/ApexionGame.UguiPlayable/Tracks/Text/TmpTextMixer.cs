@@ -31,6 +31,13 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// <c>SetCharArray</c> leaves TMP's input source on "text array" and only the setter re-renders reliably.
     /// </para>
     /// <para>
+    /// The counter channel shares this text path. Counter values blend by weight in double; the format comes from the
+    /// input with the highest weight (or the latest finished one). The string channel wins over the counter while
+    /// any active input has it on; with no active text or counter input, the hold that ends later wins, the string
+    /// channel on a tie. The counter never parses the text: From current starts from the last value the mixer wrote,
+    /// else <c>From</c>.
+    /// </para>
+    /// <para>
     /// A From current text tween starts from the <c>to</c> of the previous text clip on the track (the one that
     /// started earlier and ends last), or from the base text when there is none, so jumping to a time gives the same
     /// text as playing to it. The base text is read once per bind (<see cref="TMP_Text.text"/> allocates once after
@@ -78,6 +85,17 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private int _producedCount;
         private bool _hasProducedText;
 
+        private DoubleAccumulator _counter;
+        private CounterChannel _counterFormat;
+        private double _counterStart;
+        private float _counterWeight;
+        private bool _hasActiveCounter;
+        private CounterChannel _holdCounter;
+        private double _holdCounterEnd;
+        private bool _hasHoldCounter;
+        private double _lastCounterValue;
+        private bool _hasLastCounter;
+
         /// <inheritdoc/>
         protected override void CaptureBase(TMP_Text binding)
         {
@@ -99,6 +117,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _previousLength = 0;
             _previousSlotCount = 0;
             _wroteText = false;
+            _hasLastCounter = false;
         }
 
         /// <inheritdoc/>
@@ -179,6 +198,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _textWeight = 0f;
             _hasHoldText = false;
             _hasProducedText = false;
+
+            _counter.Reset();
+            _counterWeight = 0f;
+            _hasActiveCounter = false;
+            _hasHoldCounter = false;
         }
 
         /// <inheritdoc/>
@@ -188,6 +212,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             {
                 behaviour.CaptureVisibleRatio(binding, _previousSlotCount);
             }
+
+            behaviour.CaptureCounter(_hasLastCounter, _lastCounterValue);
 
             var text = behaviour.Text;
 
@@ -289,6 +315,23 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 _textWeight = weight;
                 _hasActiveText = true;
             }
+
+            var counter = behaviour.Counter;
+
+            if (counter.Enabled)
+            {
+                var start = CounterChannelMath.StartOf(counter);
+
+                _counter.Add(CounterChannelMath.Evaluate(counter, progress, start), weight);
+
+                if (_hasActiveCounter == false || weight > _counterWeight)
+                {
+                    _counterFormat = counter;
+                    _counterStart = start;
+                    _counterWeight = weight;
+                    _hasActiveCounter = true;
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -333,6 +376,22 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 _holdChannel = behaviour.Text;
                 _holdEnd = endTime;
                 _hasHoldText = true;
+            }
+
+            var counter = behaviour.Counter;
+
+            if (counter.Enabled)
+            {
+                var value = CounterChannelMath.Evaluate(counter, 1f, CounterChannelMath.StartOf(counter));
+
+                _counter.OfferHold(value, endTime);
+
+                if (_hasHoldCounter == false || endTime >= _holdCounterEnd)
+                {
+                    _holdCounter = counter;
+                    _holdCounterEnd = endTime;
+                    _hasHoldCounter = true;
+                }
             }
         }
 
@@ -469,6 +528,19 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     , step
                     , out slotCount
                 );
+            }
+            else if (_hasActiveCounter || (_hasHoldCounter && (_hasHoldText == false || _holdCounterEnd > _holdEnd)))
+            {
+                // The counter decides: an active counter clip, or a counter hold that ends after the string hold.
+                var format = _hasActiveCounter ? _counterFormat : _holdCounter;
+                var value = _counter.Resolve(_hasActiveCounter ? _counterStart : format.To);
+
+                EnsureCapacity(CounterFormatMath.RequiredLength(format));
+
+                length = CounterFormatMath.Fill(_buffer, value, format);
+                slotCount = length;
+                _lastCounterValue = value;
+                _hasLastCounter = true;
             }
             else if (_hasHoldText)
             {
