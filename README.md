@@ -15,11 +15,11 @@ It is a maintained successor in spirit to
 
 ## Showcase
 
-[![The Showcase sample: a 42-second trailer driven by one Timeline](docs/media/showcase.gif)](docs/media/showcase.mp4)
+[![The Showcase sample: a 42-second trailer driven by one Timeline](docs/media/showcase.webp)](docs/media/showcase.mp4)
 
 The Showcase sample is a 42-second trailer driven by a single Timeline. It uses all 15 tracks and no tween code:
 per-character text effects, scramble and typewriter reveals, a number counter, layout and control animation, and
-shadow, rotation and punch effects. [Watch the full-quality video](docs/media/showcase.mp4), or import the sample
+shadow, rotation and punch effects. [Watch the 1080p 60 fps video](docs/media/showcase.mp4), or import the sample
 from the Package Manager to see it in the Editor.
 
 ## Repository layout
