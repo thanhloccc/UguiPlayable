@@ -15,12 +15,12 @@ It is a maintained successor in spirit to
 
 ## Showcase
 
-[![The Showcase sample: a 42-second trailer driven by one Timeline](docs/media/showcase.webp)](docs/media/showcase.mp4)
+[![The Showcase sample: a 42-second trailer driven by one Timeline](Recordings/showcase-preview.webp)](Recordings/showcase-1080p60.mp4)
 
 The Showcase sample is a 42-second trailer driven by a single Timeline. It uses all 15 tracks and no tween code:
 per-character text effects, scramble and typewriter reveals, a number counter, layout and control animation, and
-shadow, rotation and punch effects. [Watch the 1080p 60 fps video](docs/media/showcase.mp4), or import the sample
-from the Package Manager to see it in the Editor.
+shadow, rotation and punch effects. [Watch the 1080p 60 fps video](Recordings/showcase-1080p60.mp4), or import the
+sample from the Package Manager to see it in the Editor.
 
 ## Repository layout
 
@@ -30,7 +30,7 @@ from the Package Manager to see it in the Editor.
 | `Assets/Samples/UGUI Playable/` | Sample sources (shipped as package samples) |
 | `Assets/ApexionGame/` | Development sandbox |
 | `docs/conventions/` | Project, coding and commit conventions |
-| `docs/media/` | README media (Showcase video and preview) |
+| `Recordings/` | Showcase video, README preview and YouTube listing (Unity Recorder output folder) |
 
 The development project also contains [EncosyTower](https://github.com/laicasaane/EncosyTower) as a design reference
 and development tooling. The package does not depend on it.

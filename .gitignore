@@ -128,3 +128,6 @@ crashlytics-build.properties
 !Packages/com.laicasaane.encosy-tower/EncosyTower.Editor.CodeGen/Dotnet/Templates~/Workspace/EncosyCodeGen.slnx
 !Packages/com.laicasaane.encosy-tower/EncosyTower.Editor.CodeGen/Dotnet/Templates~/Workspace/Runner/EncosyCodeGenRunner.csproj
 !Packages/com.laicasaane.encosy-tower/EncosyTower.Editor.CodeGen/Dotnet/Templates~/Workspace/Island/Island.csproj
+
+# Full-quality recordings kept locally (upload masters)
+/[Rr]ecordings/**/*-master.*
