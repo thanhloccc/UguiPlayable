@@ -63,6 +63,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private TextChannel _holdChannel;
         private double _holdEnd;
         private bool _hasHoldText;
+        private int _producedCount;
+        private bool _hasProducedText;
 
         /// <inheritdoc/>
         protected override void CaptureBase(TMP_Text binding)
@@ -160,11 +162,17 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _hasActiveText = false;
             _textWeight = 0f;
             _hasHoldText = false;
+            _hasProducedText = false;
         }
 
         /// <inheritdoc/>
         protected override void OnInputActivated(TmpTextBehaviour behaviour, TMP_Text binding)
         {
+            if (_wroteText)
+            {
+                behaviour.CaptureVisibleRatio(binding, _previousLength);
+            }
+
             var text = behaviour.Text;
 
             if (text.Enabled == false || text.Mode != ValueMode.FromCurrent)
@@ -271,13 +279,16 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 binding.paragraphSpacing = paragraphSpacing;
             }
 
+            ApplyText(binding);
+
             if (_ratio.HasContribution)
             {
                 var ratio = _ratio.Resolve(_baseRatio);
+                var count = _hasProducedText ? _producedCount : binding.textInfo.characterCount;
 
                 binding.maxVisibleCharacters = ratio >= 1f
                     ? TmpTextBehaviour.ALL_CHARACTERS
-                    : Mathf.Max(0, Mathf.RoundToInt(ratio * binding.textInfo.characterCount));
+                    : TextTweenMath.CountOf(ratio, count);
 
                 _wroteRatio = true;
             }
@@ -287,8 +298,6 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 binding.colorGradient = _gradient.Resolve(_baseGradient);
                 _wroteGradient = true;
             }
-
-            ApplyText(binding);
         }
 
         private void ApplyText(TMP_Text binding)
@@ -324,6 +333,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             {
                 return;
             }
+
+            _producedCount = length;
+            _hasProducedText = true;
 
             if (_wroteText && IsSameAsPrevious(length))
             {

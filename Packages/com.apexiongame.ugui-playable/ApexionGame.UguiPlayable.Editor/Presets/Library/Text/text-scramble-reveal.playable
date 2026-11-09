@@ -352,7 +352,7 @@ MonoBehaviour:
           m_RotationOrder: 4
       _ignoredAxes: 0
     _visibleRatio:
-      _enabled: 1
+      _enabled: 0
       _mode: 0
       _from: 0
       _to: 1

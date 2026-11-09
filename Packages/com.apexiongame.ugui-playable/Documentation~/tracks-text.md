@@ -35,10 +35,12 @@ Both write the text colour. If both are on, Alpha decides the A and Color decide
 ### Visible Ratio (typewriter)
 
 The ratio is a share, 0 to 1, of the text's characters. The track converts it once per frame to
-`maxVisibleCharacters`. A ratio of 1 or more writes TMP's "all" value (99999), so text you set later is not cut.
+`maxVisibleCharacters`, rounding down: nothing shows at the start, and the first character appears at 1/n of the ratio.
+A ratio of 1 or more writes TMP's "all" value (99999), so text you set later is not cut.
 
-The character count comes from TMP's text info, which can lag one frame behind a change of text. The track never forces
-a mesh update.
+The character count follows the string this track writes in the same frame (the Text channel), so the typewriter and
+the string tween of one track never disagree. Text changed by other code is counted from TMP's last rebuild, which can
+lag one frame behind the change. The track never forces a mesh update.
 
 In Edit Mode, Timeline's preview cannot revert `maxVisibleCharacters` because TMP does not serialize it. The track
 restores it itself when the preview ends.
@@ -62,12 +64,14 @@ The channel reveals a string from From to To.
 
 How it works:
 
-- The text is as long as the longer of the two strings. Positions up to the reveal point show To. The rest keep From.
-  At the end of the clip the text is exactly To.
+- The text is as long as the longer of the two strings. The reveal count is the progress times that length, rounded
+  down: at the start of the clip the text is exactly From (no padding, no scramble), and every position becomes To in
+  an even step. Positions below the count show To, the rest keep From. At the end of the clip the text is exactly To.
 - With Scramble on, a position that is not revealed yet and whose character differs from To shows a scramble
   character. The scramble character comes from the position and the progress, not from a random generator, so
   scrubbing is stable.
-- A newline in either string is kept.
+- A newline in either string is kept as its own character (`\r` stays `\r`); a revealed position shows To even where
+  From has a newline.
 - Rich-text tags are revealed as plain characters. Avoid tags in the From and To strings, or the tags show for a moment.
 - The channel is not blended. When clips overlap, the active clip with the highest weight decides. After a clip, the
   latest finished clip's To shows.

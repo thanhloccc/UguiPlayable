@@ -19,9 +19,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// </para>
     /// <para>
     /// The visible ratio is a 0 to 1 share of the text's character count. It is blended as a ratio and converted once
-    /// to <see cref="TMP_Text.maxVisibleCharacters"/>: a ratio of 1 or more writes 99999 (TMP's "all"), so text set
-    /// later is not cut. The count comes from <see cref="TMP_Text.textInfo"/>, which can lag one frame behind a text
-    /// change; the mixer never forces a mesh update.
+    /// to <see cref="TMP_Text.maxVisibleCharacters"/> as <c>floor(ratio * count)</c>: a ratio of 1 or more writes
+    /// 99999 (TMP's "all"), so text set later is not cut. The count is the length of the string this track writes in
+    /// the same frame; when the track writes no text, it comes from <see cref="TMP_Text.textInfo"/>, which can lag one
+    /// frame behind a text change. The mixer never forces a mesh update.
     /// </para>
     /// <para>
     /// The gradient channel writes <see cref="TMP_Text.colorGradient"/> only. TMP shows it when
@@ -271,15 +272,38 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         }
 
         /// <summary>
-        /// The share of the text that is visible: <c>maxVisibleCharacters / characterCount</c>, or 1 when every
-        /// character shows (or the text has none).
+        /// The share of the text that is visible: <c>maxVisibleCharacters / characterCount</c>, 1 when every
+        /// character shows and 0 when the text has no built characters.
         /// </summary>
         internal static float ReadVisibleRatio(TMP_Text text)
+            => ReadVisibleRatio(text, text.textInfo.characterCount);
+
+        /// <summary>
+        /// The share of <paramref name="count"/> characters that is visible: 1 when every character shows, 0 when
+        /// the text has no characters, otherwise <c>maxVisibleCharacters / count</c> clamped to 0 and 1.
+        /// </summary>
+        internal static float ReadVisibleRatio(TMP_Text text, int count)
         {
-            var count = text.textInfo.characterCount;
             var visible = text.maxVisibleCharacters;
 
-            return count > 0 && visible < count ? visible / (float)count : 1f;
+            if (visible >= ALL_CHARACTERS)
+            {
+                return 1f;
+            }
+
+            return count <= 0 ? 0f : Mathf.Clamp01(visible / (float)count);
+        }
+
+        /// <summary>
+        /// Stores the ratio a <see cref="ValueMode.FromCurrent"/> typewriter starts from, counted against
+        /// <paramref name="count"/> characters (the text the mixer wrote).
+        /// </summary>
+        internal void CaptureVisibleRatio(TMP_Text text, int count)
+        {
+            if (_visibleRatio.Enabled && _visibleRatio.Mode == ValueMode.FromCurrent)
+            {
+                _visibleRatio.Capture(ReadVisibleRatio(text, count));
+            }
         }
 
         private static void CaptureCurrent(ref TweenChannel<float> channel, float current)

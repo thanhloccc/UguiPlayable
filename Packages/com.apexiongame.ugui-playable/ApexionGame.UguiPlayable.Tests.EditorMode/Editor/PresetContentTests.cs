@@ -136,6 +136,27 @@ public sealed class PresetContentTests
     }
 
     [Test]
+    public void TextScrambleReveal_HasTheTypewriterOff()
+    {
+        const string PRESET = "text-scramble-reveal";
+        const string VISIBLE_RATIO_ENABLED = "_template._visibleRatio._enabled";
+        const string TEXT_ENABLED = "_template._text._enabled";
+
+        var preset = GetLibrary().Single(static x => x.name == PRESET);
+        var clips = GetClips(preset);
+
+        Assert.IsNotEmpty(clips);
+
+        foreach (var clip in clips)
+        {
+            var serialized = new SerializedObject(clip.asset);
+
+            Assert.IsFalse(serialized.FindProperty(VISIBLE_RATIO_ENABLED).boolValue, $"{clip.displayName}: typewriter");
+            Assert.IsTrue(serialized.FindProperty(TEXT_ENABLED).boolValue, $"{clip.displayName}: string tween");
+        }
+    }
+
+    [Test]
     public void SlideHideTracks_AreRevert()
     {
         foreach (var preset in GetLibrary())

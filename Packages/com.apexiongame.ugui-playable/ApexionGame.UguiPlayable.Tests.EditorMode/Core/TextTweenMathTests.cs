@@ -31,15 +31,23 @@ public sealed class TextTweenMathTests
     }
 
     [Test]
-    public void Fill_AtZeroRevealsOnlyTheFirstCharacter()
+    public void Fill_AtZeroIsFromVerbatim()
     {
-        Assert.AreEqual("Wbcd", Fill("abcd", "Wxyz", 0f));
+        Assert.AreEqual("abcd", Fill("abcd", "Wxyz", 0f));
+    }
+
+    [Test]
+    public void Fill_AtZeroDoesNotPadOrScramble()
+    {
+        Assert.AreEqual("ab", Fill("ab", "wxyz", 0f, ScrambleMode.All));
+        Assert.AreEqual("abcd", Fill("abcd", "xy", 0f, ScrambleMode.All));
+        Assert.AreEqual(string.Empty, Fill(string.Empty, "xy", 0f, ScrambleMode.All));
     }
 
     [Test]
     public void Fill_AtHalfRevealsHalf()
     {
-        // length 4, reveal = (int)(3 * 0.5) = 1.
+        // length 4, count = (int)(4 * 0.5) = 2.
         Assert.AreEqual("WXcd", Fill("abcd", "WXYZ", 0.5f));
     }
 
@@ -87,10 +95,11 @@ public sealed class TextTweenMathTests
     [Test]
     public void Fill_ScramblesOnlyUnrevealedDifferingPositions()
     {
-        // length 5, reveal = (int)(4 * 0.5) = 2: positions 0..2 are the target; 3 differs (scrambled); 4 is equal.
+        // length 5, count = (int)(5 * 0.5) = 2: positions 0..1 are the target; 2 and 3 differ (scrambled); 4 is equal.
         var text = Fill("abcdE", "XYZWE", 0.5f, ScrambleMode.Custom, CUSTOM);
 
-        Assert.AreEqual("XYZ", text.Substring(0, 3));
+        Assert.AreEqual("XY", text.Substring(0, 2));
+        Assert.That(CUSTOM.Contains(text[2]));
         Assert.That(CUSTOM.Contains(text[3]));
         Assert.AreEqual('E', text[4]);
     }
@@ -110,9 +119,15 @@ public sealed class TextTweenMathTests
 
     private static void AssertAll(string set, string text, float progress)
     {
-        var reveal = (int)(9 * progress);
+        if (progress == 0f)
+        {
+            Assert.AreEqual("          ", text, "at 0 the text is from verbatim");
+            return;
+        }
 
-        for (var i = reveal + 1; i < text.Length; i++)
+        var count = (int)(10 * progress + 1e-5f);
+
+        for (var i = count; i < text.Length; i++)
         {
             Assert.That(set.Contains(text[i]), $"'{text[i]}' not in the set at {i}");
         }
@@ -128,16 +143,52 @@ public sealed class TextTweenMathTests
     [Test]
     public void Fill_KeepsNewlinesFromEitherString()
     {
-        Assert.AreEqual("x\nc", Fill("a\nc", "xyz", 0f, ScrambleMode.None));
+        Assert.AreEqual("a\nc", Fill("a\nc", "xyz", 0f, ScrambleMode.None));
         Assert.AreEqual('\n', Fill("ab\ncd", "xyzwq", 0.2f, ScrambleMode.All)[2]);
         Assert.AreEqual('\n', Fill("abcde", "xy\nwq", 0.2f, ScrambleMode.All)[2]);
-        Assert.AreEqual('\n', Fill("ab\rcd", "xyzwq", 0.2f, ScrambleMode.All)[2]);
+        Assert.AreEqual('\r', Fill("ab\rcd", "xyzwq", 0.2f, ScrambleMode.All)[2]);
+    }
+
+    [Test]
+    public void Fill_RevealedPositionWinsOverANewlineOfFrom()
+    {
+        // length 3, count = (int)(3 * 0.7) = 2: positions 0..1 are the target, even where from has a newline.
+        Assert.AreEqual("xyc", Fill("a\nc", "xyz", 0.7f));
+        Assert.AreEqual("x\nc", Fill("a\nc", "xyz", 0.4f));
+    }
+
+    [Test]
+    public void Fill_KeepsACarriageReturn()
+    {
+        // length 4, count 1: "\r" stays "\r" and "\n" stays "\n", so "\r\n" is not turned into two line breaks.
+        Assert.AreEqual("w\r\nb", Fill("a\r\nb", "wxyz", 0.3f));
+    }
+
+    [Test]
+    public void Fill_RevealsInEvenSteps()
+    {
+        const string FROM = "abcde";
+        const string TO = "VWXYZ";
+
+        var seen = new System.Collections.Generic.HashSet<string>();
+
+        for (var k = 0; k <= TO.Length; k++)
+        {
+            Assert.AreEqual(TO.Substring(0, k) + FROM.Substring(k), Fill(FROM, TO, k / (float)TO.Length), $"count {k}");
+        }
+
+        for (var i = 0; i <= 1000; i++)
+        {
+            seen.Add(Fill(FROM, TO, i / 1000f));
+        }
+
+        Assert.AreEqual(TO.Length + 1, seen.Count);
     }
 
     [Test]
     public void Fill_PadsAShorterTargetWithSpacesWhileRevealing()
     {
-        // length 5, reveal 3 at 0.99: revealed positions past "hi" show a space; position 4 still keeps "o".
+        // length 5, count 4 at 0.99: revealed positions past "hi" show a space; position 4 still keeps "o".
         Assert.AreEqual("hi  o", Fill("hello", "hi", 0.99f));
     }
 

@@ -221,7 +221,7 @@ public sealed class TmpTextTrackTests
     }
 
     [TestCase(0f, 0)]
-    [TestCase(0.5f, 6)]
+    [TestCase(0.5f, 5)]
     [TestCase(1f, ALL)]
     public void Typewriter_WritesTheCountOfTheRatio(float ratio, int expected)
     {
@@ -242,7 +242,7 @@ public sealed class TmpTextTrackTests
         AddClip(0d, 1d, new TmpTextBehaviour());
 
         EvaluateAt(0.5d);
-        Assert.AreEqual(6, _text.maxVisibleCharacters);
+        Assert.AreEqual(5, _text.maxVisibleCharacters);
 
         EvaluateAt(1d);
         Assert.AreEqual(ALL, _text.maxVisibleCharacters, "a ratio of 1 shows everything, even later text");
@@ -269,9 +269,9 @@ public sealed class TmpTextTrackTests
             Assert.GreaterOrEqual(_text.maxVisibleCharacters, 0, $"count at {time}");
         }
 
-        // weight 0.5, progress 0.25: 0.5 * 1 (base ratio) + 0.5 * 0.25 = 0.625 of 11 characters.
+        // weight 0.5, progress 0.25: 0.5 * 1 (base ratio) + 0.5 * 0.25 = 0.625 of 11 characters, floored to 6.
         EvaluateAt(0.25d);
-        Assert.AreEqual(7, _text.maxVisibleCharacters);
+        Assert.AreEqual(6, _text.maxVisibleCharacters);
     }
 
     [Test]
@@ -291,6 +291,38 @@ public sealed class TmpTextTrackTests
     }
 
     [Test]
+    public void Typewriter_UsesTheCountOfTheTextWrittenThisFrame()
+    {
+        var clip = AddClip(
+              0d
+            , 1d
+            , new TmpTextBehaviour { VisibleRatio = new TweenChannel<float>(0.5f, 0.5f) }
+        );
+
+        ((TmpTextClip)clip.asset).Template.Text = new TextChannel("xxxx", "yyyy");
+
+        EvaluateAt(1d);
+
+        // The new text has 4 characters, TMP's text info still counts the 11 of the old one: 0.5 of 4 is 2, not 5.
+        Assert.AreEqual("yyyy", _text.text);
+        Assert.AreEqual(2, _text.maxVisibleCharacters);
+    }
+
+    [Test]
+    public void ReadVisibleRatio_IsZeroForAnUnbuiltText()
+    {
+        _text.text = string.Empty;
+        _text.ForceMeshUpdate();
+        _text.maxVisibleCharacters = 3;
+
+        Assert.AreEqual(0f, TmpTextBehaviour.ReadVisibleRatio(_text));
+
+        _text.maxVisibleCharacters = ALL;
+
+        Assert.AreEqual(1f, TmpTextBehaviour.ReadVisibleRatio(_text));
+    }
+
+    [Test]
     public void Typewriter_RestoresTheBaseCount_OnRevert()
     {
         _track.RestoreMode = RestoreMode.Revert;
@@ -303,7 +335,7 @@ public sealed class TmpTextTrackTests
         );
 
         EvaluateAt(0.5d);
-        Assert.AreEqual(6, _text.maxVisibleCharacters);
+        Assert.AreEqual(5, _text.maxVisibleCharacters);
         Assert.That(_text.fontSize, Is.EqualTo(45f).Within(TOLERANCE));
 
         StopMixer();
@@ -320,7 +352,7 @@ public sealed class TmpTextTrackTests
         AddClip(0d, 1d, new TmpTextBehaviour());
 
         EvaluateAt(0.5d);
-        Assert.AreEqual(6, _text.maxVisibleCharacters);
+        Assert.AreEqual(5, _text.maxVisibleCharacters);
 
         // What Timeline's window does when the preview stops (WindowState.cs): Stop, then flush the deferred destroy.
         _director.Stop();

@@ -79,10 +79,20 @@ public sealed class TmpTextStringTweenTests
     {
         AddClip(0d, 1d, new TextChannel("aaaa", "bbbb"));
 
-        // length 4, reveal = (int)(3 * 0.5) = 1.
+        // length 4, count = (int)(4 * 0.5) = 2.
         EvaluateAt(0.5d);
 
         Assert.AreEqual("bbaa", _text.text);
+    }
+
+    [Test]
+    public void AtTheClipStartTheTextIsFromUnchanged()
+    {
+        AddClip(0d, 1d, new TextChannel("ab", "wxyz", scramble: ScrambleMode.All));
+
+        EvaluateAt(0d);
+
+        Assert.AreEqual("ab", _text.text);
     }
 
     [Test]
@@ -124,7 +134,7 @@ public sealed class TmpTextStringTweenTests
     {
         AddClip(0d, 1d, new TextChannel(string.Empty, "ZZZZ", ValueMode.FromCurrent));
 
-        // length 11, reveal 5: "ZZZZ", then spaces past "ZZZZ", then the rest of the base text.
+        // length 11, count 5: "ZZZZ", then spaces past "ZZZZ", then the rest of the base text.
         EvaluateAt(0.5d);
 
         Assert.AreEqual("ZZZZ  World", _text.text);
@@ -139,7 +149,7 @@ public sealed class TmpTextStringTweenTests
         EvaluateAt(0.5d);
         Assert.AreEqual("bbaa", _text.text);
 
-        // The second clip starts from what the first one showed: "bbaa", reveal 1.
+        // The second clip starts from what the first one showed: "bbaa", count 2.
         EvaluateAt(1.5d);
         Assert.AreEqual("ccaa", _text.text);
     }

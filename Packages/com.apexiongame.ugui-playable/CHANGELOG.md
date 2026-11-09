@@ -9,6 +9,15 @@ and the package uses [Semantic Versioning](https://semver.org/).
 ### Changed
 
 - `package.json` links the documentation, changelog and licence, so the Package Manager window shows them.
+- TMP Text track: the string tween shows `from` unchanged at progress 0 and reveals in even steps (the count is
+  `floor(progress * length)`), and the typewriter floors instead of rounding, so the first character appears at 1/n
+  of the ratio, not at 0.5/n. The `text-scramble-reveal` preset has Visible Ratio off, so its scramble shows.
+
+### Fixed
+
+- TMP Text track: `\r\n` in a string tween no longer becomes two line breaks, and a revealed position shows `to` even
+  where `from` has a newline.
+- TMP Text track: the typewriter count no longer lags one frame behind the string tween of the same track.
 
 ## [0.1.0-preview.2] - 2026-11-05
 
