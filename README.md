@@ -13,6 +13,15 @@ UI elements on a Timeline instead of writing tween code.
 It is a maintained successor in spirit to
 [TweenPlayables](https://github.com/AnnulusGames/TweenPlayables), focused on uGUI, with UI Toolkit editors.
 
+## Showcase
+
+[![The Showcase sample: a 42-second trailer driven by one Timeline](docs/media/showcase.gif)](docs/media/showcase.mp4)
+
+The Showcase sample is a 42-second trailer driven by a single Timeline. It uses all 15 tracks and no tween code:
+per-character text effects, scramble and typewriter reveals, a number counter, layout and control animation, and
+shadow, rotation and punch effects. [Watch the full-quality video](docs/media/showcase.mp4), or import the sample
+from the Package Manager to see it in the Editor.
+
 ## Repository layout
 
 | Path | Content |
@@ -21,6 +30,7 @@ It is a maintained successor in spirit to
 | `Assets/Samples/UGUI Playable/` | Sample sources (shipped as package samples) |
 | `Assets/ApexionGame/` | Development sandbox |
 | `docs/conventions/` | Project, coding and commit conventions |
+| `docs/media/` | README media (Showcase video and preview) |
 
 The development project also contains [EncosyTower](https://github.com/laicasaane/EncosyTower) as a design reference
 and development tooling. The package does not depend on it.
