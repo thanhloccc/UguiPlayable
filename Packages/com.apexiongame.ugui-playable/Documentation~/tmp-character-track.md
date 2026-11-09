@@ -12,7 +12,8 @@ TextMeshPro needs its Essential Resources in the project. See [troubleshooting.m
 
 The track writes the text mesh, never a serialized property. It re-applies its effect whenever TMP rebuilds the text.
 Because of that, a [TMP Text track](tracks-text.md) (colour, typewriter, string tween) on the same text keeps working
-together with it. Hidden characters, such as those a typewriter has not revealed, are skipped.
+together with it. Hidden characters, such as those a typewriter has not revealed, are not drawn, but they keep their
+place in the order, so a typewriter never shifts the stagger of letters already shown.
 
 Each character gets its own progress:
 
@@ -35,8 +36,10 @@ eased by the clip's ease. With a stagger of 0, all characters animate together.
 | Ease | Out Cubic | The ease applied to each character's progress |
 | Pivot | Center | The point each character rotates and scales about: Center (box centre) or Baseline (middle of the baseline) |
 
-The order counts only the visible characters of the range. Spaces are skipped. For Centre out and Edges in, mirrored
-characters share a rank.
+The order counts the characters TMP would draw (spaces are skipped); characters a typewriter has not revealed yet keep
+their place. With a Page overflow every page is ranked. A tab or a preserve-whitespace space that TMP draws gets no
+rank and is not animated. For Centre out and Edges in, mirrored characters share a rank, and the order spans the full
+0 to 1 range, also for an even count.
 
 ## Transitions
 
@@ -95,7 +98,8 @@ outlive the graph, because the next rebuild of the text would wipe it. The track
 - **One character track per text.** A second track would animate the first track's result. The track shows a warning.
 - **Reverse geometry sorting is not supported.** If the bound text uses Geometry Sorting = Reverse (in Extra Settings),
   the track writes nothing and shows a warning.
-- **Underline and strikethrough stay still.** They do not follow the characters.
+- **Underline, strikethrough and highlight stay still.** These strips (`<u>`, `<s>`, `<mark>`) neither move nor fade
+  with per-character effects. A typewriter still hides them.
 - **Large scales soften the edges.** TMP keeps each glyph's SDF scale, so scales well above 1 make SDF edges soft. The
   clip card shows a warning for this.
 

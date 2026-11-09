@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Core;
 
@@ -82,6 +83,27 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         /// <summary>Returns <c>u = rank / (n − 1)</c>, or 0 when the range has one visible character or none.</summary>
         public static float Normalize(int rank, int n)
             => n <= 1 ? 0f : rank / (float)(n - 1);
+
+        /// <summary>
+        /// Returns <c>u = (rank − min) / (max − min)</c> over the actual rank range, or 0 when the range is a single
+        /// rank. Forward, backward and random orders span 0 to <c>n − 1</c>; centre out and edges in span 0 to
+        /// <c>n − 1</c> only for an odd count, so an even count needs the real range to reach 0 and 1.
+        /// </summary>
+        public static float Normalize(int rank, int min, int max)
+            => max <= min ? 0f : (rank - min) / (float)(max - min);
+
+        /// <summary>
+        /// Returns whether TMP would draw the character as part of the text: a sprite, or a character that is neither
+        /// white space nor a zero-width space, soft hyphen or end-of-text control. It has no visibility term on
+        /// purpose, so a character a typewriter has not revealed yet keeps its place in the order. A tab or a
+        /// preserve-whitespace space that TMP draws gets no rank and is not animated.
+        /// </summary>
+        public static bool IsRenderable(in TMP_CharacterInfo c)
+            => c.elementType == TMP_TextElementType.Sprite
+                || (char.IsWhiteSpace(c.character) == false
+                    && c.character != '\u200B'
+                    && c.character != '\u00AD'
+                    && c.character != '\u0003');
 
         /// <summary>
         /// Returns a character's progress: <c>clamp01((p − s·u) / (1 − s))</c>, with <paramref name="stagger"/>

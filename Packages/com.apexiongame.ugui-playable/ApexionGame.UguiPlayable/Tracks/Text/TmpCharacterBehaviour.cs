@@ -15,8 +15,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// <para>
     /// Each character of the range gets its own progress: <c>pᵢ = clamp01((p − s·u) / (1 − s))</c>, eased by
     /// <see cref="Ease"/>, with <c>p</c> the clip progress, <c>s</c> the <see cref="Stagger"/> and <c>u</c> the
-    /// character's place in the <see cref="Order"/>, from 0 to 1. The order counts only the visible characters of the
-    /// range (spaces and characters hidden by a typewriter are skipped).
+    /// character's place in the <see cref="Order"/>, from 0 to 1. The order counts the characters TMP would draw (spaces
+    /// are skipped); characters a typewriter has not revealed yet keep their place. With a Page overflow every page is
+    /// ranked. Underline, strikethrough and highlight strips neither move nor fade with per-character effects (a
+    /// typewriter still hides them).
     /// </para>
     /// <para>
     /// Transitions blend toward the rest pose and hold their end value after the clip. The wave and the shake are

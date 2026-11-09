@@ -49,7 +49,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private Color32[][] _sourceColors = Array.Empty<Color32[]>();
         private int _sourceMaterialCount;
         private int _sourceCharacterCount;
-        private int _sourceVersion;
+        private int _layoutVersion;
+        private int _layoutCount;
+        private char[] _layoutCharacters = Array.Empty<char>();
+        private TMP_TextElementType[] _layoutTypes = Array.Empty<TMP_TextElementType>();
         private bool _hasSource;
         private bool _rebuilt;
         private bool _wroteEffect;
@@ -84,6 +87,9 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
         /// <summary>Tests: the number of mesh uploads <see cref="Apply"/> made.</summary>
         internal int UploadCount { get; private set; }
+
+        /// <summary>Tests: the number of rank tables <see cref="PrepareRanks"/> rebuilt.</summary>
+        internal int RankBuildCount { get; private set; }
 
         /// <inheritdoc/>
         public override void PrepareFrame(Playable playable, FrameData info)
@@ -273,9 +279,47 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             _sourceMaterialCount = materialCount;
             _sourceCharacterCount = textInfo.characterCount;
-            _sourceVersion++;
+            TrackLayout(textInfo.characterInfo, textInfo.characterCount);
             _hasSource = true;
             _rebuilt = true;
+        }
+
+        // The ranks depend only on the character count and on which characters are drawable, so the layout version
+        // changes only when one of them differs from the previous rebuild (a typewriter or a colour change keeps it).
+        private void TrackLayout(TMP_CharacterInfo[] characters, int characterCount)
+        {
+            var changed = characterCount != _layoutCount;
+
+            if (_layoutCharacters.Length < characterCount)
+            {
+                var capacity = Math.Max(Math.Max(characterCount, MIN_CAPACITY), _layoutCharacters.Length * 2);
+
+                _layoutCharacters = new char[capacity];
+                _layoutTypes = new TMP_TextElementType[capacity];
+                changed = true;
+            }
+
+            for (var i = 0; i < characterCount; i++)
+            {
+                ref var character = ref characters[i];
+
+                if (changed == false
+                    && (_layoutCharacters[i] != character.character || _layoutTypes[i] != character.elementType)
+                )
+                {
+                    changed = true;
+                }
+
+                _layoutCharacters[i] = character.character;
+                _layoutTypes[i] = character.elementType;
+            }
+
+            _layoutCount = characterCount;
+
+            if (changed)
+            {
+                _layoutVersion++;
+            }
         }
 
         private static void CopyInto<T>(T[] source, ref T[] target)
@@ -459,7 +503,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 var contribution = _contributions[c];
                 var behaviour = contribution.Behaviour;
                 var weight = contribution.Weight;
-                var u = CharacterEffectMath.Normalize(characterRank, rank.VisibleCount);
+                var u = CharacterEffectMath.Normalize(characterRank, rank.MinRank, rank.MaxRank);
                 var progress = CharacterEffectMath.CharacterProgress(contribution.Progress, behaviour.Stagger, u);
                 var eased = behaviour.Ease.Evaluate(progress);
 
@@ -627,7 +671,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 var behaviour = _contributions[c].Behaviour;
                 ref var cache = ref _ranks[c];
 
-                if (cache.Matches(behaviour, _sourceVersion, characterCount))
+                if (cache.Matches(behaviour, _layoutVersion, characterCount))
                 {
                     continue;
                 }
@@ -650,7 +694,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
                 for (var i = start; i < end; i++)
                 {
-                    if (characters[i].isVisible)
+                    if (CharacterEffectMath.IsRenderable(characters[i]))
                     {
                         _visible[visibleCount++] = i;
                     }
@@ -666,12 +710,29 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     , _sortItems
                 );
 
+                var minRank = 0;
+                var maxRank = 0;
+
                 for (var k = 0; k < visibleCount; k++)
                 {
-                    ranks[_visible[k]] = _visibleRanks[k];
+                    var rank = _visibleRanks[k];
+
+                    ranks[_visible[k]] = rank;
+
+                    if (k == 0)
+                    {
+                        minRank = rank;
+                        maxRank = rank;
+                    }
+                    else
+                    {
+                        minRank = Math.Min(minRank, rank);
+                        maxRank = Math.Max(maxRank, rank);
+                    }
                 }
 
-                cache.Store(behaviour, _sourceVersion, characterCount, visibleCount);
+                RankBuildCount++;
+                cache.Store(behaviour, _layoutVersion, characterCount, visibleCount, minRank, maxRank);
             }
         }
 
@@ -808,6 +869,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         {
             public int[] Ranks;
             public int VisibleCount;
+            public int MinRank;
+            public int MaxRank;
 
             private TmpCharacterBehaviour _behaviour;
             private CharacterOrder _order;
@@ -827,7 +890,14 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                     && _rangeStart == behaviour.RangeStart
                     && _rangeLength == behaviour.RangeLength;
 
-            public void Store(TmpCharacterBehaviour behaviour, int version, int characterCount, int visibleCount)
+            public void Store(
+                  TmpCharacterBehaviour behaviour
+                , int version
+                , int characterCount
+                , int visibleCount
+                , int minRank
+                , int maxRank
+            )
             {
                 _behaviour = behaviour;
                 _order = behaviour.Order;
@@ -837,6 +907,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
                 _version = version;
                 _characterCount = characterCount;
                 VisibleCount = visibleCount;
+                MinRank = minRank;
+                MaxRank = maxRank;
             }
         }
     }

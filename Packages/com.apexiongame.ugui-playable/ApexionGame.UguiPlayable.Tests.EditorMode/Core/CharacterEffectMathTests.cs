@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using TMPro;
 using UnityEngine;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Tracks.Text;
@@ -78,6 +79,39 @@ public sealed class CharacterEffectMathTests
         Assert.That(CharacterEffectMath.Normalize(0, 5), Is.EqualTo(0f));
         Assert.That(CharacterEffectMath.Normalize(4, 5), Is.EqualTo(1f));
         Assert.That(CharacterEffectMath.Normalize(2, 5), Is.EqualTo(0.5f).Within(TOLERANCE));
+    }
+
+    [Test]
+    public void Normalize_UsesTheActualRankRange()
+    {
+        // Centre out over 4 characters has ranks 3, 1, 1, 3, so the range is 1 to 3.
+        Assert.That(CharacterEffectMath.Normalize(1, 1, 3), Is.EqualTo(0f));
+        Assert.That(CharacterEffectMath.Normalize(3, 1, 3), Is.EqualTo(1f));
+        Assert.That(CharacterEffectMath.Normalize(2, 1, 3), Is.EqualTo(0.5f).Within(TOLERANCE));
+        Assert.That(CharacterEffectMath.Normalize(2, 2, 2), Is.EqualTo(0f));
+
+        var indices = new[] { 0, 1, 2, 3 };
+        var centreOut = new int[4];
+        CharacterEffectMath.FillRanks(CharacterOrder.CenterOut, 0, indices, 4, centreOut, new uint[4], new int[4]);
+        Assert.That(CharacterEffectMath.Normalize(centreOut[1], centreOut.Min(), centreOut.Max()), Is.EqualTo(0f));
+
+        var edgesIn = new int[4];
+        CharacterEffectMath.FillRanks(CharacterOrder.EdgesIn, 0, indices, 4, edgesIn, new uint[4], new int[4]);
+        Assert.That(CharacterEffectMath.Normalize(edgesIn[1], edgesIn.Min(), edgesIn.Max()), Is.EqualTo(1f));
+    }
+
+    [Test]
+    public void IsRenderable_SkipsWhitespaceAndInvisibleControls()
+    {
+        Assert.IsTrue(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = 'A' }));
+        Assert.IsFalse(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = ' ' }));
+        Assert.IsFalse(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = '\t' }));
+        Assert.IsFalse(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = '\u200B' }));
+        Assert.IsFalse(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = '\u00AD' }));
+        Assert.IsFalse(CharacterEffectMath.IsRenderable(new TMP_CharacterInfo { character = '\u0003' }));
+        Assert.IsTrue(CharacterEffectMath.IsRenderable(
+            new TMP_CharacterInfo { character = ' ', elementType = TMP_TextElementType.Sprite }
+        ), "a sprite is drawn whatever its character");
     }
 
     [Test]

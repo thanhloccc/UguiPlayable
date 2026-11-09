@@ -258,6 +258,119 @@ public sealed class TmpCharacterTrackTests
     }
 
     [Test]
+    public void Typewriter_KeepsTheStaggerOfShownCharacters()
+    {
+        var typewriterTrack = _timeline.CreateTrack<TmpTextTrack>();
+        _director.SetGenericBinding(typewriterTrack, _text);
+
+        var typewriterClip = typewriterTrack.CreateClip<TmpTextClip>();
+        typewriterClip.start = 0d;
+        typewriterClip.duration = 1d;
+
+        // The typewriter reveals 0 to 1 over the first second; the character clip runs for two, so t = 0.5 is clip
+        // progress 0.25 with about half of the text shown.
+        AddClip(0d, 2d, new TmpCharacterBehaviour { Stagger = 0.5f, Ease = new EaseSetting(Ease.Linear) });
+
+        EvaluateAt(0.5d);
+        Canvas.ForceUpdateCanvases();
+        EvaluateAt(0.5d);
+        Canvas.ForceUpdateCanvases();
+
+        Assert.IsTrue(_text.textInfo.characterInfo[1].isVisible, "character 1 is shown");
+        Assert.IsFalse(_text.textInfo.characterInfo[CHARACTERS - 1].isVisible, "the typewriter is half way");
+
+        // Ten characters are ranked whatever is shown, so character 1 has u = 1/9: (0.25 - 0.5/9) / 0.5 = 0.389.
+        var expected = Mathf.RoundToInt(255f * (0.25f - 0.5f / 9f) / 0.5f);
+
+        Assert.That(AlphaOf(1), Is.EqualTo(expected).Within(2), "the stagger counts every character, shown or not");
+    }
+
+    [Test]
+    public void Ranks_AreNotRebuiltWhenOnlyTheTypewriterChanges()
+    {
+        var typewriterTrack = _timeline.CreateTrack<TmpTextTrack>();
+        _director.SetGenericBinding(typewriterTrack, _text);
+
+        var typewriterClip = typewriterTrack.CreateClip<TmpTextClip>();
+        typewriterClip.start = 0d;
+        typewriterClip.duration = 1d;
+
+        AddClip(0d, 1d);
+
+        EvaluateAt(0.3d);
+        Canvas.ForceUpdateCanvases();
+        EvaluateAt(0.3d);
+        Canvas.ForceUpdateCanvases();
+
+        var mixer = GetMixer();
+        var builds = mixer.RankBuildCount;
+        var shownBefore = CountVisible();
+        Assert.That(builds, Is.GreaterThan(0));
+
+        EvaluateAt(0.5d);
+        Canvas.ForceUpdateCanvases();
+        EvaluateAt(0.7d);
+        Canvas.ForceUpdateCanvases();
+        EvaluateAt(0.9d);
+        Canvas.ForceUpdateCanvases();
+
+        Assert.That(CountVisible(), Is.GreaterThan(shownBefore), "TMP rebuilt the text with more letters shown");
+        Assert.AreEqual(builds, mixer.RankBuildCount, "revealing letters keeps the rank table");
+
+        int CountVisible()
+        {
+            var characters = _text.textInfo.characterInfo;
+            var count = 0;
+
+            for (var i = 0; i < _text.textInfo.characterCount; i++)
+            {
+                if (characters[i].isVisible)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    }
+
+    [Test]
+    public void CenterOut_StartsAtZeroAndEdgesIn_EndsAtOne_ForAnEvenCount()
+    {
+        _text.text = "ABCD";
+        _text.ForceMeshUpdate();
+        _rest = Snapshot();
+
+        var clip = AddClip(0d, 1d, new TmpCharacterBehaviour {
+            Stagger = 0.5f,
+            Order = CharacterOrder.CenterOut,
+            Ease = new EaseSetting(Ease.Linear),
+        });
+
+        // The two middle letters have u = 0, so they start with the clip; the edge letters (u = 1) start at 0.5.
+        EvaluateAt(0.1d);
+        Assert.That(AlphaOf(1), Is.EqualTo(51).Within(1), "the middle letters start at the clip start");
+        Assert.AreEqual(AlphaOf(1), AlphaOf(2));
+        Assert.AreEqual(0, AlphaOf(0));
+
+        EvaluateAt(1d);
+        Assert.AreEqual(255, AlphaOf(0));
+        Assert.AreEqual(255, AlphaOf(3));
+
+        ((TmpCharacterClip)clip.asset).Template.Order = CharacterOrder.EdgesIn;
+        _director.RebuildGraph();
+
+        // Edges in: the edge letters (u = 0) start with the clip, the middle letters (u = 1) end at 1 with the clip.
+        EvaluateAt(0.1d);
+        Assert.That(AlphaOf(0), Is.EqualTo(51).Within(1), "the outer letters start at the clip start");
+        Assert.AreEqual(0, AlphaOf(1));
+
+        EvaluateAt(1d);
+        Assert.AreEqual(255, AlphaOf(1));
+        Assert.AreEqual(255, AlphaOf(2));
+    }
+
+    [Test]
     public void MixedMaterialText_AnimatesTheSubMeshCharacters()
     {
         _text.text = "AB<sprite=0>CD";

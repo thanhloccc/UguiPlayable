@@ -15,6 +15,9 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- TMP Characters track: the stagger and wave phase of letters already shown no longer jump while a typewriter reveals
+  more letters (the order counts every character TMP would draw, not only the visible ones), and Centre out and Edges
+  in use the full 0 to 1 range for an even character count.
 - TMP Text track: `\r\n` in a string tween no longer becomes two line breaks, and a revealed position shows `to` even
   where `from` has a newline.
 - TMP Text track: the typewriter count no longer lags one frame behind the string tween of the same track.
