@@ -15,6 +15,9 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- TMP Characters track: the pivot is blended with the weights of the rotation and scale it serves, so it no longer
+  pops at the start of a crossfade between a Center and a Baseline clip, and the latest finished clip decides the
+  rest pivot.
 - TMP Characters track: the stagger and wave phase of letters already shown no longer jump while a typewriter reveals
   more letters (the order counts every character TMP would draw, not only the visible ones), and Centre out and Edges
   in use the full 0 to 1 range for an even character count.

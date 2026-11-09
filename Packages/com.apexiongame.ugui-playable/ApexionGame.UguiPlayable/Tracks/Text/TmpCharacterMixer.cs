@@ -439,29 +439,39 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             }
         }
 
-        // The pivot of the latest contributing clip that animates the character, else the first hold's.
+        // The pivot point, blended like the rotation and scale it serves: the latest finished clip that turns or
+        // scales the character is the rest pivot, and the active ones add theirs with their weights.
         private Vector2 GetPivot(int index, ref TMP_CharacterInfo character)
         {
-            var pivot = CharacterPivot.Center;
+            var bottomLeft = character.bottomLeft;
+            var topRight = character.topRight;
+            var baseLine = character.baseLine;
+            var center = CharacterEffectMath.Pivot(CharacterPivot.Center, bottomLeft, topRight, baseLine);
+            var pivot = default(Vector2Accumulator);
 
             for (var h = 0; h < _holdCount; h++)
             {
-                if (_holds[h].Behaviour.IsInRange(index, _sourceCharacterCount))
+                var behaviour = _holds[h].Behaviour;
+
+                if (behaviour.TurnsOrScales && behaviour.IsInRange(index, _sourceCharacterCount))
                 {
-                    pivot = _holds[h].Behaviour.Pivot;
-                    break;
+                    var point = CharacterEffectMath.Pivot(behaviour.Pivot, bottomLeft, topRight, baseLine);
+                    pivot.OfferHold(point, _holds[h].EndTime);
                 }
             }
 
             for (var c = 0; c < _contributionCount; c++)
             {
-                if (_ranks[c].Ranks[index] >= 0)
+                var behaviour = _contributions[c].Behaviour;
+
+                if (behaviour.TurnsOrScales && _ranks[c].Ranks[index] >= 0)
                 {
-                    pivot = _contributions[c].Behaviour.Pivot;
+                    var point = CharacterEffectMath.Pivot(behaviour.Pivot, bottomLeft, topRight, baseLine);
+                    pivot.Add(point, _contributions[c].Weight);
                 }
             }
 
-            return CharacterEffectMath.Pivot(pivot, character.bottomLeft, character.topRight, character.baseLine);
+            return pivot.Resolve(center, center);
         }
 
         private Pose EvaluatePose(int index, int characterCount)

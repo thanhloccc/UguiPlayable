@@ -614,6 +614,65 @@ public sealed class TmpCharacterTrackTests
     }
 
     [Test]
+    public void Pivot_BlendsByWeightDuringACrossfade()
+    {
+        AddClip(0d, 2d, ScaleAbout(CharacterPivot.Center, 1f, 2f));
+        AddClip(1d, 2d, ScaleAbout(CharacterPivot.Baseline, 2f, 2f));
+
+        // B's weight is 0 at the start of the overlap: the result is A alone, about the centre.
+        EvaluateAt(1d);
+        AssertScaledAbout(0, CharacterPivot.Center, 1.5f);
+
+        // A's weight is 0 at the end of the overlap: the result is B alone, about the baseline.
+        EvaluateAt(2d);
+        AssertScaledAbout(0, CharacterPivot.Baseline, 2f);
+
+        // In between, the pivot is neither: it moved with the weights, so the vertices are not either result.
+        EvaluateAt(1.5d);
+        var info = _text.textInfo.characterInfo[0];
+        var (bl, tr, line) = (info.bottomLeft, info.topRight, info.baseLine);
+        var centre = CharacterEffectMath.Pivot(CharacterPivot.Center, bl, tr, line);
+        var baseline = CharacterEffectMath.Pivot(CharacterPivot.Baseline, bl, tr, line);
+        var pivot = Vector2.Lerp(centre, baseline, 0.5f);
+        var scale = Mathf.Lerp(1.75f, 2f, 0.5f);
+        var rest = _rest[info.materialReferenceIndex][info.vertexIndex];
+        var expected = pivot + ((Vector2)rest - pivot) * scale;
+
+        Assert.That(((Vector2)VertexOf(0, 0) - expected).magnitude, Is.LessThan(TOLERANCE));
+    }
+
+    [Test]
+    public void Pivot_FollowsTheLatestFinishedClip()
+    {
+        AddClip(0d, 1d, ScaleAbout(CharacterPivot.Center, 2f, 2f));
+        AddClip(1d, 1d, ScaleAbout(CharacterPivot.Baseline, 2f, 2f));
+
+        EvaluateAt(3d);
+
+        AssertScaledAbout(0, CharacterPivot.Baseline, 2f);
+    }
+
+    [Test]
+    public void Pivot_IgnoresAHoldWithoutRotationOrScale()
+    {
+        AddClip(0d, 1d, ScaleAbout(CharacterPivot.Baseline, 2f, 2f));
+        AddClip(
+              1d
+            , 1d
+            , new TmpCharacterBehaviour {
+                Stagger = 0f,
+                Ease = new EaseSetting(Ease.Linear),
+                Pivot = CharacterPivot.Center,
+                Alpha = new CharacterChannel<float>(0f, 1f),
+            }
+        );
+
+        EvaluateAt(3d);
+
+        AssertScaledAbout(0, CharacterPivot.Baseline, 2f);
+    }
+
+    [Test]
     public void Evaluate_DoesNotAllocate()
     {
         AddClip(
@@ -696,6 +755,30 @@ public sealed class TmpCharacterTrackTests
                 , seed: seed
             ),
         };
+
+    private static TmpCharacterBehaviour ScaleAbout(CharacterPivot pivot, float from, float to)
+        => new() {
+            Stagger = 0f,
+            Ease = new EaseSetting(Ease.Linear),
+            Pivot = pivot,
+            Alpha = new CharacterChannel<float>(0f, 1f, enabled: false),
+            Scale = new CharacterChannel<Vector2>(new Vector2(from, from), new Vector2(to, to)),
+        };
+
+    // The character's four vertices are the rest ones scaled uniformly about the given pivot.
+    private void AssertScaledAbout(int character, CharacterPivot pivot, float scale)
+    {
+        var info = _text.textInfo.characterInfo[character];
+        var point = CharacterEffectMath.Pivot(pivot, info.bottomLeft, info.topRight, info.baseLine);
+
+        for (var corner = 0; corner < 4; corner++)
+        {
+            var rest = _rest[info.materialReferenceIndex][info.vertexIndex + corner];
+            var expected = point + ((Vector2)rest - point) * scale;
+
+            Assert.That(((Vector2)VertexOf(character, corner) - expected).magnitude, Is.LessThan(TOLERANCE));
+        }
+    }
 
     private TimelineClip AddClip(double start, double duration, TmpCharacterBehaviour behaviour = null)
     {

@@ -216,6 +216,19 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             => _offset.Enabled || _rotation.Enabled || _scale.Enabled || _alpha.Enabled || _color.Enabled;
 
         /// <summary>
+        /// Whether the clip turns or scales its characters, so its <see cref="Pivot"/> matters: a rotation or scale
+        /// channel, or a wave or shake aimed at the rotation or scale.
+        /// </summary>
+        internal bool TurnsOrScales
+            => _rotation.Enabled
+            || _scale.Enabled
+            || (_wave.Enabled && IsTurning(_wave.Target))
+            || (_shake.Enabled && IsTurning(_shake.Target));
+
+        private static bool IsTurning(OscillationTarget target)
+            => target == OscillationTarget.Rotation || target == OscillationTarget.Scale;
+
+        /// <summary>
         /// The animated character indices of a text with <paramref name="characterCount"/> characters:
         /// [<paramref name="start"/>, <paramref name="end"/>), clamped to the text.
         /// </summary>

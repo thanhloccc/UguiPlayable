@@ -34,7 +34,7 @@ eased by the clip's ease. With a stagger of 0, all characters animate together.
 | Order | Forward | Forward, Backward, Centre out, Edges in or Random |
 | Order Seed | 0 | The seed of the Random order. The same seed gives the same order |
 | Ease | Out Cubic | The ease applied to each character's progress |
-| Pivot | Center | The point each character rotates and scales about: Center (box centre) or Baseline (middle of the baseline) |
+| Pivot | Center | The point each character rotates and scales about: Center (box centre) or Baseline (middle of the baseline). It is blended with the same weights as the rotation and scale it serves, so a crossfade between two pivots moves the point smoothly, and after the clips the latest finished clip that rotates or scales decides it |
 
 The order counts the characters TMP would draw (spaces are skipped); characters a typewriter has not revealed yet keep
 their place. With a Page overflow every page is ranked. A tab or a preserve-whitespace space that TMP draws gets no
