@@ -53,6 +53,13 @@ This manual belongs to version `0.1.0-preview.2`. For install steps and requirem
 | UGUI Playable/Text/TMP Text | `TMP_Text` | [tracks-text.md](tracks-text.md) |
 | UGUI Playable/Text/TMP Characters | `TMP_Text` | [tmp-character-track.md](tmp-character-track.md) |
 
+## Samples
+
+The package has two samples (**Window > Package Manager > UGUI Playable > Samples**). The Showcase is the tour of every
+track: one 42-second timeline with text, graphics, layout, controls and effects. Import it, press Play, then open
+`showcase-trailer` in the Timeline window to see how each effect is built. The other sample shows screens, popups and a
+toast. Both need the TMP Essential Resources. See [troubleshooting.md](troubleshooting.md).
+
 ## Things every track shares
 
 - **Restore Mode** on the track: Keep (default) or Revert. See [value-modes-and-restore.md](value-modes-and-restore.md).

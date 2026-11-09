@@ -58,4 +58,10 @@ The **Alpha** channel is on by default, from 0 to 1, with a Linear ease. The oth
 - The clip inspector says "This clip animates nothing. Turn on a channel.": turn on at least one channel.
 - More help: [troubleshooting.md](troubleshooting.md).
 
+## See it all at work
+
+Import the **Showcase** sample (**Window > Package Manager > UGUI Playable > Samples**) for a 42-second trailer that
+uses every track. Open its scene, press Play, and open `showcase-trailer` in the Timeline window to see how each
+effect is built. Import the TMP Essential Resources first. See [troubleshooting.md](troubleshooting.md).
+
 Next: [value-modes-and-restore.md](value-modes-and-restore.md).

@@ -1,13 +1,14 @@
 # Troubleshooting
 
-## Text is missing or the sample shows no text (TMP Essential Resources)
+## Text is missing or a sample shows no text (TMP Essential Resources)
 
-The TMP tracks and the sample need TextMeshPro's Essential Resources: the default font asset, the shaders and the
+The TMP tracks and both samples need TextMeshPro's Essential Resources: the default font asset, the shaders and the
 settings. Unity does not import them with the package. Without them, TMP text shows nothing, shows pink, or logs
 errors about a missing font or material.
 
 Fix: choose **Window > TextMeshPro > Import TMP Essential Resources** and import everything. Do this once per project.
-The sample's font (Liberation Sans SDF) comes from this import. After the import, reopen the scene.
+The body font of both samples (Liberation Sans SDF) comes from this import. The Showcase's display font (Unbounded
+Bold SDF) ships with the Showcase sample, so it needs no extra step. After the import, reopen the scene.
 
 ## Nothing happens in Play Mode
 

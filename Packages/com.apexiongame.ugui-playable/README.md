@@ -70,9 +70,15 @@ The manual is in [Documentation~/index.md](Documentation~/index.md). It is plain
 
 ## Sample
 
-The package has one sample, shown in **Window > Package Manager > UGUI Playable > Samples**. It is a small scene with
-screens, popups and a toast, driven by shared transition timelines. The sample text uses TextMeshPro, so import the TMP
-Essential Resources first (**Window > TextMeshPro > Import TMP Essential Resources**). See
+The package has two samples, shown in **Window > Package Manager > UGUI Playable > Samples**. Import either one or both.
+
+- **UGUI Playable Sample**: a small scene with screens, popups and a toast, driven by shared transition timelines.
+- **ApexionGame.UguiPlayable.Samples.Showcase**: a 42-second trailer, one timeline that uses all 15 tracks. It has a
+  chapter for text, graphics, layout, controls and effects, and a Replay button at the end. Open its scene and press
+  Play, then open the timeline to see how each effect is built.
+
+Both samples use TextMeshPro, so import the TMP Essential Resources first (**Window > TextMeshPro > Import TMP
+Essential Resources**). The Showcase also ships its display font (Unbounded Bold, SIL OFL 1.1). See
 [troubleshooting.md](Documentation~/troubleshooting.md).
 
 ## Determinism and allocation
