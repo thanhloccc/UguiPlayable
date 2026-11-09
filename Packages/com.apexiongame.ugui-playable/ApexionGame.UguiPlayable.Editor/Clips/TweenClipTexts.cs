@@ -107,6 +107,26 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             "Extra wait after a step that ends with . , : ; ! ? or …, counted in steps (characters, words or "
             + "lines). 0 never waits; there is no wait after the last step.";
 
+        public const string COUNTER_FROM_CURRENT_NOTE =
+            "Starts from the last number this track wrote, or from From when it has written none. The text is never read.";
+
+        public const string COUNTER_STRING_ON_NOTE =
+            "The Text channel of this clip is also on and wins: the counter shows only while no active clip has the "
+            + "Text channel on.";
+
+        public const string COUNTER_DECIMALS = "Decimals";
+        public const string COUNTER_GROUPING = "Grouping";
+        public const string COUNTER_GROUP_SEPARATOR = "Group";
+        public const string COUNTER_DECIMAL_SEPARATOR = "Decimal";
+        public const string COUNTER_PREFIX = "Prefix";
+        public const string COUNTER_SUFFIX = "Suffix";
+        public const string COUNTER_DECIMALS_TOOLTIP = "How many decimals are printed, 0 to 6.";
+        public const string COUNTER_GROUPING_TOOLTIP = "Separate the integer digits in groups of three.";
+        public const string COUNTER_GROUP_SEPARATOR_TOOLTIP = "Text between digit groups. Empty means a comma.";
+
+        public const string COUNTER_DECIMAL_SEPARATOR_TOOLTIP =
+            "Text between the integer and decimal digits. Empty means a point.";
+
         public const string TEXT_CUSTOM_TOOLTIP = "The characters used when Scramble is Custom. Empty means no scramble.";
 
         public static string FormatChannelCount(int enabled, int total)

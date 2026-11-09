@@ -25,6 +25,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
 
         /// <summary>A <c>WaveChannel</c>: enabled, target, shape, amplitude, cycles, phase per character.</summary>
         Wave,
+
+        /// <summary>A <c>CounterChannel</c>: enabled, mode, double from/to, ease, decimals, grouping, separators, affixes.</summary>
+        Counter,
     }
 
     /// <summary>

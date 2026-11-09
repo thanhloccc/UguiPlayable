@@ -25,6 +25,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string CUSTOM_SCRAMBLE_CHARS = "_customScrambleChars";
         public const string SCRAMBLE_RATE = "_scrambleRate";
         public const string DECIMALS = "_decimals";
+        public const string GROUPING = "_grouping";
+        public const string GROUP_SEPARATOR = "_groupSeparator";
+        public const string DECIMAL_SEPARATOR = "_decimalSeparator";
+        public const string PREFIX = "_prefix";
+        public const string SUFFIX = "_suffix";
         public const string TARGET = "_target";
         public const string STRENGTH = "_strength";
         public const string FREQUENCY = "_frequency";
@@ -158,11 +163,12 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return false;
             }
 
-            // The number counter has double From/To like a float tween but its own card (step 10a); until it exists
-            // the inspector must not draw it as a float channel.
+            // The number counter has double From/To like a float tween, so it is detected first by its decimals.
             if (child.FindPropertyRelative(DECIMALS) != null)
             {
-                return false;
+                info = new ChannelInfo(child.name, ChannelShape.Counter, ChannelValueKind.Float, false);
+                enabled = enabledProperty.boolValue;
+                return true;
             }
 
             var from = child.FindPropertyRelative(FROM);

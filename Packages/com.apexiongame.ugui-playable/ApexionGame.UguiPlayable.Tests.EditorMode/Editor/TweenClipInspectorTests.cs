@@ -112,7 +112,7 @@ public sealed class TweenClipInspectorTests
     [TestCase(typeof(GridLayoutGroupClip), "_spacing,_cellSize,_padding")]
     [TestCase(
           typeof(TmpTextClip)
-        , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient,_text"
+        , "_color,_alpha,_fontSize,_characterSpacing,_wordSpacing,_lineSpacing,_paragraphSpacing,_visibleRatio,_colorGradient,_text,_counter"
     )]
     public void Model_FindsTheChannelsOfEachClipType(Type clipType, string expected)
     {
@@ -773,6 +773,85 @@ public sealed class TweenClipInspectorTests
         Assert.AreEqual(3, card.Query<TextField>().ToList().Count);
         Assert.AreEqual(1, card.Query<EnumField>().ToList().Count);
         Assert.AreEqual(2, card.Query<Button>(className: TweenClipSections.ICON_BUTTON_USS_CLASS_NAME).ToList().Count);
+    }
+
+    [Test]
+    public void Model_FindsTheCounterChannel()
+    {
+        Create(typeof(TmpTextClip));
+
+        var info = Find(TweenClipModel.Create(_editor.serializedObject).Channels, "_counter");
+
+        Assert.AreEqual(ChannelShape.Counter, info.Shape);
+        Assert.AreEqual("Counter", ChannelPresentation.GetDisplayName(info.Name));
+        Assert.IsNotNull(ChannelPresentation.GetIcon(info.Name));
+
+        // The text channel keeps its own shape and no other channel is taken for a counter.
+        Assert.AreEqual(ChannelShape.Text, Find(TweenClipModel.Create(_editor.serializedObject).Channels, "_text").Shape);
+    }
+
+    [Test]
+    public void CounterCard_ShowsTheNoteWhenTheStringIsAlsoOn()
+    {
+        Create(typeof(TmpTextClip));
+
+        var clip = (TmpTextClip)_clip;
+        var serializedObject = new SerializedObject(_clip);
+        var info = Find(TweenClipModel.Create(serializedObject).Channels, "_counter");
+        var card = CounterChannelCardSection.Create(serializedObject, info);
+        var note = card.Q<Label>(className: TweenClipSections.NOTE_USS_CLASS_NAME);
+
+        Assert.AreEqual(DisplayStyle.None, note.style.display.value);
+
+        serializedObject.FindProperty("_template._counter._enabled").boolValue = true;
+        serializedObject.FindProperty("_template._text._enabled").boolValue = true;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        card = CounterChannelCardSection.Create(new SerializedObject(_clip), info);
+        note = card.Q<Label>(className: TweenClipSections.NOTE_USS_CLASS_NAME);
+
+        Assert.AreEqual(TweenClipTexts.COUNTER_STRING_ON_NOTE, note.text);
+        Assert.AreNotEqual(DisplayStyle.None, note.style.display.value);
+        Assert.IsTrue(clip.Template.Text.Enabled);
+        Assert.AreEqual(2, card.Query<DoubleField>().ToList().Count);
+        Assert.AreEqual(1, card.Query<IntegerField>().ToList().Count);
+    }
+
+    [UnityTest]
+    public IEnumerator CounterCard_ModeControlIsOneUndoStep()
+    {
+        Create(typeof(TmpTextClip));
+
+        var clip = (TmpTextClip)_clip;
+        var root = BuildInHost();
+        yield return Frames();
+
+        var group = root.Query<ToggleButtonGroup>().ToList().First(g => IsInsideCounterCard(g));
+
+        Assert.AreEqual(ValueMode.Absolute, clip.Template.Counter.Mode);
+
+        Undo.IncrementCurrentGroup();
+        group.value = SegmentedControl.ToState(1, 2);
+        yield return Frames();
+
+        Assert.AreEqual(ValueMode.FromCurrent, clip.Template.Counter.Mode);
+
+        Undo.PerformUndo();
+        yield return Frames();
+
+        Assert.AreEqual(ValueMode.Absolute, clip.Template.Counter.Mode);
+    }
+
+    private static bool IsInsideCounterCard(VisualElement element)
+    {
+        for (var parent = element.parent; parent != null; parent = parent.parent)
+        {
+            if (parent.ClassListContains(TweenClipSections.CARD_USS_CLASS_NAME))
+            {
+                return parent.Q<Label>(className: TweenClipSections.CARD_NAME_USS_CLASS_NAME)?.text == "Counter";
+            }
+        }
+
+        return false;
     }
 
     [Test]

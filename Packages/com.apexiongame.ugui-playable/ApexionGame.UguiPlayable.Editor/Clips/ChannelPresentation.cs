@@ -50,6 +50,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string VISIBLE_RATIO = "_visibleRatio";
         public const string COLOR_GRADIENT = "_colorGradient";
         public const string TEXT = "_text";
+        public const string COUNTER = "_counter";
         public const string PUNCH = "_punch";
         public const string SHAKE = "_shake";
         public const string ROTATION_MODE = "_rotationMode";
@@ -93,6 +94,7 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             [VISIBLE_RATIO] = new("Visible Ratio", static () => EditorIcons.TextCursor),
             [COLOR_GRADIENT] = new("Color Gradient", static () => EditorIcons.Paintbrush),
             [TEXT] = new("Text", static () => EditorIcons.WholeWord),
+            [COUNTER] = new("Counter", static () => EditorIcons.ListOrdered),
             [PUNCH] = new("Punch", static () => EditorIcons.Activity),
             [SHAKE] = new("Shake", static () => EditorIcons.Vibrate),
             [IS_ON] = new("Is On", static () => EditorIcons.ToggleRight),

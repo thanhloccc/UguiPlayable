@@ -141,6 +141,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
                 return TextChannelCardSection.Create(serializedObject, info, source);
             }
 
+            if (info.Shape == ChannelShape.Counter)
+            {
+                return CounterChannelCardSection.Create(serializedObject, info);
+            }
+
             if (info.Shape == ChannelShape.Character)
             {
                 return CharacterChannelCardSection.Create(serializedObject, info);
