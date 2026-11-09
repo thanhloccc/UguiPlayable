@@ -60,6 +60,11 @@ This manual belongs to version `0.1.0-preview.2`. For install steps and requirem
 - **Ease** on every tweened channel: one of 31 built-in easing functions (Linear, then Sine, Quad, Cubic, Quart,
   Quint, Expo, Circ, Elastic, Back and Bounce, each In, Out and In-Out) or a custom `AnimationCurve`. The default is
   Linear.
+  The Back, Elastic and Bounce eases have a **Customize** switch (off by default, which keeps the preset exactly).
+  With it on, **Strength** is the overshoot for Back (0 is none), the amplitude for Elastic (1 or more) and the
+  bounciness for Bounce (0 does not bounce, 1 is the preset). **Period** (Elastic only) is the length of one
+  oscillation as a fraction of the duration (for In-Out, of each half): 0.3, or 0.45 for In-Out, is the preset. An
+  exact-height Bounce variant is not offered.
 - **Blending and extrapolation**: clips support Timeline blending and extrapolation (hold, loop, ping-pong).
 - **Axes**: a vector channel has one toggle per axis. An axis you turn off is left alone.
 - **Set from binding**: a button next to a value copies the bound object's current value into the field.

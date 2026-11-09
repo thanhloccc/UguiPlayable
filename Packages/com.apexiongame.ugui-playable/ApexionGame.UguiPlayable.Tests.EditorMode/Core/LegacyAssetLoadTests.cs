@@ -72,6 +72,38 @@ public sealed class LegacyAssetLoadTests
         Assert.AreEqual(0f, clip.Template.Text.ScrambleRate);
     }
 
+    [Test]
+    public void LegacyClip_EasesAreNotCustomized()
+    {
+        var clip = LoadLegacyClip();
+        var serialized = new SerializedObject(clip);
+        var iterator = serialized.GetIterator();
+        var checkedCount = 0;
+
+        // Every EaseSetting in the clip, found by its serialized shape.
+        while (iterator.Next(true))
+        {
+            if (iterator.propertyType != SerializedPropertyType.Generic || iterator.name != "_ease")
+            {
+                continue;
+            }
+
+            var customize = iterator.FindPropertyRelative("_customize");
+
+            if (customize == null)
+            {
+                continue;
+            }
+
+            checkedCount++;
+            Assert.IsFalse(customize.boolValue, iterator.propertyPath);
+            Assert.AreEqual(0f, iterator.FindPropertyRelative("_strength").floatValue, iterator.propertyPath);
+            Assert.AreEqual(0f, iterator.FindPropertyRelative("_period").floatValue, iterator.propertyPath);
+        }
+
+        Assert.Greater(checkedCount, 0, "The clip has no EaseSetting to check.");
+    }
+
     [TestCase(0.25f)]
     [TestCase(0.5f)]
     [TestCase(0.75f)]

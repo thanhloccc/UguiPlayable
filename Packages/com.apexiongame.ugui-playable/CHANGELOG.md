@@ -8,6 +8,11 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Ease: the Back, Elastic and Bounce eases can be customised. `EaseSetting` gets a **Customize** switch, a Strength
+  (overshoot, amplitude or bounciness) and, for Elastic, a Period, with `EaseSetting.Customize`, `Strength`, `Period`,
+  `IsParametric(Ease)`, a constructor `EaseSetting(Ease, float strength, float period)` and
+  `EaseFunctions.Evaluate(Ease, float t, float strength, float period)`. With the switch off, which is how every
+  existing asset loads, the ease is the unchanged preset. The `Ease` enum is unchanged.
 - TMP Text track: a scramble **Rate** (`TextChannel.ScrambleRate`, changes per second) makes the scramble characters
   change in time, not only when the reveal steps, so a long clip on a short text keeps flickering; the step is a
   function of the clip-local time, so scrubbing is stable. New clips created in the editor and the `text-scramble-reveal`

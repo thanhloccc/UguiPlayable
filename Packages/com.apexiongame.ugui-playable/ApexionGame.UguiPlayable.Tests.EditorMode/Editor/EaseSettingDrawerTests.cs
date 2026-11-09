@@ -139,6 +139,55 @@ public sealed class EaseSettingDrawerTests
         Assert.That(_holder.Setting.Curve == null || _holder.Setting.Curve.length == 0, "and the created curve");
     }
 
+    [UnityTest]
+    public IEnumerator Customize_IsShownOnlyForParametricFamilies()
+    {
+        foreach (Ease ease in Enum.GetValues(typeof(Ease)))
+        {
+            Create(new EaseSetting(ease));
+
+            var root = BuildDrawer();
+            yield return Frames();
+
+            var toggle = root.Q<Toggle>();
+            var expected = EaseSetting.IsParametric(ease) ? DisplayStyle.Flex : DisplayStyle.None;
+
+            Assert.IsNotNull(toggle, ease.ToString());
+            Assert.AreEqual(expected, toggle.style.display.value, ease.ToString());
+
+            TearDown();
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator Customize_On_WritesDefaultsInOneUndoStep()
+    {
+        Create(new EaseSetting(Ease.InOutElastic));
+
+        var root = BuildDrawer();
+        yield return Frames();
+
+        var floats = root.Query<FloatField>().ToList();
+
+        Assert.AreEqual(DisplayStyle.None, floats[0].style.display.value);
+
+        Undo.IncrementCurrentGroup();
+        root.Q<Toggle>().value = true;
+        yield return Frames();
+
+        Assert.IsTrue(_holder.Setting.Customize);
+        Assert.AreEqual(1f, _holder.Setting.Strength);
+        Assert.AreEqual(0.45f, _holder.Setting.Period);
+        Assert.AreEqual(DisplayStyle.Flex, floats[0].style.display.value);
+
+        Undo.PerformUndo();
+        yield return Frames();
+
+        Assert.IsFalse(_holder.Setting.Customize, "one undo reverts the switch");
+        Assert.AreEqual(0f, _holder.Setting.Strength, "and the written parameters");
+        Assert.AreEqual(0f, _holder.Setting.Period);
+    }
+
     [Test]
     public void EditorIcons_ReturnsATextureForEveryIcon()
     {

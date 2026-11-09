@@ -11,6 +11,13 @@ public class EaseFunctionsTests
 
     private static readonly Ease[] s_presets = GetPresets();
 
+    private static readonly Ease[] s_parametric =
+    {
+        Ease.InElastic, Ease.OutElastic, Ease.InOutElastic,
+        Ease.InBack, Ease.OutBack, Ease.InOutBack,
+        Ease.InBounce, Ease.OutBounce, Ease.InOutBounce,
+    };
+
     private static Ease[] GetPresets()
     {
         var presets = new Ease[(int)Ease.Custom];
@@ -133,6 +140,110 @@ public class EaseFunctionsTests
         Assert.That((int)Ease.Linear, Is.EqualTo(0));
         Assert.That((int)Ease.OutBounce, Is.EqualTo(29));
         Assert.That((int)Ease.Custom, Is.EqualTo(31));
+    }
+
+    [Test]
+    public void Customize_Off_IsBitExact([ValueSource(nameof(s_parametric))] Ease ease)
+    {
+        // Customize off keeps today's path, whatever the stored parameters are.
+        var setting = new EaseSetting(ease);
+
+        for (var i = 0; i <= 100; i++)
+        {
+            var t = i / 100f;
+
+            Assert.IsTrue(EaseFunctions.Evaluate(ease, t) == setting.Evaluate(t), $"{ease} at {t}");
+        }
+    }
+
+    [Test]
+    public void Parametric_DefaultsMatchThePresets([ValueSource(nameof(s_parametric))] Ease ease)
+    {
+        var period = ease == Ease.InOutElastic ? 0.45f : 0.3f;
+        var setting = new EaseSetting(ease, 1f, period);
+
+        for (var i = 0; i <= 100; i++)
+        {
+            var t = i / 100f;
+
+            Assert.That(setting.Evaluate(t), Is.EqualTo(EaseFunctions.Evaluate(ease, t)).Within(1e-5f), $"{ease} at {t}");
+        }
+    }
+
+    [Test]
+    public void Parametric_BackStrengthZero_HasNoOvershoot()
+    {
+        foreach (var ease in new[] { Ease.InBack, Ease.OutBack, Ease.InOutBack })
+        {
+            for (var i = 0; i <= 100; i++)
+            {
+                var value = EaseFunctions.Evaluate(ease, i / 100f, 0f, 0f);
+
+                Assert.That(value, Is.InRange(-1e-5f, 1f + 1e-5f), $"{ease} at {i}");
+            }
+        }
+
+        Assert.That(EaseFunctions.Evaluate(Ease.OutBack, 0.8f, 2f, 0f), Is.GreaterThan(EaseFunctions.Evaluate(Ease.OutBack, 0.8f)));
+    }
+
+    [Test]
+    public void Parametric_ElasticPeriod_ChangesTheOscillation()
+    {
+        var short_ = EaseFunctions.Evaluate(Ease.OutElastic, 0.4f, 1f, 0.2f);
+        var long_ = EaseFunctions.Evaluate(Ease.OutElastic, 0.4f, 1f, 0.6f);
+
+        Assert.That(short_, Is.Not.EqualTo(long_).Within(1e-3f));
+    }
+
+    [Test]
+    public void Parametric_BounceStrengthZero_DoesNotBounce()
+    {
+        // One fall to the end, no rebound: monotonic and never above 1.
+        var previous = 0f;
+
+        for (var i = 0; i <= 100; i++)
+        {
+            var value = EaseFunctions.Evaluate(Ease.OutBounce, i / 100f, 0f, 0f);
+
+            Assert.That(value, Is.GreaterThanOrEqualTo(previous - 1e-6f), $"at {i}");
+            Assert.That(value, Is.LessThanOrEqualTo(1f + 1e-6f), $"at {i}");
+            previous = value;
+        }
+    }
+
+    [Test]
+    public void Parametric_HitsZeroAndOne(
+          [ValueSource(nameof(s_parametric))] Ease ease
+        , [Values(0f, 0.5f, 1f, 2f)] float strength
+        , [Values(0f, 0.2f, 0.6f)] float period
+    )
+    {
+        Assert.That(EaseFunctions.Evaluate(ease, 0f, strength, period), Is.EqualTo(0f).Within(TOLERANCE), $"{ease} at 0");
+        Assert.That(EaseFunctions.Evaluate(ease, 1f, strength, period), Is.EqualTo(1f).Within(TOLERANCE), $"{ease} at 1");
+    }
+
+    [Test]
+    public void Parametric_DoesNotAllocate()
+    {
+        var sink = 0f;
+
+        for (var i = 0; i < s_parametric.Length; i++)
+        {
+            sink += EaseFunctions.Evaluate(s_parametric[i], 0.37f, 1.5f, 0.4f);
+        }
+
+        var before = GC.GetAllocatedBytesForCurrentThread();
+
+        for (var run = 0; run < 1000; run++)
+        {
+            var ease = s_parametric[run % s_parametric.Length];
+            sink += EaseFunctions.Evaluate(ease, (run % 100) / 100f, 1.5f, 0.4f);
+        }
+
+        var after = GC.GetAllocatedBytesForCurrentThread();
+
+        Assert.That(after - before, Is.EqualTo(0L));
+        Assert.That(float.IsNaN(sink), Is.False);
     }
 
     [Test]
