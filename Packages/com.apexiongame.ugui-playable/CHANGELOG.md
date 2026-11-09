@@ -8,6 +8,12 @@ and the package uses [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- TMP Text track: the typewriter can reveal by word or by line, and can pause after punctuation (`.,:;!?…`).
+  `TmpTextBehaviour.VisibleUnit` (new enum `TypewriterUnit`: Character, Word, Line) and
+  `TmpTextBehaviour.PunctuationPause` (in steps of the unit), shown as Unit and Pause in the Visible Ratio card.
+  Everything still goes through `maxVisibleCharacters`. Character with pause 0, which is how every existing clip loads,
+  is unchanged. Word and line boundaries follow a text change one frame late, and a crossfade between clips of
+  different units can stop inside a word.
 - Ease: the Back, Elastic and Bounce eases can be customised. `EaseSetting` gets a **Customize** switch, a Strength
   (overshoot, amplitude or bounciness) and, for Elastic, a Period, with `EaseSetting.Customize`, `Strength`, `Period`,
   `IsParametric(Ease)`, a constructor `EaseSetting(Ease, float strength, float period)` and

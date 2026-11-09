@@ -345,6 +345,84 @@ public sealed class TmpTextTrackTests
     }
 
     [Test]
+    public void Typewriter_ByWord_WritesWordBoundaries()
+    {
+        AddClip(0d, 1d, new TmpTextBehaviour { VisibleUnit = TypewriterUnit.Word });
+
+        // "Hello World": nothing, then "Hello " with its space, then everything.
+        for (var time = 0d; time <= 1d; time += 0.05d)
+        {
+            EvaluateAt(time);
+
+            var count = _text.maxVisibleCharacters;
+
+            Assert.IsTrue(count == 0 || count == 6 || count == ALL, $"count {count} at {time}");
+        }
+
+        EvaluateAt(0.45d);
+        Assert.AreEqual(0, _text.maxVisibleCharacters);
+
+        EvaluateAt(0.5d);
+        Assert.AreEqual(6, _text.maxVisibleCharacters);
+
+        EvaluateAt(1d);
+        Assert.AreEqual(ALL, _text.maxVisibleCharacters);
+    }
+
+    [Test]
+    public void Typewriter_ByWord_FromCurrent_DoesNotJump()
+    {
+        // "Hi " shows: 3 of 12 characters is a character ratio of 0.25, which by word would hide "Hi" again.
+        _text.text = "Hi everybody";
+        _text.ForceMeshUpdate();
+        _text.maxVisibleCharacters = 3;
+
+        AddClip(
+              0d
+            , 1d
+            , new TmpTextBehaviour {
+                VisibleRatio = new TweenChannel<float>(0f, 1f, ValueMode.FromCurrent),
+                VisibleUnit = TypewriterUnit.Word,
+            }
+        );
+
+        EvaluateAt(0d);
+        Assert.AreEqual(3, _text.maxVisibleCharacters, "the clip starts where the text is");
+
+        EvaluateAt(0.05d);
+        Assert.AreEqual(3, _text.maxVisibleCharacters);
+
+        EvaluateAt(1d);
+        Assert.AreEqual(ALL, _text.maxVisibleCharacters);
+    }
+
+    [Test]
+    public void Typewriter_Crossfade_CharacterToWord_MayLandMidWord()
+    {
+        // Each clip is mapped to a character ratio and the ratios blend (D19): half of "Hello " (6 of 11) by word
+        // and half of nothing by character is 3 characters, inside "Hello".
+        var first = AddClip(0d, 2d, new TmpTextBehaviour { VisibleRatio = new TweenChannel<float>(0f, 0f) });
+        var second = AddClip(
+              1d
+            , 2d
+            , new TmpTextBehaviour {
+                VisibleRatio = new TweenChannel<float>(0.5f, 0.5f),
+                VisibleUnit = TypewriterUnit.Word,
+            }
+        );
+
+        first.blendOutDuration = 1d;
+        second.blendInDuration = 1d;
+
+        EvaluateAt(1.5d);
+
+        Assert.That(_text.maxVisibleCharacters, Is.InRange(1, 5), "a count inside the first word");
+
+        EvaluateAt(2.5d);
+        Assert.AreEqual(6, _text.maxVisibleCharacters, "the word clip alone shows whole words");
+    }
+
+    [Test]
     public void Typewriter_RestoresTheBaseCount_OnRevert()
     {
         _track.RestoreMode = RestoreMode.Revert;
@@ -655,6 +733,8 @@ public sealed class TmpTextTrackTests
         template.LineSpacing = behaviour.LineSpacing;
         template.ParagraphSpacing = behaviour.ParagraphSpacing;
         template.VisibleRatio = behaviour.VisibleRatio;
+        template.VisibleUnit = behaviour.VisibleUnit;
+        template.PunctuationPause = behaviour.PunctuationPause;
         template.ColorGradient = behaviour.ColorGradient;
         return clip;
     }

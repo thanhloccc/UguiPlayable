@@ -48,6 +48,23 @@ The character count follows the string this track writes in the same frame (the 
 the string tween of one track never disagree. Text changed by other code is counted from TMP's last rebuild, which can
 lag one frame behind the change. The track never forces a mesh update.
 
+**Unit** decides what one step reveals: a **Character** (the default), a **Word** or a **Line**. A word comes with the
+spaces and punctuation after it, so "Hello, brave new world." shows `Hello, ` then `Hello, brave ` and so on, and the
+full stop comes with the last word. Words are TMP's: runs of letters, digits and hyphens. A text with no space between
+its letters (Chinese, Japanese) can be a single word, and a text with no letter or digit at all is revealed by
+character. Lines are the lines TMP laid out, wrapping included.
+
+**Pause** waits after a step that ends with punctuation (`.` `,` `:` `;` `!` `?` `…`), counted in steps of the unit:
+with Character and Pause 6, "Wait. Go!" holds after "Wait." for as long as six more letters would take. Only the last
+mark of a run waits ("..." waits once), and there is no wait after the last step. 0 never waits. The clip's length is
+shared over the letters and the waits, so a pause makes the typing itself faster.
+
+Word and line boundaries come from TMP's last layout. Right after the text changes (by the Text channel of the same
+track or by other code), they follow the previous text for one frame. The track never forces a mesh update to avoid
+this. Each clip maps its ratio to whole steps before the clips blend, so a crossfade between a Character clip and a
+Word clip, or an ease in from the text's own count, can stop inside a word. From current starts a Word or Line clip at
+the last whole step the text shows.
+
 In Edit Mode, Timeline's preview cannot revert `maxVisibleCharacters` because TMP does not serialize it. The track
 restores it itself when the preview ends.
 

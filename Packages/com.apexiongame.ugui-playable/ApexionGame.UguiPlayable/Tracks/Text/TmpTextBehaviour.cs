@@ -26,6 +26,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// update.
     /// </para>
     /// <para>
+    /// <see cref="VisibleUnit"/> and <see cref="PunctuationPause"/> map each clip's eased ratio to whole characters,
+    /// words or lines before the blend, so the blend stays a character ratio: a crossfade between clips of different
+    /// units can land inside a word. Word and line boundaries come from <see cref="TMP_Text.textInfo"/> and follow a
+    /// text change one frame late.
+    /// </para>
+    /// <para>
     /// The gradient channel writes <see cref="TMP_Text.colorGradient"/> only. TMP shows it when
     /// <see cref="TMP_Text.enableVertexGradient"/> is on, which the track leaves as it is.
     /// </para>
@@ -75,6 +81,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
         [SerializeField]
         private TweenChannel<float> _visibleRatio = new(0f, 1f, enabled: true);
+
+        [SerializeField]
+        private TypewriterUnit _visibleUnit;
+
+        [SerializeField, Min(0f)]
+        private float _punctuationPause;
 
         [SerializeField]
         private TweenChannel<VertexGradient> _colorGradient = new(
@@ -143,6 +155,31 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         {
             get => _visibleRatio;
             set => _visibleRatio = value;
+        }
+
+        /// <summary>
+        /// What one step of the typewriter reveals: a character (the default), a word with the spaces and punctuation
+        /// after it, or a line.
+        /// </summary>
+        /// <remarks>
+        /// Words and lines come from <see cref="TMP_Text.textInfo"/>, so right after the text changes they follow the
+        /// previous layout for one frame. A text with no TMP word character is revealed by character.
+        /// </remarks>
+        public TypewriterUnit VisibleUnit
+        {
+            get => _visibleUnit;
+            set => _visibleUnit = value;
+        }
+
+        /// <summary>
+        /// How long the typewriter waits after a unit that ends with punctuation (<c>.,:;!?…</c>), in units of
+        /// typing: 0 (the default) never waits, 2 waits as long as two more units would take. Never after the last
+        /// unit.
+        /// </summary>
+        public float PunctuationPause
+        {
+            get => _punctuationPause;
+            set => _punctuationPause = Mathf.Max(value, 0f);
         }
 
         /// <summary>The <see cref="TMP_Text.colorGradient"/> channel.</summary>
@@ -237,7 +274,7 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             if (_visibleRatio.Enabled && _visibleRatio.Mode == ValueMode.FromCurrent)
             {
-                _visibleRatio.Capture(ReadVisibleRatio(text));
+                _visibleRatio.Capture(ReadUnitRatio(text, text.textInfo.characterCount));
             }
 
             if (_colorGradient.Enabled && _colorGradient.Mode == ValueMode.FromCurrent)
@@ -304,8 +341,44 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         {
             if (_visibleRatio.Enabled && _visibleRatio.Mode == ValueMode.FromCurrent)
             {
-                _visibleRatio.Capture(ReadVisibleRatio(text, count));
+                _visibleRatio.Capture(ReadUnitRatio(text, count));
             }
+        }
+
+        /// <summary>Whether the typewriter maps its ratio straight to characters: by character, no pause.</summary>
+        internal bool IsCharacterTypewriter()
+            => _visibleUnit == TypewriterUnit.Character && _punctuationPause <= 0f;
+
+        /// <summary>
+        /// Maps an eased typewriter ratio of this clip to a share of <paramref name="count"/> characters, through its
+        /// unit and pause.
+        /// </summary>
+        internal float ToCharacterRatio(TMP_TextInfo info, int count, float ratio)
+        {
+            if (ratio >= 1f || count <= 0)
+            {
+                return ratio;
+            }
+
+            return TypewriterMath.VisibleCount(info, count, _visibleUnit, _punctuationPause, ratio) / (float)count;
+        }
+
+        // The ratio, in this clip's units, at which it shows what the text shows now: no jump at activation.
+        private float ReadUnitRatio(TMP_Text text, int count)
+        {
+            if (IsCharacterTypewriter())
+            {
+                return ReadVisibleRatio(text, count);
+            }
+
+            var visible = text.maxVisibleCharacters;
+
+            if (visible >= ALL_CHARACTERS)
+            {
+                return 1f;
+            }
+
+            return TypewriterMath.UnitRatio(text.textInfo, count, _visibleUnit, _punctuationPause, visible);
         }
 
         private static void CaptureCurrent(ref TweenChannel<float> channel, float current)

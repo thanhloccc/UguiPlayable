@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using ApexionGame.UguiPlayable.Core;
 using ApexionGame.UguiPlayable.Editor.Common;
+using ApexionGame.UguiPlayable.Tracks.Text;
 using ApexionGame.UguiPlayable.Tracks.Transforms;
 
 namespace ApexionGame.UguiPlayable.Editor.Clips
@@ -14,6 +15,9 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
     /// </summary>
     internal sealed class ChannelCardSection
     {
+        private const string VISIBLE_UNIT = "_visibleUnit";
+        private const string PUNCTUATION_PAUSE = "_punctuationPause";
+
         private static readonly string[] s_modeLabels = { "Absolute", "Relative", "From current" };
         private static readonly string[] s_rotationModeLabels = {
               TweenClipTexts.ROTATION_EULER
@@ -121,6 +125,11 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _body.Add(_fromRow.Root);
             _body.Add(_toRow.Root);
             _body.Add(new PropertyField(channel.FindPropertyRelative(TweenClipModel.EASE)));
+
+            if (info.Name == ChannelPresentation.VISIBLE_RATIO)
+            {
+                AddTypewriterRows(template);
+            }
 
             _card.TrackPropertyValue(_enabled, _ => RefreshState());
             _card.TrackPropertyValue(_mode, _ => RefreshState());
@@ -246,6 +255,43 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
             _axisGroup.RegisterValueChangedCallback(evt => OnAxesChanged(evt.newValue));
             row.Add(_axisGroup);
             return row;
+        }
+
+        // The typewriter's sibling fields: what one step reveals and the pause after punctuation.
+        private void AddTypewriterRows(SerializedProperty template)
+        {
+            var unit = template.FindPropertyRelative(VISIBLE_UNIT);
+            var pause = template.FindPropertyRelative(PUNCTUATION_PAUSE);
+
+            if (unit == null || pause == null)
+            {
+                return;
+            }
+
+            var unitField = new EnumField(TypewriterUnit.Character) {
+                tooltip = TweenClipTexts.TYPEWRITER_UNIT_TOOLTIP,
+            };
+
+            unitField.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
+            unitField.BindProperty(unit);
+
+            var unitRow = TweenClipSections.CreateRow(TweenClipTexts.TYPEWRITER_UNIT);
+            unitRow.Add(unitField);
+            _body.Add(unitRow);
+
+            var pauseField = new FloatField { tooltip = TweenClipTexts.TYPEWRITER_PAUSE_TOOLTIP };
+            pauseField.AddToClassList(TweenClipSections.FIELD_USS_CLASS_NAME);
+            pauseField.BindProperty(pause);
+            pauseField.RegisterValueChangedCallback(static evt => {
+                if (evt.newValue < 0f && evt.target is FloatField field)
+                {
+                    field.value = 0f;
+                }
+            });
+
+            var pauseRow = TweenClipSections.CreateRow(TweenClipTexts.TYPEWRITER_PAUSE);
+            pauseRow.Add(pauseField);
+            _body.Add(pauseRow);
         }
 
         private VisualElement CreateRotationModeRow()

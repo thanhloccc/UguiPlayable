@@ -14,7 +14,10 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
     /// <para>
     /// Each float and the gradient blend on their own and are written only when a clip animates them. The typewriter
     /// ratio blends in ratio space (never as raw counts against TMP's 99999) and becomes
-    /// <see cref="TMP_Text.maxVisibleCharacters"/> once per frame.
+    /// <see cref="TMP_Text.maxVisibleCharacters"/> once per frame. A clip that reveals by word or line, or pauses after
+    /// punctuation, is mapped to its character ratio first, once the frame's character count is known (after the
+    /// text is written); its word and line boundaries are those of <see cref="TMP_Text.textInfo"/>, one frame late
+    /// after a text change.
     /// </para>
     /// <para>
     /// <see cref="TMP_Text.maxVisibleCharacters"/> is not serialized, so Timeline's edit-mode preview cannot revert
@@ -47,6 +50,11 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
         private float _baseRatio;
         private FloatAccumulator _ratio;
         private bool _wroteRatio;
+        private UnitRatio[] _unitRatios = Array.Empty<UnitRatio>();
+        private int _unitRatioCount;
+        private UnitRatio _unitHold;
+        private double _unitHoldEnd;
+        private bool _hasUnitHold;
 
         private VertexGradient _baseGradient;
         private VertexGradientAccumulator _gradient;
@@ -163,6 +171,8 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             _lineSpacing.Reset();
             _paragraphSpacing.Reset();
             _ratio.Reset();
+            _unitRatioCount = 0;
+            _hasUnitHold = false;
             _gradient.Reset();
 
             _hasActiveText = false;
@@ -252,7 +262,16 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             if (visibleRatio.Enabled)
             {
-                _ratio.Add(TweenChannelMath.Evaluate(visibleRatio, progress, _baseRatio), weight);
+                var ratio = TweenChannelMath.Evaluate(visibleRatio, progress, _baseRatio);
+
+                if (behaviour.IsCharacterTypewriter())
+                {
+                    _ratio.Add(ratio, weight);
+                }
+                else
+                {
+                    AddUnitRatio(new UnitRatio(behaviour, ratio, weight));
+                }
             }
 
             var gradient = behaviour.ColorGradient;
@@ -286,7 +305,20 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
 
             if (visibleRatio.Enabled)
             {
-                _ratio.OfferHold(TweenChannelMath.Evaluate(visibleRatio, 1f, _baseRatio), endTime);
+                var ratio = TweenChannelMath.Evaluate(visibleRatio, 1f, _baseRatio);
+
+                if (behaviour.IsCharacterTypewriter())
+                {
+                    _ratio.OfferHold(ratio, endTime);
+                }
+
+                // The latest end wins, as in the accumulator; a character hold that ends later replaces it there.
+                if (_hasUnitHold == false || endTime >= _unitHoldEnd)
+                {
+                    _unitHold = new UnitRatio(behaviour.IsCharacterTypewriter() ? null : behaviour, ratio, 0f);
+                    _unitHoldEnd = endTime;
+                    _hasUnitHold = true;
+                }
             }
 
             var gradient = behaviour.ColorGradient;
@@ -335,11 +367,12 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             }
 
             ApplyText(binding);
+            AddUnitRatios(binding);
 
             if (_ratio.HasContribution)
             {
                 var ratio = _ratio.Resolve(_baseRatio);
-                var count = _hasProducedText ? _producedCount : binding.textInfo.characterCount;
+                var count = GetCharacterCount(binding);
 
                 binding.maxVisibleCharacters = ratio >= 1f
                     ? TmpTextBehaviour.ALL_CHARACTERS
@@ -352,6 +385,53 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             {
                 binding.colorGradient = _gradient.Resolve(_baseGradient);
                 _wroteGradient = true;
+            }
+        }
+
+        // The text written this frame when there is one, otherwise TMP's last layout.
+        private int GetCharacterCount(TMP_Text binding)
+            => _hasProducedText ? _producedCount : binding.textInfo.characterCount;
+
+        // Grows by doubling; the inputs of one frame fit after the first frames.
+        private void AddUnitRatio(in UnitRatio entry)
+        {
+            if (_unitRatioCount == _unitRatios.Length)
+            {
+                var grown = new UnitRatio[Math.Max(4, _unitRatios.Length * 2)];
+
+                Array.Copy(_unitRatios, grown, _unitRatioCount);
+                _unitRatios = grown;
+            }
+
+            _unitRatios[_unitRatioCount++] = entry;
+        }
+
+        // The word, line and pause clips join the blend as character ratios, now that the count is known.
+        private void AddUnitRatios(TMP_Text binding)
+        {
+            if (_unitRatioCount == 0 && (_hasUnitHold == false || _unitHold.Behaviour == null))
+            {
+                return;
+            }
+
+            var count = GetCharacterCount(binding);
+            var info = binding.textInfo;
+
+            for (var i = 0; i < _unitRatioCount; i++)
+            {
+                ref readonly var entry = ref _unitRatios[i];
+
+                _ratio.Add(entry.Behaviour.ToCharacterRatio(info, count, entry.Ratio), entry.Weight);
+            }
+
+            if (_hasUnitHold && _unitHold.Behaviour != null)
+            {
+                _ratio.OfferHold(_unitHold.Behaviour.ToCharacterRatio(info, count, _unitHold.Ratio), _unitHoldEnd);
+            }
+
+            for (var i = 0; i < _unitRatioCount; i++)
+            {
+                _unitRatios[i] = default;
             }
         }
 
@@ -460,6 +540,22 @@ namespace ApexionGame.UguiPlayable.Tracks.Text
             }
 
             _buffer = new char[Math.Max(required, _buffer.Length * 2)];
+        }
+
+        // The eased ratio of a clip that does not reveal by character with no pause, kept until the count is known.
+        // A null behaviour marks a character hold, already offered to the accumulator.
+        private readonly struct UnitRatio
+        {
+            public readonly TmpTextBehaviour Behaviour;
+            public readonly float Ratio;
+            public readonly float Weight;
+
+            public UnitRatio(TmpTextBehaviour behaviour, float ratio, float weight)
+            {
+                Behaviour = behaviour;
+                Ratio = ratio;
+                Weight = weight;
+            }
         }
 
         // One float property of the text: its base value, this frame's blend and whether it was ever written. The

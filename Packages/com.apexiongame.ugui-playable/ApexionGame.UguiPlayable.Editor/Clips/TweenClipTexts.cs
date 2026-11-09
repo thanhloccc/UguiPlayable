@@ -96,6 +96,17 @@ namespace ApexionGame.UguiPlayable.Editor.Clips
         public const string TEXT_RATE_TOOLTIP =
             "How many times per second the scramble characters change. 0 changes them only when the reveal advances.";
 
+        public const string TYPEWRITER_UNIT = "Unit";
+        public const string TYPEWRITER_PAUSE = "Pause";
+
+        public const string TYPEWRITER_UNIT_TOOLTIP =
+            "What one step of the typewriter reveals. Word and Line read the text's layout, which follows a text "
+            + "change one frame late.";
+
+        public const string TYPEWRITER_PAUSE_TOOLTIP =
+            "Extra wait after a step that ends with . , : ; ! ? or …, counted in steps (characters, words or "
+            + "lines). 0 never waits; there is no wait after the last step.";
+
         public const string TEXT_CUSTOM_TOOLTIP = "The characters used when Scramble is Custom. Empty means no scramble.";
 
         public static string FormatChannelCount(int enabled, int total)

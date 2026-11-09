@@ -733,6 +733,30 @@ public sealed class TweenClipInspectorTests
     }
 
     [Test]
+    public void TmpTextClip_VisibleRatioCardHasUnitAndPause()
+    {
+        Create(typeof(TmpTextClip));
+
+        var serializedObject = new SerializedObject(_clip);
+        var channels = TweenClipModel.Create(serializedObject).Channels;
+        var source = new ClipBindingSource(_clip);
+        var card = ChannelCardSection.Create(serializedObject, Find(channels, "_visibleRatio"), source);
+
+        var unit = card.Query<EnumField>().ToList().Single(f => f.tooltip == TweenClipTexts.TYPEWRITER_UNIT_TOOLTIP);
+        var pause = card.Query<FloatField>().ToList().Single(f => f.tooltip == TweenClipTexts.TYPEWRITER_PAUSE_TOOLTIP);
+
+        Assert.AreEqual("_template._visibleUnit", unit.bindingPath);
+        Assert.AreEqual("_template._punctuationPause", pause.bindingPath);
+
+        // The fields are siblings of the channel, not channels, and no other card shows them.
+        Assert.IsFalse(channels.Any(channel => channel.Name == "_visibleUnit" || channel.Name == "_punctuationPause"));
+
+        var alpha = ChannelCardSection.Create(serializedObject, Find(channels, "_alpha"), source);
+
+        Assert.IsFalse(alpha.Query<EnumField>().ToList().Any(f => f.tooltip == TweenClipTexts.TYPEWRITER_UNIT_TOOLTIP));
+    }
+
+    [Test]
     public void TmpTextClip_DrawsTheTextChannelAsATextCard()
     {
         Create(typeof(TmpTextClip));

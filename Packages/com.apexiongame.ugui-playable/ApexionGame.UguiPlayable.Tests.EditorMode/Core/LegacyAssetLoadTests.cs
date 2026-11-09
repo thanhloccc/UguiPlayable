@@ -73,6 +73,15 @@ public sealed class LegacyAssetLoadTests
     }
 
     [Test]
+    public void LegacyClip_TypewriterIsByCharacterWithoutPause()
+    {
+        var clip = LoadLegacyClip();
+
+        Assert.AreEqual(TypewriterUnit.Character, clip.Template.VisibleUnit);
+        Assert.AreEqual(0f, clip.Template.PunctuationPause);
+    }
+
+    [Test]
     public void LegacyClip_EasesAreNotCustomized()
     {
         var clip = LoadLegacyClip();
