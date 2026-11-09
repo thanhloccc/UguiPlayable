@@ -121,8 +121,9 @@ appears. In the Editor, TextMeshPro's `SetCharArray` allocates; see
 
 ### Counter (number)
 
-The channel counts a number from From to To and writes it as formatted text. It is off by default; the inspector card
-follows in the next release, so for now set it from code (`TmpTextBehaviour.Counter`, a `CounterChannel`).
+The channel counts a number from From to To and writes it as formatted text. It is off by default. Turn it on with the
+**Counter** card of the TMP Text clip inspector; to set it from code, assign `TmpTextBehaviour.Counter` a
+`CounterChannel` (its constructors take an `EaseSetting` for the ease).
 
 | Setting | Default | Meaning |
 |---|---|---|

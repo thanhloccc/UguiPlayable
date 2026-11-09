@@ -74,6 +74,20 @@ namespace ApexionGame.UguiPlayable.Core
         }
 
         /// <summary>
+        /// Creates a channel with the given ease, no decimals, no grouping and no prefix or suffix.
+        /// </summary>
+        public CounterChannel(
+              double from
+            , double to
+            , EaseSetting ease
+            , ValueMode mode = ValueMode.Absolute
+            , bool enabled = true
+        )
+            : this(from, to, ease, 0, false, DEFAULT_GROUP_SEPARATOR, DEFAULT_DECIMAL_SEPARATOR, string.Empty, string.Empty, mode, enabled)
+        {
+        }
+
+        /// <summary>
         /// Creates a channel with a linear ease and the given format.
         /// </summary>
         public CounterChannel(
@@ -88,12 +102,32 @@ namespace ApexionGame.UguiPlayable.Core
             , ValueMode mode = ValueMode.Absolute
             , bool enabled = true
         )
+            : this(from, to, EaseSetting.Default, decimals, grouping, groupSeparator, decimalSeparator, prefix, suffix, mode, enabled)
+        {
+        }
+
+        /// <summary>
+        /// Creates a channel with the given ease and format.
+        /// </summary>
+        public CounterChannel(
+              double from
+            , double to
+            , EaseSetting ease
+            , int decimals
+            , bool grouping
+            , string groupSeparator = DEFAULT_GROUP_SEPARATOR
+            , string decimalSeparator = DEFAULT_DECIMAL_SEPARATOR
+            , string prefix = ""
+            , string suffix = ""
+            , ValueMode mode = ValueMode.Absolute
+            , bool enabled = true
+        )
         {
             _enabled = enabled;
             _mode = mode;
             _from = from;
             _to = to;
-            _ease = EaseSetting.Default;
+            _ease = ease;
             _decimals = Math.Clamp(decimals, 0, MAX_DECIMALS);
             _grouping = grouping;
             _groupSeparator = groupSeparator ?? string.Empty;

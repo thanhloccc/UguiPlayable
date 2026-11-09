@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using ApexionGame.UguiPlayable.Core;
+using ApexionGame.UguiPlayable.Easing;
 using ApexionGame.UguiPlayable.Tracks.Text;
 using Object = UnityEngine.Object;
 
@@ -72,6 +73,27 @@ public sealed class TmpTextCounterTests
         Assert.IsFalse(behaviour.Counter.Enabled);
         Assert.AreEqual(0, behaviour.Counter.Decimals);
         Assert.IsFalse(behaviour.Counter.Grouping);
+    }
+
+    [Test]
+    public void Counter_ConstructorsTakeAnEase()
+    {
+        var ease = new EaseSetting(Ease.InQuad);
+
+        var simple = new CounterChannel(0d, 10d, ease, ValueMode.FromCurrent, false);
+        Assert.AreEqual(Ease.InQuad, simple.Ease.Ease);
+        Assert.AreEqual(ValueMode.FromCurrent, simple.Mode);
+        Assert.IsFalse(simple.Enabled);
+        Assert.AreEqual(0, simple.Decimals);
+
+        var full = new CounterChannel(0d, 10d, ease, 2, true, prefix: "$");
+        Assert.AreEqual(Ease.InQuad, full.Ease.Ease);
+        Assert.AreEqual(2, full.Decimals);
+        Assert.IsTrue(full.Grouping);
+        Assert.AreEqual("$", full.Prefix);
+
+        // The older overloads still use the default ease.
+        Assert.AreEqual(EaseSetting.Default.Ease, new CounterChannel(0d, 10d, 1, false).Ease.Ease);
     }
 
     [Test]
